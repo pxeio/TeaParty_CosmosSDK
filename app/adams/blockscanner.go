@@ -18,7 +18,6 @@ import (
 // from the party chain, monitors the accounts in question for new transactions, and then
 // updates the party chain with the outcome of the transaction.
 func (e *ExchangeServer) Watch(ctx sdk.Context) {
-
 	for {
 		select {
 		case <-ctx.Done():
@@ -27,16 +26,31 @@ func (e *ExchangeServer) Watch(ctx sdk.Context) {
 			return
 		default:
 			// Fetch current orders from the party chain.
+			e.logger.Info("fetching orders from party chain...")
 			orders := e.PartyKeeper.GetAllPendingOrders(ctx)
 			if err := e.initMonitor(orders); err != nil {
 				e.logger.Error("error initializing monitor: " + err.Error())
 				// TODO: handle this error
 			}
 
-			// // Monitor the accounts for new transactions.
-			// e.monitorAccounts(ctx)
-			// // Update the party chain with the outcome of the transactions.
-			// e.updatePartyChain(ctx)
+			if len(orders) == 0 {
+				e.logger.Info("no orders to monitor")
+				time.Sleep(5 * time.Second)
+				continue
+			}
+
+			e.logger.Info("found orders.. checking if they are being watched")
+			for _, oip := range e.ordersInProgress {
+				for _, o := range orders {
+					if oip.Index == o.Index {
+						e.logger.Info("order already in progress, skipping")
+						continue
+					}
+					e.logger.Info("adding new order to monitor: " + o.Index)
+					e.ordersInProgress = append(e.ordersInProgress, o)
+				}
+			}
+			go e.initMonitor(orders)
 
 		}
 
@@ -50,8 +64,7 @@ func (e *ExchangeServer) Watch(ctx sdk.Context) {
 func (e *ExchangeServer) initMonitor(pendingOrders []types.PendingOrders) error {
 	for _, order := range pendingOrders {
 		e.logger.Infof("Order: %+v", order)
-		var ta string
-		ta = order.TradeAsset
+		ta := order.TradeAsset
 
 		const productionTimeLimit = 7200 // 2 hours
 		const devTimelimit = 300         // 300 second

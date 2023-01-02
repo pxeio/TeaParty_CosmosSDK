@@ -112,7 +112,7 @@ type ExchangeServer struct {
 
 	// ordersCollection contains the MongoDB collection for the sell orders.
 	// ordersCollection *mongo.Collection
-	lockedOrders []string
+	ordersInProgress []partyTypes.PendingOrders
 
 	// nknClient is the client used to interact with the NKN network.
 	// nknClient *nkn.MultiClient

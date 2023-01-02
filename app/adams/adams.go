@@ -5,13 +5,17 @@ import (
 	"os"
 	"strconv"
 
+	zap "go.uber.org/zap"
+
 	"github.com/ethereum/go-ethereum/ethclient"
 	solRPC "github.com/gagliardetto/solana-go/rpc"
 )
 
 func NewAdams() (*ExchangeServer, error) {
 	e := &ExchangeServer{}
-
+	logger, _ := zap.NewProduction()
+	defer logger.Sync() // flushes buffer, if any
+	e.logger = logger.Sugar()
 	// initialize the ethereum nodes.
 	ethClient1, err := ethclient.Dial(os.Getenv("ETH_RPC_1"))
 	if err != nil {
@@ -86,6 +90,14 @@ func NewAdams() (*ExchangeServer, error) {
 }
 
 func (e *ExchangeServer) Dispatch(awrr *AccountWatchRequestResult) error {
+	// remove the order from ordersInProgress list
+	for i, order := range e.ordersInProgress {
+		if order.Index == awrr.AccountWatchRequest.TransactionID {
+			e.ordersInProgress = append(e.ordersInProgress[:i], e.ordersInProgress[i+1:]...)
+			break
+		}
+	}
+
 	// notify the party chain of the transaction outcome
 	if err := e.notifyPartyChainOfWatchResult(awrr); err != nil {
 		e.logger.Errorw("failed to notify the party chain of the watch result", err)
