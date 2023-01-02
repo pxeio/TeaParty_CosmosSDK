@@ -1,0 +1,17 @@
+syntax = "proto3";
+package teapartycrypto.partychain.party;
+
+option go_package = "github.com/TeaPartyCrypto/partychain/x/party/types";
+
+message TradeOrders {
+  string index = 1; 
+  string tradeAsset = 2; 
+  string price = 3; 
+  string currency = 4; 
+  string amount = 5; 
+  string sellerShippingAddr = 6; 
+  string sellerNknAddr = 7; 
+  string refundAddr = 8; 
+  
+}
+

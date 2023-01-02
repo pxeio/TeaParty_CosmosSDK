@@ -1,0 +1,69 @@
+syntax = "proto3";
+package teapartycrypto.partychain.party;
+
+// this line is used by starport scaffolding # proto/tx/import
+
+option go_package = "github.com/TeaPartyCrypto/partychain/x/party/types";
+
+// Msg defines the Msg service.
+service Msg {
+      rpc SubmitSell(MsgSubmitSell) returns (MsgSubmitSellResponse);
+  rpc Buy(MsgBuy) returns (MsgBuyResponse);
+  rpc Cancel(MsgCancel) returns (MsgCancelResponse);
+  rpc AccountWatchOutcome(MsgAccountWatchOutcome) returns (MsgAccountWatchOutcomeResponse);
+  rpc AccountWatchFailure(MsgAccountWatchFailure) returns (MsgAccountWatchFailureResponse);
+// this line is used by starport scaffolding # proto/tx/rpc
+}
+
+message MsgSubmitSell {
+  string creator = 1;
+  string tradeAsset = 2;
+  string price = 3;
+  string currency = 4;
+  string amount = 5;
+  string sellerShippingAddr = 6;
+  string sellerNknAddr = 7;
+  string refundAddr = 8;
+}
+
+message MsgSubmitSellResponse {
+}
+
+message MsgBuy {
+  string creator = 1;
+  string txID = 2;
+  string buyerShippingAddress = 3;
+  string buyerNKNAddress = 4;
+  string refundAddress = 5;
+}
+
+message MsgBuyResponse {
+}
+
+message MsgCancel {
+  string creator = 1;
+}
+
+message MsgCancelResponse {
+}
+
+message MsgAccountWatchOutcome {
+  string creator = 1;
+  string txID = 2;
+  string paymentTransactionID = 3;
+  bool buyer = 4;
+  string paymentOutcome = 5;
+}
+
+message MsgAccountWatchOutcomeResponse {
+}
+
+message MsgAccountWatchFailure {
+  string creator = 1;
+  string txID = 2;
+}
+
+message MsgAccountWatchFailureResponse {
+}
+
+// this line is used by starport scaffolding # proto/tx/message

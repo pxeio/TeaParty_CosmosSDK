@@ -1,0 +1,26 @@
+syntax = "proto3";
+package teapartycrypto.partychain.party;
+
+option go_package = "github.com/TeaPartyCrypto/partychain/x/party/types";
+
+message PendingOrders {
+  string index = 1; 
+  string buyerEscrowWalletPublicKey = 2; 
+  string buyerEscrowWalletPrivateKey = 3; 
+  string sellerEscrowWalletPublicKey = 4; 
+  string sellerEscrowWalletPrivateKey = 5; 
+  bool sellerPaymentComplete = 6; 
+  bool buyerPaymentComplete = 7; 
+  string amount = 8; 
+  string buyerShippingAddress = 9; 
+  string buyerRefundAddress = 10; 
+  string buyerNKNAddress = 11; 
+  string sellerRefundAddress = 12; 
+  string sellerShippingAddress = 13; 
+  string sellerNKNAddress = 14; 
+  string tradeAsset = 15; 
+  string currency = 16; 
+  string price = 17; 
+  
+}
+

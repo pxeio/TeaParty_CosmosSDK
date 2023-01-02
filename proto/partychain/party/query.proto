@@ -1,0 +1,88 @@
+syntax = "proto3";
+package teapartycrypto.partychain.party;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "partychain/party/params.proto";
+import "partychain/party/trade_orders.proto";
+import "partychain/party/pending_orders.proto";
+// this line is used by starport scaffolding # 1
+
+option go_package = "github.com/TeaPartyCrypto/partychain/x/party/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // Parameters queries the parameters of the module.
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+    option (google.api.http).get = "/TeaPartyCrypto/partychain/party/params";
+  }
+  // Queries a TradeOrders by index.
+	rpc TradeOrders(QueryGetTradeOrdersRequest) returns (QueryGetTradeOrdersResponse) {
+		option (google.api.http).get = "/TeaPartyCrypto/partychain/party/trade_orders/{index}";
+	}
+
+	// Queries a list of TradeOrders items.
+	rpc TradeOrdersAll(QueryAllTradeOrdersRequest) returns (QueryAllTradeOrdersResponse) {
+		option (google.api.http).get = "/TeaPartyCrypto/partychain/party/trade_orders";
+	}
+
+// Queries a PendingOrders by index.
+	rpc PendingOrders(QueryGetPendingOrdersRequest) returns (QueryGetPendingOrdersResponse) {
+		option (google.api.http).get = "/TeaPartyCrypto/partychain/party/pending_orders/{index}";
+	}
+
+	// Queries a list of PendingOrders items.
+	rpc PendingOrdersAll(QueryAllPendingOrdersRequest) returns (QueryAllPendingOrdersResponse) {
+		option (google.api.http).get = "/TeaPartyCrypto/partychain/party/pending_orders";
+	}
+
+// this line is used by starport scaffolding # 2
+}
+
+// QueryParamsRequest is request type for the Query/Params RPC method.
+message QueryParamsRequest {}
+
+// QueryParamsResponse is response type for the Query/Params RPC method.
+message QueryParamsResponse {
+  // params holds all the parameters of this module.
+  Params params = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryGetTradeOrdersRequest {
+	  string index = 1;
+
+}
+
+message QueryGetTradeOrdersResponse {
+	TradeOrders tradeOrders = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllTradeOrdersRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllTradeOrdersResponse {
+	repeated TradeOrders tradeOrders = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetPendingOrdersRequest {
+	  string index = 1;
+
+}
+
+message QueryGetPendingOrdersResponse {
+	PendingOrders pendingOrders = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllPendingOrdersRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllPendingOrdersResponse {
+	repeated PendingOrders pendingOrders = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// this line is used by starport scaffolding # 3
