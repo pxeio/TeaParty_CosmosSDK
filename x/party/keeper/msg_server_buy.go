@@ -65,6 +65,9 @@ func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyR
 	// store the pending order
 	k.SetPendingOrders(ctx, po)
 
+	// start an account-watch for the order
+	// NewAccountWatch(ctx, po, k)
+
 	return &types.MsgBuyResponse{}, nil
 }
 
