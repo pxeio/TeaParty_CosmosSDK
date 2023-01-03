@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	// this line is used by starport scaffolding # 1
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -151,7 +152,32 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 func (AppModule) ConsensusVersion() uint64 { return 1 }
 
 // BeginBlock contains the logic that is automatically triggered at the beginning of each block
-func (am AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}
+func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
+	// look at the list of pending-orders and see if any of them have expired
+	// if they have, then we need to refund the escrowed funds
+	// and remove the order from the list of pending orders
+	po := am.keeper.GetAllPendingOrders(ctx)
+
+	for _, order := range po {
+		fmt.Println("order: ", order)
+		// todo: check if order has expired
+		// if it has, then refund the escrowed funds
+		// and remove the order from the list of pending orders
+
+		// look at the list of pending-orders and see if any of them
+		// have both buyer and seller payments made
+		// if they have, then we need to transfer the funds from the
+		// escrow account to the seller and buyer || send the Private keys via NKN
+		// and remove the order from the list of pending orders
+		if order.BuyerPaymentComplete && order.SellerPaymentComplete {
+			// add the order to a list of
+			// remove order from list of pending orders
+			am.keeper.RemovePendingOrders(ctx, order)
+		}
+
+	}
+
+}
 
 // EndBlock contains the logic that is automatically triggered at the end of each block
 func (am AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
