@@ -44682,6 +44682,648 @@ paths:
           format: uint64
       tags:
         - Query
+  /TeaPartyCrypto/partychain/party/orders_awaiting_finalizer:
+    get:
+      summary: Queries a list of OrdersAwaitingFinalizer items.
+      operationId: TeapartycryptoPartychainPartyOrdersAwaitingFinalizerAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              ordersAwaitingFinalizer:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    index:
+                      type: string
+                    nknAddress:
+                      type: string
+                    walletPrivateKey:
+                      type: string
+                    walletPublicKey:
+                      type: string
+                    shippingAddress:
+                      type: string
+                    refundAddress:
+                      type: string
+                    amount:
+                      type: string
+                    creator:
+                      type: string
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    description: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently. It will be empty if
+                      there are no more results.
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  /TeaPartyCrypto/partychain/party/orders_awaiting_finalizer/{index}:
+    get:
+      summary: Queries a OrdersAwaitingFinalizer by index.
+      operationId: TeapartycryptoPartychainPartyOrdersAwaitingFinalizer
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              ordersAwaitingFinalizer:
+                type: object
+                properties:
+                  index:
+                    type: string
+                  nknAddress:
+                    type: string
+                  walletPrivateKey:
+                    type: string
+                  walletPublicKey:
+                    type: string
+                  shippingAddress:
+                    type: string
+                  refundAddress:
+                    type: string
+                  amount:
+                    type: string
+                  creator:
+                    type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: index
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /TeaPartyCrypto/partychain/party/params:
+    get:
+      summary: Parameters queries the parameters of the module.
+      operationId: TeapartycryptoPartychainPartyParams
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              params:
+                description: params holds all the parameters of this module.
+                type: object
+            description: >-
+              QueryParamsResponse is response type for the Query/Params RPC
+              method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
+  /TeaPartyCrypto/partychain/party/pending_orders:
+    get:
+      summary: Queries a list of PendingOrders items.
+      operationId: TeapartycryptoPartychainPartyPendingOrdersAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              pendingOrders:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    index:
+                      type: string
+                    buyerEscrowWalletPublicKey:
+                      type: string
+                    buyerEscrowWalletPrivateKey:
+                      type: string
+                    sellerEscrowWalletPublicKey:
+                      type: string
+                    sellerEscrowWalletPrivateKey:
+                      type: string
+                    sellerPaymentComplete:
+                      type: boolean
+                    buyerPaymentComplete:
+                      type: boolean
+                    amount:
+                      type: string
+                    buyerShippingAddress:
+                      type: string
+                    buyerRefundAddress:
+                      type: string
+                    buyerNKNAddress:
+                      type: string
+                    sellerRefundAddress:
+                      type: string
+                    sellerShippingAddress:
+                      type: string
+                    sellerNKNAddress:
+                      type: string
+                    tradeAsset:
+                      type: string
+                    currency:
+                      type: string
+                    price:
+                      type: string
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    description: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently. It will be empty if
+                      there are no more results.
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  /TeaPartyCrypto/partychain/party/pending_orders/{index}:
+    get:
+      summary: Queries a PendingOrders by index.
+      operationId: TeapartycryptoPartychainPartyPendingOrders
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              pendingOrders:
+                type: object
+                properties:
+                  index:
+                    type: string
+                  buyerEscrowWalletPublicKey:
+                    type: string
+                  buyerEscrowWalletPrivateKey:
+                    type: string
+                  sellerEscrowWalletPublicKey:
+                    type: string
+                  sellerEscrowWalletPrivateKey:
+                    type: string
+                  sellerPaymentComplete:
+                    type: boolean
+                  buyerPaymentComplete:
+                    type: boolean
+                  amount:
+                    type: string
+                  buyerShippingAddress:
+                    type: string
+                  buyerRefundAddress:
+                    type: string
+                  buyerNKNAddress:
+                    type: string
+                  sellerRefundAddress:
+                    type: string
+                  sellerShippingAddress:
+                    type: string
+                  sellerNKNAddress:
+                    type: string
+                  tradeAsset:
+                    type: string
+                  currency:
+                    type: string
+                  price:
+                    type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: index
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /TeaPartyCrypto/partychain/party/trade_orders:
+    get:
+      summary: Queries a list of TradeOrders items.
+      operationId: TeapartycryptoPartychainPartyTradeOrdersAll
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              tradeOrders:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    index:
+                      type: string
+                    tradeAsset:
+                      type: string
+                    price:
+                      type: string
+                    currency:
+                      type: string
+                    amount:
+                      type: string
+                    sellerShippingAddr:
+                      type: string
+                    sellerNknAddr:
+                      type: string
+                    refundAddr:
+                      type: string
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    description: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently. It will be empty if
+                      there are no more results.
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  /TeaPartyCrypto/partychain/party/trade_orders/{index}:
+    get:
+      summary: Queries a TradeOrders by index.
+      operationId: TeapartycryptoPartychainPartyTradeOrders
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              tradeOrders:
+                type: object
+                properties:
+                  index:
+                    type: string
+                  tradeAsset:
+                    type: string
+                  price:
+                    type: string
+                  currency:
+                    type: string
+                  amount:
+                    type: string
+                  sellerShippingAddr:
+                    type: string
+                  sellerNknAddr:
+                    type: string
+                  refundAddr:
+                    type: string
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      parameters:
+        - name: index
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
 definitions:
   cosmos.auth.v1beta1.AddressBytesToStringResponse:
     type: object
@@ -74235,3 +74877,356 @@ definitions:
     description: |-
       Version defines the versioning scheme used to negotiate the IBC verison in
       the connection handshake.
+  teapartycrypto.partychain.party.MsgAccountWatchFailureResponse:
+    type: object
+  teapartycrypto.partychain.party.MsgAccountWatchOutcomeResponse:
+    type: object
+  teapartycrypto.partychain.party.MsgBuyResponse:
+    type: object
+  teapartycrypto.partychain.party.MsgCancelResponse:
+    type: object
+  teapartycrypto.partychain.party.MsgCreateOrdersAwaitingFinalizerResponse:
+    type: object
+  teapartycrypto.partychain.party.MsgDeleteOrdersAwaitingFinalizerResponse:
+    type: object
+  teapartycrypto.partychain.party.MsgSubmitSellResponse:
+    type: object
+  teapartycrypto.partychain.party.MsgUpdateOrdersAwaitingFinalizerResponse:
+    type: object
+  teapartycrypto.partychain.party.OrdersAwaitingFinalizer:
+    type: object
+    properties:
+      index:
+        type: string
+      nknAddress:
+        type: string
+      walletPrivateKey:
+        type: string
+      walletPublicKey:
+        type: string
+      shippingAddress:
+        type: string
+      refundAddress:
+        type: string
+      amount:
+        type: string
+      creator:
+        type: string
+  teapartycrypto.partychain.party.Params:
+    type: object
+    description: Params defines the parameters for the module.
+  teapartycrypto.partychain.party.PendingOrders:
+    type: object
+    properties:
+      index:
+        type: string
+      buyerEscrowWalletPublicKey:
+        type: string
+      buyerEscrowWalletPrivateKey:
+        type: string
+      sellerEscrowWalletPublicKey:
+        type: string
+      sellerEscrowWalletPrivateKey:
+        type: string
+      sellerPaymentComplete:
+        type: boolean
+      buyerPaymentComplete:
+        type: boolean
+      amount:
+        type: string
+      buyerShippingAddress:
+        type: string
+      buyerRefundAddress:
+        type: string
+      buyerNKNAddress:
+        type: string
+      sellerRefundAddress:
+        type: string
+      sellerShippingAddress:
+        type: string
+      sellerNKNAddress:
+        type: string
+      tradeAsset:
+        type: string
+      currency:
+        type: string
+      price:
+        type: string
+  teapartycrypto.partychain.party.QueryAllOrdersAwaitingFinalizerResponse:
+    type: object
+    properties:
+      ordersAwaitingFinalizer:
+        type: array
+        items:
+          type: object
+          properties:
+            index:
+              type: string
+            nknAddress:
+              type: string
+            walletPrivateKey:
+              type: string
+            walletPublicKey:
+              type: string
+            shippingAddress:
+              type: string
+            refundAddress:
+              type: string
+            amount:
+              type: string
+            creator:
+              type: string
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            description: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently. It will be empty if
+              there are no more results.
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  teapartycrypto.partychain.party.QueryAllPendingOrdersResponse:
+    type: object
+    properties:
+      pendingOrders:
+        type: array
+        items:
+          type: object
+          properties:
+            index:
+              type: string
+            buyerEscrowWalletPublicKey:
+              type: string
+            buyerEscrowWalletPrivateKey:
+              type: string
+            sellerEscrowWalletPublicKey:
+              type: string
+            sellerEscrowWalletPrivateKey:
+              type: string
+            sellerPaymentComplete:
+              type: boolean
+            buyerPaymentComplete:
+              type: boolean
+            amount:
+              type: string
+            buyerShippingAddress:
+              type: string
+            buyerRefundAddress:
+              type: string
+            buyerNKNAddress:
+              type: string
+            sellerRefundAddress:
+              type: string
+            sellerShippingAddress:
+              type: string
+            sellerNKNAddress:
+              type: string
+            tradeAsset:
+              type: string
+            currency:
+              type: string
+            price:
+              type: string
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            description: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently. It will be empty if
+              there are no more results.
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  teapartycrypto.partychain.party.QueryAllTradeOrdersResponse:
+    type: object
+    properties:
+      tradeOrders:
+        type: array
+        items:
+          type: object
+          properties:
+            index:
+              type: string
+            tradeAsset:
+              type: string
+            price:
+              type: string
+            currency:
+              type: string
+            amount:
+              type: string
+            sellerShippingAddr:
+              type: string
+            sellerNknAddr:
+              type: string
+            refundAddr:
+              type: string
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            description: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently. It will be empty if
+              there are no more results.
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  teapartycrypto.partychain.party.QueryGetOrdersAwaitingFinalizerResponse:
+    type: object
+    properties:
+      ordersAwaitingFinalizer:
+        type: object
+        properties:
+          index:
+            type: string
+          nknAddress:
+            type: string
+          walletPrivateKey:
+            type: string
+          walletPublicKey:
+            type: string
+          shippingAddress:
+            type: string
+          refundAddress:
+            type: string
+          amount:
+            type: string
+          creator:
+            type: string
+  teapartycrypto.partychain.party.QueryGetPendingOrdersResponse:
+    type: object
+    properties:
+      pendingOrders:
+        type: object
+        properties:
+          index:
+            type: string
+          buyerEscrowWalletPublicKey:
+            type: string
+          buyerEscrowWalletPrivateKey:
+            type: string
+          sellerEscrowWalletPublicKey:
+            type: string
+          sellerEscrowWalletPrivateKey:
+            type: string
+          sellerPaymentComplete:
+            type: boolean
+          buyerPaymentComplete:
+            type: boolean
+          amount:
+            type: string
+          buyerShippingAddress:
+            type: string
+          buyerRefundAddress:
+            type: string
+          buyerNKNAddress:
+            type: string
+          sellerRefundAddress:
+            type: string
+          sellerShippingAddress:
+            type: string
+          sellerNKNAddress:
+            type: string
+          tradeAsset:
+            type: string
+          currency:
+            type: string
+          price:
+            type: string
+  teapartycrypto.partychain.party.QueryGetTradeOrdersResponse:
+    type: object
+    properties:
+      tradeOrders:
+        type: object
+        properties:
+          index:
+            type: string
+          tradeAsset:
+            type: string
+          price:
+            type: string
+          currency:
+            type: string
+          amount:
+            type: string
+          sellerShippingAddr:
+            type: string
+          sellerNknAddr:
+            type: string
+          refundAddr:
+            type: string
+  teapartycrypto.partychain.party.QueryParamsResponse:
+    type: object
+    properties:
+      params:
+        description: params holds all the parameters of this module.
+        type: object
+    description: QueryParamsResponse is response type for the Query/Params RPC method.
+  teapartycrypto.partychain.party.TradeOrders:
+    type: object
+    properties:
+      index:
+        type: string
+      tradeAsset:
+        type: string
+      price:
+        type: string
+      currency:
+        type: string
+      amount:
+        type: string
+      sellerShippingAddr:
+        type: string
+      sellerNknAddr:
+        type: string
+      refundAddr:
+        type: string

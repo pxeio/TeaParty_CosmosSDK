@@ -38,6 +38,14 @@ func TestGenesisState_Validate(t *testing.T) {
 						Index: "1",
 					},
 				},
+				OrdersAwaitingFinalizerList: []types.OrdersAwaitingFinalizer{
+					{
+						Index: "0",
+					},
+					{
+						Index: "1",
+					},
+				},
 				// this line is used by starport scaffolding # types/genesis/validField
 			},
 			valid: true,
@@ -60,6 +68,20 @@ func TestGenesisState_Validate(t *testing.T) {
 			desc: "duplicated pendingOrders",
 			genState: &types.GenesisState{
 				PendingOrdersList: []types.PendingOrders{
+					{
+						Index: "0",
+					},
+					{
+						Index: "0",
+					},
+				},
+			},
+			valid: false,
+		},
+		{
+			desc: "duplicated ordersAwaitingFinalizer",
+			genState: &types.GenesisState{
+				OrdersAwaitingFinalizerList: []types.OrdersAwaitingFinalizer{
 					{
 						Index: "0",
 					},

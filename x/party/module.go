@@ -15,6 +15,7 @@ import (
 	"github.com/TeaPartyCrypto/partychain/x/party/client/cli"
 	"github.com/TeaPartyCrypto/partychain/x/party/keeper"
 	"github.com/TeaPartyCrypto/partychain/x/party/types"
+	partyTypes "github.com/TeaPartyCrypto/partychain/x/party/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
@@ -153,14 +154,10 @@ func (AppModule) ConsensusVersion() uint64 { return 1 }
 
 // BeginBlock contains the logic that is automatically triggered at the beginning of each block
 func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
-	// look at the list of pending-orders and see if any of them have expired
-	// if they have, then we need to refund the escrowed funds
-	// and remove the order from the list of pending orders
 	po := am.keeper.GetAllPendingOrders(ctx)
-
 	for _, order := range po {
 		fmt.Println("order: ", order)
-		// todo: check if order has expired
+		// TODO:: check if order has expired
 		// if it has, then refund the escrowed funds
 		// and remove the order from the list of pending orders
 
@@ -170,9 +167,35 @@ func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 		// escrow account to the seller and buyer || send the Private keys via NKN
 		// and remove the order from the list of pending orders
 		if order.BuyerPaymentComplete && order.SellerPaymentComplete {
-			// add the order to a list of
-			// remove order from list of pending orders
-			am.keeper.RemovePendingOrders(ctx, order)
+			// TODO:: check that the number of blocks since the order was created is greater than
+			// the number of blocks required for the order to be finalized
+
+			// add the order to the list of orders awaiting finalizer
+			// get the current order index
+
+			// create a new order awaiting finalizer for the buyer
+			buyeroaf := partyTypes.OrdersAwaitingFinalizer{
+				Index:            order.SellerEscrowWalletPublicKey,
+				NknAddress:       order.BuyerNKNAddress,
+				WalletPrivateKey: order.SellerEscrowWalletPrivateKey,
+				Amount:           order.Amount,
+				RefundAddress:    order.BuyerRefundAddress,
+				Creator:          order.Index,
+			}
+
+			// create a new order awaiting finalizer for the seller
+			selleroaf := partyTypes.OrdersAwaitingFinalizer{
+				Index:            order.BuyerEscrowWalletPublicKey,
+				NknAddress:       order.SellerNKNAddress,
+				WalletPrivateKey: order.BuyerEscrowWalletPrivateKey,
+				Amount:           order.Price,
+				RefundAddress:    order.SellerRefundAddress,
+				Creator:          order.Index,
+			}
+
+			am.keeper.SetOrdersAwaitingFinalizer(ctx, buyeroaf)
+			am.keeper.SetOrdersAwaitingFinalizer(ctx, selleroaf)
+			am.keeper.RemovePendingOrders(ctx, order.Index)
 		}
 
 	}

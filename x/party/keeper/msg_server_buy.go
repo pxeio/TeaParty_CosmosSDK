@@ -22,7 +22,7 @@ func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyR
 	// atempt to find a matching sell order
 	// if found, start the trade
 	// if not found, deny the buy order
-	tradeOrder, found := k.GetTradeOrders(ctx, msg.Creator)
+	tradeOrder, found := k.GetTradeOrders(ctx, msg.TxID)
 	if !found {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "No matching sell order found.")
 	}
@@ -64,6 +64,9 @@ func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyR
 
 	// store the pending order
 	k.SetPendingOrders(ctx, po)
+
+	// remove the trade order from the store
+	k.RemoveTradeOrders(ctx, po.Index)
 
 	return &types.MsgBuyResponse{}, nil
 }

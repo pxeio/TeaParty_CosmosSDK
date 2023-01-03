@@ -1,6 +1,7 @@
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
 import { PageRequest, PageResponse } from "../../cosmos/base/query/v1beta1/pagination";
+import { OrdersAwaitingFinalizer } from "./orders_awaiting_finalizer";
 import { Params } from "./params";
 import { PendingOrders } from "./pending_orders";
 import { TradeOrders } from "./trade_orders";
@@ -48,6 +49,23 @@ export interface QueryAllPendingOrdersRequest {
 
 export interface QueryAllPendingOrdersResponse {
   pendingOrders: PendingOrders[];
+  pagination: PageResponse | undefined;
+}
+
+export interface QueryGetOrdersAwaitingFinalizerRequest {
+  index: string;
+}
+
+export interface QueryGetOrdersAwaitingFinalizerResponse {
+  ordersAwaitingFinalizer: OrdersAwaitingFinalizer | undefined;
+}
+
+export interface QueryAllOrdersAwaitingFinalizerRequest {
+  pagination: PageRequest | undefined;
+}
+
+export interface QueryAllOrdersAwaitingFinalizerResponse {
+  ordersAwaitingFinalizer: OrdersAwaitingFinalizer[];
   pagination: PageResponse | undefined;
 }
 
@@ -571,6 +589,237 @@ export const QueryAllPendingOrdersResponse = {
   },
 };
 
+function createBaseQueryGetOrdersAwaitingFinalizerRequest(): QueryGetOrdersAwaitingFinalizerRequest {
+  return { index: "" };
+}
+
+export const QueryGetOrdersAwaitingFinalizerRequest = {
+  encode(message: QueryGetOrdersAwaitingFinalizerRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.index !== "") {
+      writer.uint32(10).string(message.index);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGetOrdersAwaitingFinalizerRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetOrdersAwaitingFinalizerRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.index = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetOrdersAwaitingFinalizerRequest {
+    return { index: isSet(object.index) ? String(object.index) : "" };
+  },
+
+  toJSON(message: QueryGetOrdersAwaitingFinalizerRequest): unknown {
+    const obj: any = {};
+    message.index !== undefined && (obj.index = message.index);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryGetOrdersAwaitingFinalizerRequest>, I>>(
+    object: I,
+  ): QueryGetOrdersAwaitingFinalizerRequest {
+    const message = createBaseQueryGetOrdersAwaitingFinalizerRequest();
+    message.index = object.index ?? "";
+    return message;
+  },
+};
+
+function createBaseQueryGetOrdersAwaitingFinalizerResponse(): QueryGetOrdersAwaitingFinalizerResponse {
+  return { ordersAwaitingFinalizer: undefined };
+}
+
+export const QueryGetOrdersAwaitingFinalizerResponse = {
+  encode(message: QueryGetOrdersAwaitingFinalizerResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.ordersAwaitingFinalizer !== undefined) {
+      OrdersAwaitingFinalizer.encode(message.ordersAwaitingFinalizer, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGetOrdersAwaitingFinalizerResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetOrdersAwaitingFinalizerResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.ordersAwaitingFinalizer = OrdersAwaitingFinalizer.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetOrdersAwaitingFinalizerResponse {
+    return {
+      ordersAwaitingFinalizer: isSet(object.ordersAwaitingFinalizer)
+        ? OrdersAwaitingFinalizer.fromJSON(object.ordersAwaitingFinalizer)
+        : undefined,
+    };
+  },
+
+  toJSON(message: QueryGetOrdersAwaitingFinalizerResponse): unknown {
+    const obj: any = {};
+    message.ordersAwaitingFinalizer !== undefined && (obj.ordersAwaitingFinalizer = message.ordersAwaitingFinalizer
+      ? OrdersAwaitingFinalizer.toJSON(message.ordersAwaitingFinalizer)
+      : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryGetOrdersAwaitingFinalizerResponse>, I>>(
+    object: I,
+  ): QueryGetOrdersAwaitingFinalizerResponse {
+    const message = createBaseQueryGetOrdersAwaitingFinalizerResponse();
+    message.ordersAwaitingFinalizer =
+      (object.ordersAwaitingFinalizer !== undefined && object.ordersAwaitingFinalizer !== null)
+        ? OrdersAwaitingFinalizer.fromPartial(object.ordersAwaitingFinalizer)
+        : undefined;
+    return message;
+  },
+};
+
+function createBaseQueryAllOrdersAwaitingFinalizerRequest(): QueryAllOrdersAwaitingFinalizerRequest {
+  return { pagination: undefined };
+}
+
+export const QueryAllOrdersAwaitingFinalizerRequest = {
+  encode(message: QueryAllOrdersAwaitingFinalizerRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryAllOrdersAwaitingFinalizerRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllOrdersAwaitingFinalizerRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllOrdersAwaitingFinalizerRequest {
+    return { pagination: isSet(object.pagination) ? PageRequest.fromJSON(object.pagination) : undefined };
+  },
+
+  toJSON(message: QueryAllOrdersAwaitingFinalizerRequest): unknown {
+    const obj: any = {};
+    message.pagination !== undefined
+      && (obj.pagination = message.pagination ? PageRequest.toJSON(message.pagination) : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryAllOrdersAwaitingFinalizerRequest>, I>>(
+    object: I,
+  ): QueryAllOrdersAwaitingFinalizerRequest {
+    const message = createBaseQueryAllOrdersAwaitingFinalizerRequest();
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PageRequest.fromPartial(object.pagination)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseQueryAllOrdersAwaitingFinalizerResponse(): QueryAllOrdersAwaitingFinalizerResponse {
+  return { ordersAwaitingFinalizer: [], pagination: undefined };
+}
+
+export const QueryAllOrdersAwaitingFinalizerResponse = {
+  encode(message: QueryAllOrdersAwaitingFinalizerResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.ordersAwaitingFinalizer) {
+      OrdersAwaitingFinalizer.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryAllOrdersAwaitingFinalizerResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllOrdersAwaitingFinalizerResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.ordersAwaitingFinalizer.push(OrdersAwaitingFinalizer.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllOrdersAwaitingFinalizerResponse {
+    return {
+      ordersAwaitingFinalizer: Array.isArray(object?.ordersAwaitingFinalizer)
+        ? object.ordersAwaitingFinalizer.map((e: any) => OrdersAwaitingFinalizer.fromJSON(e))
+        : [],
+      pagination: isSet(object.pagination) ? PageResponse.fromJSON(object.pagination) : undefined,
+    };
+  },
+
+  toJSON(message: QueryAllOrdersAwaitingFinalizerResponse): unknown {
+    const obj: any = {};
+    if (message.ordersAwaitingFinalizer) {
+      obj.ordersAwaitingFinalizer = message.ordersAwaitingFinalizer.map((e) =>
+        e ? OrdersAwaitingFinalizer.toJSON(e) : undefined
+      );
+    } else {
+      obj.ordersAwaitingFinalizer = [];
+    }
+    message.pagination !== undefined
+      && (obj.pagination = message.pagination ? PageResponse.toJSON(message.pagination) : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryAllOrdersAwaitingFinalizerResponse>, I>>(
+    object: I,
+  ): QueryAllOrdersAwaitingFinalizerResponse {
+    const message = createBaseQueryAllOrdersAwaitingFinalizerResponse();
+    message.ordersAwaitingFinalizer = object.ordersAwaitingFinalizer?.map((e) => OrdersAwaitingFinalizer.fromPartial(e))
+      || [];
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PageResponse.fromPartial(object.pagination)
+      : undefined;
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -583,6 +832,14 @@ export interface Query {
   PendingOrders(request: QueryGetPendingOrdersRequest): Promise<QueryGetPendingOrdersResponse>;
   /** Queries a list of PendingOrders items. */
   PendingOrdersAll(request: QueryAllPendingOrdersRequest): Promise<QueryAllPendingOrdersResponse>;
+  /** Queries a OrdersAwaitingFinalizer by index. */
+  OrdersAwaitingFinalizer(
+    request: QueryGetOrdersAwaitingFinalizerRequest,
+  ): Promise<QueryGetOrdersAwaitingFinalizerResponse>;
+  /** Queries a list of OrdersAwaitingFinalizer items. */
+  OrdersAwaitingFinalizerAll(
+    request: QueryAllOrdersAwaitingFinalizerRequest,
+  ): Promise<QueryAllOrdersAwaitingFinalizerResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -594,6 +851,8 @@ export class QueryClientImpl implements Query {
     this.TradeOrdersAll = this.TradeOrdersAll.bind(this);
     this.PendingOrders = this.PendingOrders.bind(this);
     this.PendingOrdersAll = this.PendingOrdersAll.bind(this);
+    this.OrdersAwaitingFinalizer = this.OrdersAwaitingFinalizer.bind(this);
+    this.OrdersAwaitingFinalizerAll = this.OrdersAwaitingFinalizerAll.bind(this);
   }
   Params(request: QueryParamsRequest): Promise<QueryParamsResponse> {
     const data = QueryParamsRequest.encode(request).finish();
@@ -623,6 +882,22 @@ export class QueryClientImpl implements Query {
     const data = QueryAllPendingOrdersRequest.encode(request).finish();
     const promise = this.rpc.request("teapartycrypto.partychain.party.Query", "PendingOrdersAll", data);
     return promise.then((data) => QueryAllPendingOrdersResponse.decode(new _m0.Reader(data)));
+  }
+
+  OrdersAwaitingFinalizer(
+    request: QueryGetOrdersAwaitingFinalizerRequest,
+  ): Promise<QueryGetOrdersAwaitingFinalizerResponse> {
+    const data = QueryGetOrdersAwaitingFinalizerRequest.encode(request).finish();
+    const promise = this.rpc.request("teapartycrypto.partychain.party.Query", "OrdersAwaitingFinalizer", data);
+    return promise.then((data) => QueryGetOrdersAwaitingFinalizerResponse.decode(new _m0.Reader(data)));
+  }
+
+  OrdersAwaitingFinalizerAll(
+    request: QueryAllOrdersAwaitingFinalizerRequest,
+  ): Promise<QueryAllOrdersAwaitingFinalizerResponse> {
+    const data = QueryAllOrdersAwaitingFinalizerRequest.encode(request).finish();
+    const promise = this.rpc.request("teapartycrypto.partychain.party.Query", "OrdersAwaitingFinalizerAll", data);
+    return promise.then((data) => QueryAllOrdersAwaitingFinalizerResponse.decode(new _m0.Reader(data)));
   }
 }
 

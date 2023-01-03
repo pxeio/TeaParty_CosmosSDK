@@ -16,6 +16,10 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	for _, elem := range genState.PendingOrdersList {
 		k.SetPendingOrders(ctx, elem)
 	}
+	// Set all the ordersAwaitingFinalizer
+	for _, elem := range genState.OrdersAwaitingFinalizerList {
+		k.SetOrdersAwaitingFinalizer(ctx, elem)
+	}
 	// this line is used by starport scaffolding # genesis/module/init
 	k.SetParams(ctx, genState.Params)
 }
@@ -27,6 +31,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 
 	genesis.TradeOrdersList = k.GetAllTradeOrders(ctx)
 	genesis.PendingOrdersList = k.GetAllPendingOrders(ctx)
+	genesis.OrdersAwaitingFinalizerList = k.GetAllOrdersAwaitingFinalizer(ctx)
 	// this line is used by starport scaffolding # genesis/module/export
 
 	return genesis

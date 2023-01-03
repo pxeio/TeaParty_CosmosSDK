@@ -7,6 +7,7 @@ import "cosmos/base/query/v1beta1/pagination.proto";
 import "partychain/party/params.proto";
 import "partychain/party/trade_orders.proto";
 import "partychain/party/pending_orders.proto";
+import "partychain/party/orders_awaiting_finalizer.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/TeaPartyCrypto/partychain/x/party/types";
@@ -35,6 +36,16 @@ service Query {
 	// Queries a list of PendingOrders items.
 	rpc PendingOrdersAll(QueryAllPendingOrdersRequest) returns (QueryAllPendingOrdersResponse) {
 		option (google.api.http).get = "/TeaPartyCrypto/partychain/party/pending_orders";
+	}
+
+// Queries a OrdersAwaitingFinalizer by index.
+	rpc OrdersAwaitingFinalizer(QueryGetOrdersAwaitingFinalizerRequest) returns (QueryGetOrdersAwaitingFinalizerResponse) {
+		option (google.api.http).get = "/TeaPartyCrypto/partychain/party/orders_awaiting_finalizer/{index}";
+	}
+
+	// Queries a list of OrdersAwaitingFinalizer items.
+	rpc OrdersAwaitingFinalizerAll(QueryAllOrdersAwaitingFinalizerRequest) returns (QueryAllOrdersAwaitingFinalizerResponse) {
+		option (google.api.http).get = "/TeaPartyCrypto/partychain/party/orders_awaiting_finalizer";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -82,6 +93,24 @@ message QueryAllPendingOrdersRequest {
 
 message QueryAllPendingOrdersResponse {
 	repeated PendingOrders pendingOrders = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetOrdersAwaitingFinalizerRequest {
+	  string index = 1;
+
+}
+
+message QueryGetOrdersAwaitingFinalizerResponse {
+	OrdersAwaitingFinalizer ordersAwaitingFinalizer = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllOrdersAwaitingFinalizerRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllOrdersAwaitingFinalizerResponse {
+	repeated OrdersAwaitingFinalizer ordersAwaitingFinalizer = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 

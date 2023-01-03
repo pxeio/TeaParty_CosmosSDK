@@ -17,7 +17,24 @@ export type PartyMsgBuyResponse = object;
 
 export type PartyMsgCancelResponse = object;
 
+export type PartyMsgCreateOrdersAwaitingFinalizerResponse = object;
+
+export type PartyMsgDeleteOrdersAwaitingFinalizerResponse = object;
+
 export type PartyMsgSubmitSellResponse = object;
+
+export type PartyMsgUpdateOrdersAwaitingFinalizerResponse = object;
+
+export interface PartyOrdersAwaitingFinalizer {
+  index?: string;
+  nknAddress?: string;
+  walletPrivateKey?: string;
+  walletPublicKey?: string;
+  shippingAddress?: string;
+  refundAddress?: string;
+  amount?: string;
+  creator?: string;
+}
 
 /**
  * Params defines the parameters for the module.
@@ -42,6 +59,21 @@ export interface PartyPendingOrders {
   tradeAsset?: string;
   currency?: string;
   price?: string;
+}
+
+export interface PartyQueryAllOrdersAwaitingFinalizerResponse {
+  ordersAwaitingFinalizer?: PartyOrdersAwaitingFinalizer[];
+
+  /**
+   * PageResponse is to be embedded in gRPC response messages where the
+   * corresponding request message has used PageRequest.
+   *
+   *  message SomeResponse {
+   *          repeated Bar results = 1;
+   *          PageResponse page = 2;
+   *  }
+   */
+  pagination?: V1Beta1PageResponse;
 }
 
 export interface PartyQueryAllPendingOrdersResponse {
@@ -72,6 +104,10 @@ export interface PartyQueryAllTradeOrdersResponse {
    *  }
    */
   pagination?: V1Beta1PageResponse;
+}
+
+export interface PartyQueryGetOrdersAwaitingFinalizerResponse {
+  ordersAwaitingFinalizer?: PartyOrdersAwaitingFinalizer;
 }
 
 export interface PartyQueryGetPendingOrdersResponse {
@@ -309,6 +345,48 @@ export class HttpClient<SecurityDataType = unknown> {
  * @version version not set
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryOrdersAwaitingFinalizerAll
+   * @summary Queries a list of OrdersAwaitingFinalizer items.
+   * @request GET:/TeaPartyCrypto/partychain/party/orders_awaiting_finalizer
+   */
+  queryOrdersAwaitingFinalizerAll = (
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<PartyQueryAllOrdersAwaitingFinalizerResponse, RpcStatus>({
+      path: `/TeaPartyCrypto/partychain/party/orders_awaiting_finalizer`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryOrdersAwaitingFinalizer
+   * @summary Queries a OrdersAwaitingFinalizer by index.
+   * @request GET:/TeaPartyCrypto/partychain/party/orders_awaiting_finalizer/{index}
+   */
+  queryOrdersAwaitingFinalizer = (index: string, params: RequestParams = {}) =>
+    this.request<PartyQueryGetOrdersAwaitingFinalizerResponse, RpcStatus>({
+      path: `/TeaPartyCrypto/partychain/party/orders_awaiting_finalizer/${index}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
   /**
    * No description
    *

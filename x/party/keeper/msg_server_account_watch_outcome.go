@@ -39,14 +39,6 @@ func (k msgServer) AccountWatchOutcome(goCtx context.Context, msg *types.MsgAcco
 				}
 			}
 
-			// check if both payments are complete
-			if p.BuyerPaymentComplete && p.SellerPaymentComplete {
-				// TODO:: call complete order
-				// for now we will just remove the order from the pending orders and trade orders
-				k.RemovePendingOrders(ctx, p.Index)
-				k.RemoveTradeOrders(ctx, p.Index)
-			}
-
 			k.RemovePendingOrders(ctx, p.Index)
 			k.SetPendingOrders(ctx, p)
 		}

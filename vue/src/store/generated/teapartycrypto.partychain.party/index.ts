@@ -1,11 +1,12 @@
 import { Client, registry, MissingWalletError } from 'TeaPartyCrypto-partychain-client-ts'
 
+import { OrdersAwaitingFinalizer } from "TeaPartyCrypto-partychain-client-ts/teapartycrypto.partychain.party/types"
 import { Params } from "TeaPartyCrypto-partychain-client-ts/teapartycrypto.partychain.party/types"
 import { PendingOrders } from "TeaPartyCrypto-partychain-client-ts/teapartycrypto.partychain.party/types"
 import { TradeOrders } from "TeaPartyCrypto-partychain-client-ts/teapartycrypto.partychain.party/types"
 
 
-export { Params, PendingOrders, TradeOrders };
+export { OrdersAwaitingFinalizer, Params, PendingOrders, TradeOrders };
 
 function initClient(vuexGetters) {
 	return new Client(vuexGetters['common/env/getEnv'], vuexGetters['common/wallet/signer'])
@@ -41,8 +42,11 @@ const getDefaultState = () => {
 				TradeOrdersAll: {},
 				PendingOrders: {},
 				PendingOrdersAll: {},
+				OrdersAwaitingFinalizer: {},
+				OrdersAwaitingFinalizerAll: {},
 				
 				_Structure: {
+						OrdersAwaitingFinalizer: getStructure(OrdersAwaitingFinalizer.fromPartial({})),
 						Params: getStructure(Params.fromPartial({})),
 						PendingOrders: getStructure(PendingOrders.fromPartial({})),
 						TradeOrders: getStructure(TradeOrders.fromPartial({})),
@@ -103,6 +107,18 @@ export default {
 						(<any> params).query=null
 					}
 			return state.PendingOrdersAll[JSON.stringify(params)] ?? {}
+		},
+				getOrdersAwaitingFinalizer: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.OrdersAwaitingFinalizer[JSON.stringify(params)] ?? {}
+		},
+				getOrdersAwaitingFinalizerAll: (state) => (params = { params: {}}) => {
+					if (!(<any> params).query) {
+						(<any> params).query=null
+					}
+			return state.OrdersAwaitingFinalizerAll[JSON.stringify(params)] ?? {}
 		},
 				
 		getTypeStructure: (state) => (type) => {
@@ -256,42 +272,64 @@ export default {
 		},
 		
 		
-		async sendMsgAccountWatchOutcome({ rootGetters }, { value, fee = [], memo = '' }) {
+		
+		
+		 		
+		
+		
+		async QueryOrdersAwaitingFinalizer({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
-				const client=await initClient(rootGetters)
-				const result = await client.TeapartycryptoPartychainParty.tx.sendMsgAccountWatchOutcome({ value, fee: {amount: fee, gas: "200000"}, memo })
-				return result
+				const key = params ?? {};
+				const client = initClient(rootGetters);
+				let value= (await client.TeapartycryptoPartychainParty.query.queryOrdersAwaitingFinalizer( key.index)).data
+				
+					
+				commit('QUERY', { query: 'OrdersAwaitingFinalizer', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryOrdersAwaitingFinalizer', payload: { options: { all }, params: {...key},query }})
+				return getters['getOrdersAwaitingFinalizer']( { params: {...key}, query}) ?? {}
 			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgAccountWatchOutcome:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgAccountWatchOutcome:Send Could not broadcast Tx: '+ e.message)
-				}
+				throw new Error('QueryClient:QueryOrdersAwaitingFinalizer API Node Unavailable. Could not perform query: ' + e.message)
+				
 			}
 		},
-		async sendMsgSubmitSell({ rootGetters }, { value, fee = [], memo = '' }) {
+		
+		
+		
+		
+		 		
+		
+		
+		async QueryOrdersAwaitingFinalizerAll({ commit, rootGetters, getters }, { options: { subscribe, all} = { subscribe:false, all:false}, params, query=null }) {
 			try {
-				const client=await initClient(rootGetters)
-				const result = await client.TeapartycryptoPartychainParty.tx.sendMsgSubmitSell({ value, fee: {amount: fee, gas: "200000"}, memo })
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSubmitSell:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgSubmitSell:Send Could not broadcast Tx: '+ e.message)
+				const key = params ?? {};
+				const client = initClient(rootGetters);
+				let value= (await client.TeapartycryptoPartychainParty.query.queryOrdersAwaitingFinalizerAll(query ?? undefined)).data
+				
+					
+				while (all && (<any> value).pagination && (<any> value).pagination.next_key!=null) {
+					let next_values=(await client.TeapartycryptoPartychainParty.query.queryOrdersAwaitingFinalizerAll({...query ?? {}, 'pagination.key':(<any> value).pagination.next_key} as any)).data
+					value = mergeResults(value, next_values);
 				}
+				commit('QUERY', { query: 'OrdersAwaitingFinalizerAll', key: { params: {...key}, query}, value })
+				if (subscribe) commit('SUBSCRIBE', { action: 'QueryOrdersAwaitingFinalizerAll', payload: { options: { all }, params: {...key},query }})
+				return getters['getOrdersAwaitingFinalizerAll']( { params: {...key}, query}) ?? {}
+			} catch (e) {
+				throw new Error('QueryClient:QueryOrdersAwaitingFinalizerAll API Node Unavailable. Could not perform query: ' + e.message)
+				
 			}
 		},
-		async sendMsgCancel({ rootGetters }, { value, fee = [], memo = '' }) {
+		
+		
+		async sendMsgDeleteOrdersAwaitingFinalizer({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const client=await initClient(rootGetters)
-				const result = await client.TeapartycryptoPartychainParty.tx.sendMsgCancel({ value, fee: {amount: fee, gas: "200000"}, memo })
+				const result = await client.TeapartycryptoPartychainParty.tx.sendMsgDeleteOrdersAwaitingFinalizer({ value, fee: {amount: fee, gas: "200000"}, memo })
 				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgCancel:Init Could not initialize signing client. Wallet is required.')
+					throw new Error('TxClient:MsgDeleteOrdersAwaitingFinalizer:Init Could not initialize signing client. Wallet is required.')
 				}else{
-					throw new Error('TxClient:MsgCancel:Send Could not broadcast Tx: '+ e.message)
+					throw new Error('TxClient:MsgDeleteOrdersAwaitingFinalizer:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
@@ -308,6 +346,19 @@ export default {
 				}
 			}
 		},
+		async sendMsgSubmitSell({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const client=await initClient(rootGetters)
+				const result = await client.TeapartycryptoPartychainParty.tx.sendMsgSubmitSell({ value, fee: {amount: fee, gas: "200000"}, memo })
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgSubmitSell:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgSubmitSell:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
 		async sendMsgBuy({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const client=await initClient(rootGetters)
@@ -321,43 +372,69 @@ export default {
 				}
 			}
 		},
-		
-		async MsgAccountWatchOutcome({ rootGetters }, { value }) {
+		async sendMsgCancel({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
-				const client=initClient(rootGetters)
-				const msg = await client.TeapartycryptoPartychainParty.tx.msgAccountWatchOutcome({value})
-				return msg
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgAccountWatchOutcome:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgAccountWatchOutcome:Create Could not create message: ' + e.message)
-				}
-			}
-		},
-		async MsgSubmitSell({ rootGetters }, { value }) {
-			try {
-				const client=initClient(rootGetters)
-				const msg = await client.TeapartycryptoPartychainParty.tx.msgSubmitSell({value})
-				return msg
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSubmitSell:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgSubmitSell:Create Could not create message: ' + e.message)
-				}
-			}
-		},
-		async MsgCancel({ rootGetters }, { value }) {
-			try {
-				const client=initClient(rootGetters)
-				const msg = await client.TeapartycryptoPartychainParty.tx.msgCancel({value})
-				return msg
+				const client=await initClient(rootGetters)
+				const result = await client.TeapartycryptoPartychainParty.tx.sendMsgCancel({ value, fee: {amount: fee, gas: "200000"}, memo })
+				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
 					throw new Error('TxClient:MsgCancel:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgCancel:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
+		async sendMsgUpdateOrdersAwaitingFinalizer({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const client=await initClient(rootGetters)
+				const result = await client.TeapartycryptoPartychainParty.tx.sendMsgUpdateOrdersAwaitingFinalizer({ value, fee: {amount: fee, gas: "200000"}, memo })
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgUpdateOrdersAwaitingFinalizer:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgUpdateOrdersAwaitingFinalizer:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
+		async sendMsgCreateOrdersAwaitingFinalizer({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const client=await initClient(rootGetters)
+				const result = await client.TeapartycryptoPartychainParty.tx.sendMsgCreateOrdersAwaitingFinalizer({ value, fee: {amount: fee, gas: "200000"}, memo })
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgCreateOrdersAwaitingFinalizer:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgCreateOrdersAwaitingFinalizer:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
+		async sendMsgAccountWatchOutcome({ rootGetters }, { value, fee = [], memo = '' }) {
+			try {
+				const client=await initClient(rootGetters)
+				const result = await client.TeapartycryptoPartychainParty.tx.sendMsgAccountWatchOutcome({ value, fee: {amount: fee, gas: "200000"}, memo })
+				return result
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgAccountWatchOutcome:Init Could not initialize signing client. Wallet is required.')
+				}else{
+					throw new Error('TxClient:MsgAccountWatchOutcome:Send Could not broadcast Tx: '+ e.message)
+				}
+			}
+		},
+		
+		async MsgDeleteOrdersAwaitingFinalizer({ rootGetters }, { value }) {
+			try {
+				const client=initClient(rootGetters)
+				const msg = await client.TeapartycryptoPartychainParty.tx.msgDeleteOrdersAwaitingFinalizer({value})
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgDeleteOrdersAwaitingFinalizer:Init Could not initialize signing client. Wallet is required.')
 				} else{
-					throw new Error('TxClient:MsgCancel:Create Could not create message: ' + e.message)
+					throw new Error('TxClient:MsgDeleteOrdersAwaitingFinalizer:Create Could not create message: ' + e.message)
 				}
 			}
 		},
@@ -374,6 +451,19 @@ export default {
 				}
 			}
 		},
+		async MsgSubmitSell({ rootGetters }, { value }) {
+			try {
+				const client=initClient(rootGetters)
+				const msg = await client.TeapartycryptoPartychainParty.tx.msgSubmitSell({value})
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgSubmitSell:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgSubmitSell:Create Could not create message: ' + e.message)
+				}
+			}
+		},
 		async MsgBuy({ rootGetters }, { value }) {
 			try {
 				const client=initClient(rootGetters)
@@ -384,6 +474,58 @@ export default {
 					throw new Error('TxClient:MsgBuy:Init Could not initialize signing client. Wallet is required.')
 				} else{
 					throw new Error('TxClient:MsgBuy:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgCancel({ rootGetters }, { value }) {
+			try {
+				const client=initClient(rootGetters)
+				const msg = await client.TeapartycryptoPartychainParty.tx.msgCancel({value})
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgCancel:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgCancel:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgUpdateOrdersAwaitingFinalizer({ rootGetters }, { value }) {
+			try {
+				const client=initClient(rootGetters)
+				const msg = await client.TeapartycryptoPartychainParty.tx.msgUpdateOrdersAwaitingFinalizer({value})
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgUpdateOrdersAwaitingFinalizer:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgUpdateOrdersAwaitingFinalizer:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgCreateOrdersAwaitingFinalizer({ rootGetters }, { value }) {
+			try {
+				const client=initClient(rootGetters)
+				const msg = await client.TeapartycryptoPartychainParty.tx.msgCreateOrdersAwaitingFinalizer({value})
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgCreateOrdersAwaitingFinalizer:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgCreateOrdersAwaitingFinalizer:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgAccountWatchOutcome({ rootGetters }, { value }) {
+			try {
+				const client=initClient(rootGetters)
+				const msg = await client.TeapartycryptoPartychainParty.tx.msgAccountWatchOutcome({value})
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgAccountWatchOutcome:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgAccountWatchOutcome:Create Could not create message: ' + e.message)
 				}
 			}
 		},

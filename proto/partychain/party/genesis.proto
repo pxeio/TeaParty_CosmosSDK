@@ -5,6 +5,7 @@ import "gogoproto/gogo.proto";
 import "partychain/party/params.proto";
 import "partychain/party/trade_orders.proto";
 import "partychain/party/pending_orders.proto";
+import "partychain/party/orders_awaiting_finalizer.proto";
 // this line is used by starport scaffolding # genesis/proto/import
 
 option go_package = "github.com/TeaPartyCrypto/partychain/x/party/types";
@@ -14,5 +15,6 @@ message GenesisState {
   Params params = 1 [(gogoproto.nullable) = false];
   repeated TradeOrders tradeOrdersList = 2 [(gogoproto.nullable) = false];
   repeated PendingOrders pendingOrdersList = 3 [(gogoproto.nullable) = false];
+  repeated OrdersAwaitingFinalizer ordersAwaitingFinalizerList = 4 [(gogoproto.nullable) = false];
   // this line is used by starport scaffolding # genesis/proto/state
 }
