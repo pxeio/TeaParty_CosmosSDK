@@ -11,7 +11,7 @@ export interface OrdersAwaitingFinalizer {
   shippingAddress: string;
   refundAddress: string;
   amount: string;
-  creator: string;
+  chain: string;
 }
 
 function createBaseOrdersAwaitingFinalizer(): OrdersAwaitingFinalizer {
@@ -23,7 +23,7 @@ function createBaseOrdersAwaitingFinalizer(): OrdersAwaitingFinalizer {
     shippingAddress: "",
     refundAddress: "",
     amount: "",
-    creator: "",
+    chain: "",
   };
 }
 
@@ -50,8 +50,8 @@ export const OrdersAwaitingFinalizer = {
     if (message.amount !== "") {
       writer.uint32(58).string(message.amount);
     }
-    if (message.creator !== "") {
-      writer.uint32(66).string(message.creator);
+    if (message.chain !== "") {
+      writer.uint32(66).string(message.chain);
     }
     return writer;
   },
@@ -85,7 +85,7 @@ export const OrdersAwaitingFinalizer = {
           message.amount = reader.string();
           break;
         case 8:
-          message.creator = reader.string();
+          message.chain = reader.string();
           break;
         default:
           reader.skipType(tag & 7);
@@ -104,7 +104,7 @@ export const OrdersAwaitingFinalizer = {
       shippingAddress: isSet(object.shippingAddress) ? String(object.shippingAddress) : "",
       refundAddress: isSet(object.refundAddress) ? String(object.refundAddress) : "",
       amount: isSet(object.amount) ? String(object.amount) : "",
-      creator: isSet(object.creator) ? String(object.creator) : "",
+      chain: isSet(object.chain) ? String(object.chain) : "",
     };
   },
 
@@ -117,7 +117,7 @@ export const OrdersAwaitingFinalizer = {
     message.shippingAddress !== undefined && (obj.shippingAddress = message.shippingAddress);
     message.refundAddress !== undefined && (obj.refundAddress = message.refundAddress);
     message.amount !== undefined && (obj.amount = message.amount);
-    message.creator !== undefined && (obj.creator = message.creator);
+    message.chain !== undefined && (obj.chain = message.chain);
     return obj;
   },
 
@@ -130,7 +130,7 @@ export const OrdersAwaitingFinalizer = {
     message.shippingAddress = object.shippingAddress ?? "";
     message.refundAddress = object.refundAddress ?? "";
     message.amount = object.amount ?? "";
-    message.creator = object.creator ?? "";
+    message.chain = object.chain ?? "";
     return message;
   },
 };

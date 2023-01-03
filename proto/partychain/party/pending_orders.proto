@@ -21,6 +21,7 @@ message PendingOrders {
   string tradeAsset = 15; 
   string currency = 16; 
   string price = 17; 
+  string blockHeight = 18; 
   
 }
 

@@ -17,13 +17,7 @@ export type PartyMsgBuyResponse = object;
 
 export type PartyMsgCancelResponse = object;
 
-export type PartyMsgCreateOrdersAwaitingFinalizerResponse = object;
-
-export type PartyMsgDeleteOrdersAwaitingFinalizerResponse = object;
-
 export type PartyMsgSubmitSellResponse = object;
-
-export type PartyMsgUpdateOrdersAwaitingFinalizerResponse = object;
 
 export interface PartyOrdersAwaitingFinalizer {
   index?: string;
@@ -33,7 +27,7 @@ export interface PartyOrdersAwaitingFinalizer {
   shippingAddress?: string;
   refundAddress?: string;
   amount?: string;
-  creator?: string;
+  chain?: string;
 }
 
 /**
@@ -59,6 +53,7 @@ export interface PartyPendingOrders {
   tradeAsset?: string;
   currency?: string;
   price?: string;
+  blockHeight?: string;
 }
 
 export interface PartyQueryAllOrdersAwaitingFinalizerResponse {

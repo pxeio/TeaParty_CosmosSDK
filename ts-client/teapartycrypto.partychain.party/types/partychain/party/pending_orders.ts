@@ -21,6 +21,7 @@ export interface PendingOrders {
   tradeAsset: string;
   currency: string;
   price: string;
+  blockHeight: string;
 }
 
 function createBasePendingOrders(): PendingOrders {
@@ -42,6 +43,7 @@ function createBasePendingOrders(): PendingOrders {
     tradeAsset: "",
     currency: "",
     price: "",
+    blockHeight: "",
   };
 }
 
@@ -97,6 +99,9 @@ export const PendingOrders = {
     }
     if (message.price !== "") {
       writer.uint32(138).string(message.price);
+    }
+    if (message.blockHeight !== "") {
+      writer.uint32(146).string(message.blockHeight);
     }
     return writer;
   },
@@ -159,6 +164,9 @@ export const PendingOrders = {
         case 17:
           message.price = reader.string();
           break;
+        case 18:
+          message.blockHeight = reader.string();
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -194,6 +202,7 @@ export const PendingOrders = {
       tradeAsset: isSet(object.tradeAsset) ? String(object.tradeAsset) : "",
       currency: isSet(object.currency) ? String(object.currency) : "",
       price: isSet(object.price) ? String(object.price) : "",
+      blockHeight: isSet(object.blockHeight) ? String(object.blockHeight) : "",
     };
   },
 
@@ -220,6 +229,7 @@ export const PendingOrders = {
     message.tradeAsset !== undefined && (obj.tradeAsset = message.tradeAsset);
     message.currency !== undefined && (obj.currency = message.currency);
     message.price !== undefined && (obj.price = message.price);
+    message.blockHeight !== undefined && (obj.blockHeight = message.blockHeight);
     return obj;
   },
 
@@ -242,6 +252,7 @@ export const PendingOrders = {
     message.tradeAsset = object.tradeAsset ?? "";
     message.currency = object.currency ?? "";
     message.price = object.price ?? "";
+    message.blockHeight = object.blockHeight ?? "";
     return message;
   },
 };

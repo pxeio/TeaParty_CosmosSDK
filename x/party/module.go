@@ -178,9 +178,11 @@ func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 				Index:            order.SellerEscrowWalletPublicKey,
 				NknAddress:       order.BuyerNKNAddress,
 				WalletPrivateKey: order.SellerEscrowWalletPrivateKey,
+				WalletPublicKey:  order.SellerEscrowWalletPublicKey,
 				Amount:           order.Amount,
 				RefundAddress:    order.BuyerRefundAddress,
-				Creator:          order.Index,
+				ShippingAddress:  order.BuyerShippingAddress,
+				Chain:            order.Currency,
 			}
 
 			// create a new order awaiting finalizer for the seller
@@ -188,9 +190,11 @@ func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 				Index:            order.BuyerEscrowWalletPublicKey,
 				NknAddress:       order.SellerNKNAddress,
 				WalletPrivateKey: order.BuyerEscrowWalletPrivateKey,
+				WalletPublicKey:  order.BuyerEscrowWalletPublicKey,
 				Amount:           order.Price,
 				RefundAddress:    order.SellerRefundAddress,
-				Creator:          order.Index,
+				ShippingAddress:  order.SellerShippingAddress,
+				Chain:            order.TradeAsset,
 			}
 
 			am.keeper.SetOrdersAwaitingFinalizer(ctx, buyeroaf)

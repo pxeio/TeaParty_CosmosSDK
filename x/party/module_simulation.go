@@ -44,18 +44,6 @@ const (
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgAccountWatchFailure int = 100
 
-	opWeightMsgCreateOrdersAwaitingFinalizer = "op_weight_msg_orders_awaiting_finalizer"
-	// TODO: Determine the simulation weight value
-	defaultWeightMsgCreateOrdersAwaitingFinalizer int = 100
-
-	opWeightMsgUpdateOrdersAwaitingFinalizer = "op_weight_msg_orders_awaiting_finalizer"
-	// TODO: Determine the simulation weight value
-	defaultWeightMsgUpdateOrdersAwaitingFinalizer int = 100
-
-	opWeightMsgDeleteOrdersAwaitingFinalizer = "op_weight_msg_orders_awaiting_finalizer"
-	// TODO: Determine the simulation weight value
-	defaultWeightMsgDeleteOrdersAwaitingFinalizer int = 100
-
 	// this line is used by starport scaffolding # simapp/module/const
 )
 
@@ -67,16 +55,6 @@ func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 	}
 	partyGenesis := types.GenesisState{
 		Params: types.DefaultParams(),
-		OrdersAwaitingFinalizerList: []types.OrdersAwaitingFinalizer{
-			{
-				Creator: sample.AccAddress(),
-				Index:   "0",
-			},
-			{
-				Creator: sample.AccAddress(),
-				Index:   "1",
-			},
-		},
 		// this line is used by starport scaffolding # simapp/module/genesisState
 	}
 	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(&partyGenesis)
@@ -153,39 +131,6 @@ func (am AppModule) WeightedOperations(simState module.SimulationState) []simtyp
 	operations = append(operations, simulation.NewWeightedOperation(
 		weightMsgAccountWatchFailure,
 		partysimulation.SimulateMsgAccountWatchFailure(am.accountKeeper, am.bankKeeper, am.keeper),
-	))
-
-	var weightMsgCreateOrdersAwaitingFinalizer int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgCreateOrdersAwaitingFinalizer, &weightMsgCreateOrdersAwaitingFinalizer, nil,
-		func(_ *rand.Rand) {
-			weightMsgCreateOrdersAwaitingFinalizer = defaultWeightMsgCreateOrdersAwaitingFinalizer
-		},
-	)
-	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgCreateOrdersAwaitingFinalizer,
-		partysimulation.SimulateMsgCreateOrdersAwaitingFinalizer(am.accountKeeper, am.bankKeeper, am.keeper),
-	))
-
-	var weightMsgUpdateOrdersAwaitingFinalizer int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgUpdateOrdersAwaitingFinalizer, &weightMsgUpdateOrdersAwaitingFinalizer, nil,
-		func(_ *rand.Rand) {
-			weightMsgUpdateOrdersAwaitingFinalizer = defaultWeightMsgUpdateOrdersAwaitingFinalizer
-		},
-	)
-	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgUpdateOrdersAwaitingFinalizer,
-		partysimulation.SimulateMsgUpdateOrdersAwaitingFinalizer(am.accountKeeper, am.bankKeeper, am.keeper),
-	))
-
-	var weightMsgDeleteOrdersAwaitingFinalizer int
-	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgDeleteOrdersAwaitingFinalizer, &weightMsgDeleteOrdersAwaitingFinalizer, nil,
-		func(_ *rand.Rand) {
-			weightMsgDeleteOrdersAwaitingFinalizer = defaultWeightMsgDeleteOrdersAwaitingFinalizer
-		},
-	)
-	operations = append(operations, simulation.NewWeightedOperation(
-		weightMsgDeleteOrdersAwaitingFinalizer,
-		partysimulation.SimulateMsgDeleteOrdersAwaitingFinalizer(am.accountKeeper, am.bankKeeper, am.keeper),
 	))
 
 	// this line is used by starport scaffolding # simapp/module/operation

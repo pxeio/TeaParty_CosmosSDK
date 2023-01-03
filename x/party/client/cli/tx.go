@@ -35,9 +35,6 @@ func GetTxCmd() *cobra.Command {
 	cmd.AddCommand(CmdCancel())
 	cmd.AddCommand(CmdAccountWatchOutcome())
 	cmd.AddCommand(CmdAccountWatchFailure())
-	cmd.AddCommand(CmdCreateOrdersAwaitingFinalizer())
-	cmd.AddCommand(CmdUpdateOrdersAwaitingFinalizer())
-	cmd.AddCommand(CmdDeleteOrdersAwaitingFinalizer())
 	// this line is used by starport scaffolding # 1
 
 	return cmd

@@ -33,10 +33,10 @@ genesis:
       params:
         bond_denom: "tea"
     # party:
-    #   # warrenList:
-    #   #   - index: "1"
-    #   #     apiKey: "192.168.0.1"
-    #   #     creator: "0x"
+    #   warrenList:
+    #     - index: "1"
+    #       apiKey: "192.168.0.1"
+    #       creator: "0x"
     mint:
       params:
         mint_denom: "tea"

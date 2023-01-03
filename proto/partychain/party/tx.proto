@@ -1,7 +1,6 @@
 syntax = "proto3";
 package teapartycrypto.partychain.party;
 
-import "partychain/party/orders_awaiting_finalizer.proto";
 // this line is used by starport scaffolding # proto/tx/import
 
 option go_package = "github.com/TeaPartyCrypto/partychain/x/party/types";
@@ -13,9 +12,6 @@ service Msg {
   rpc Cancel(MsgCancel) returns (MsgCancelResponse);
   rpc AccountWatchOutcome(MsgAccountWatchOutcome) returns (MsgAccountWatchOutcomeResponse);
   rpc AccountWatchFailure(MsgAccountWatchFailure) returns (MsgAccountWatchFailureResponse);
-  rpc CreateOrdersAwaitingFinalizer(MsgCreateOrdersAwaitingFinalizer) returns (MsgCreateOrdersAwaitingFinalizerResponse);
-  rpc UpdateOrdersAwaitingFinalizer(MsgUpdateOrdersAwaitingFinalizer) returns (MsgUpdateOrdersAwaitingFinalizerResponse);
-  rpc DeleteOrdersAwaitingFinalizer(MsgDeleteOrdersAwaitingFinalizer) returns (MsgDeleteOrdersAwaitingFinalizerResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -68,37 +64,5 @@ message MsgAccountWatchFailure {
 
 message MsgAccountWatchFailureResponse {
 }
-
-message MsgCreateOrdersAwaitingFinalizer {
-  string creator = 1;
-  string index = 2;
-
-  string nknAddress = 3;
-  string walletPrivateKey = 4;
-  string walletPublicKey = 5;
-  string shippingAddress = 6;
-  string refundAddress = 7;
-  string amount = 8;
-}
-message MsgCreateOrdersAwaitingFinalizerResponse {}
-
-message MsgUpdateOrdersAwaitingFinalizer {
-  string creator = 1;
-  string index = 2;
-
-  string nknAddress = 3;
-  string walletPrivateKey = 4;
-  string walletPublicKey = 5;
-  string shippingAddress = 6;
-  string refundAddress = 7;
-  string amount = 8;
-}
-message MsgUpdateOrdersAwaitingFinalizerResponse {}
-
-message MsgDeleteOrdersAwaitingFinalizer {
-  string creator = 1;
-  string index = 2;
-}
-message MsgDeleteOrdersAwaitingFinalizerResponse {}
 
 // this line is used by starport scaffolding # proto/tx/message
