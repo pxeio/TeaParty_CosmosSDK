@@ -74891,6 +74891,8 @@ definitions:
     type: object
   teapartycrypto.partychain.party.MsgSubmitSellResponse:
     type: object
+  teapartycrypto.partychain.party.MsgTransactionResultResponse:
+    type: object
   teapartycrypto.partychain.party.OrdersAwaitingFinalizer:
     type: object
     properties:

@@ -202,6 +202,12 @@ func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 			am.keeper.RemovePendingOrders(ctx, order.Index)
 		}
 
+		// look at the list of accounts awaiting finalizer and see if any of them
+		// have ben finalized
+		// if they have, then we need to remove the account from the list
+		// for _, account := range am.keeper.GetAllAccountsAwaitingFinalizer(ctx) {
+		// 	for
+
 	}
 
 }

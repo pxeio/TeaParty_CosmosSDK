@@ -19,6 +19,8 @@ export type PartyMsgCancelResponse = object;
 
 export type PartyMsgSubmitSellResponse = object;
 
+export type PartyMsgTransactionResultResponse = object;
+
 export interface PartyOrdersAwaitingFinalizer {
   index?: string;
   nknAddress?: string;
