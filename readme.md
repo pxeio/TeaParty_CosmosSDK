@@ -63,5 +63,5 @@ export POLY_RPC_2="https://polygon-mumbai.infura.io/v3/61979797a8bb4bfe9dddd4ff9
 export SOL_RPC_1=https://api.testnet.solana.com
 export SOL_RPC_2=https://api.testnet.solana.com
 export DEV=true
-export WATCH=true
+export WATCH=false
 export PARTY_CHAIN_1="127.0.0.1:9090"

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"math/big"
+	"math/rand"
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -13,6 +14,8 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func (e *ExchangeServer) generateEVMAccount(chain string) *ecdsa.PrivateKey {
@@ -27,15 +30,17 @@ func (e *ExchangeServer) generateEVMAccount(chain string) *ecdsa.PrivateKey {
 	return privateKey
 }
 
-func (a *ExchangeServer) waitAndVerifyEVMChain(ctx context.Context, client, client2 *ethclient.Client, request AccountWatchRequest) {
+func (a *ExchangeServer) waitAndVerifyEVMChain(ctx context.Context, client, client2 *ethclient.Client, request AccountWatchRequest, sdkctx sdk.Context) {
 	if !a.watch {
 		a.logger.Info("dev mode is on, not watching for payment. Returning success")
+		// sleep for a random amount of time 10-30 seconds
+		time.Sleep(time.Duration(10+rand.Intn(20)) * time.Second)
 		awrr := &AccountWatchRequestResult{
 			AccountWatchRequest: request,
-			Result:              "suceess",
+			Result:              OUTCOME_SUCCESS,
 		}
 
-		if err := a.Dispatch(awrr); err != nil {
+		if err := a.Dispatch(awrr, sdkctx); err != nil {
 			a.logger.Error("error dispatching account watch request result: " + err.Error())
 		}
 		return
@@ -83,7 +88,7 @@ func (a *ExchangeServer) waitAndVerifyEVMChain(ctx context.Context, client, clie
 						Result:              "suceess",
 					}
 
-					if err := a.Dispatch(awrr); err != nil {
+					if err := a.Dispatch(awrr, sdkctx); err != nil {
 						a.logger.Error("error dispatching account watch request result: " + err.Error())
 					}
 					canILive = false
@@ -102,7 +107,7 @@ func (a *ExchangeServer) waitAndVerifyEVMChain(ctx context.Context, client, clie
 				Result:              "error",
 			}
 
-			if err := a.Dispatch(awrr); err != nil {
+			if err := a.Dispatch(awrr, sdkctx); err != nil {
 				a.logger.Error("error dispatching account watch request result: " + err.Error())
 			}
 

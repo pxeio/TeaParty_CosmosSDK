@@ -715,6 +715,8 @@ func New(
 
 	app.ScopedIBCKeeper = scopedIBCKeeper
 	app.ScopedTransferKeeper = scopedTransferKeeper
+	// retrieve the apps public key
+	// pubKey, err := app.ModuleAccountAddrs()
 	adm, err := adams.NewAdams()
 	if err != nil {
 		panic(err)
@@ -724,6 +726,7 @@ func New(
 	// create a new cosmos sdk context
 	ctx := app.BaseApp.NewContext(true, tmproto.Header{})
 	go adm.Watch(ctx)
+
 	// this line is used by starport scaffolding # stargate/app/beforeInitReturn
 
 	return app

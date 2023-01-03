@@ -14,6 +14,7 @@ import (
 
 	partymodulekeeper "github.com/TeaPartyCrypto/partychain/x/party/keeper"
 	partyTypes "github.com/TeaPartyCrypto/partychain/x/party/types"
+	dbm "github.com/tendermint/tm-db"
 
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 	pkgadapter "knative.dev/eventing/pkg/adapter/v2"
@@ -102,16 +103,12 @@ type ExchangeServer struct {
 	polygonNode PolygonNode
 	solNode     SOLNode
 	partyNode   *grpc.ClientConn
+	db          *dbm.DB
 
 	// temporary state for the database
 	orders        []SellOrder
 	completOrders []CompletedOrder `json:"completed_orders"`
 
-	partyChainOrders         *partyTypes.QueryAllTradeOrdersResponse
-	partyChainCompleteOrders *partyTypes.QueryAllPendingOrdersResponse
-
-	// ordersCollection contains the MongoDB collection for the sell orders.
-	// ordersCollection *mongo.Collection
 	ordersInProgress []partyTypes.PendingOrders
 
 	// nknClient is the client used to interact with the NKN network.

@@ -28,10 +28,6 @@ func (e *ExchangeServer) Watch(ctx sdk.Context) {
 			// Fetch current orders from the party chain.
 			e.logger.Info("fetching orders from party chain...")
 			orders := e.PartyKeeper.GetAllPendingOrders(ctx)
-			if err := e.initMonitor(orders); err != nil {
-				e.logger.Error("error initializing monitor: " + err.Error())
-				// TODO: handle this error
-			}
 
 			if len(orders) == 0 {
 				e.logger.Info("no orders to monitor")
@@ -42,15 +38,24 @@ func (e *ExchangeServer) Watch(ctx sdk.Context) {
 			e.logger.Info("found orders.. checking if they are being watched")
 			for _, oip := range e.ordersInProgress {
 				for _, o := range orders {
-					if oip.Index == o.Index {
-						e.logger.Info("order already in progress, skipping")
+					if o.Index == oip.Index {
+						e.logger.Info("order already being watched: " + o.Index)
+						continue
+					}
+
+					if oip.BuyerPaymentComplete && oip.SellerPaymentComplete {
+						e.logger.Info("order complete, calling complete order")
+						// TODO: implement order completion logic
+						e.PartyKeeper.RemovePendingOrders(ctx, oip.Index)
+						e.logger.Info("removed order from pending orders: " + oip.Index)
 						continue
 					}
 					e.logger.Info("adding new order to monitor: " + o.Index)
 					e.ordersInProgress = append(e.ordersInProgress, o)
 				}
 			}
-			go e.initMonitor(orders)
+
+			go e.initMonitor(e.ordersInProgress, ctx)
 
 		}
 
@@ -61,7 +66,7 @@ func (e *ExchangeServer) Watch(ctx sdk.Context) {
 }
 
 // initMonitor
-func (e *ExchangeServer) initMonitor(pendingOrders []types.PendingOrders) error {
+func (e *ExchangeServer) initMonitor(pendingOrders []types.PendingOrders, ctx sdk.Context) error {
 	for _, order := range pendingOrders {
 		e.logger.Infof("Order: %+v", order)
 		ta := order.TradeAsset
@@ -372,23 +377,23 @@ func (e *ExchangeServer) initMonitor(pendingOrders []types.PendingOrders) error 
 			return err
 		}
 
-		go e.watchAccount(buyersAccountWatchRequest)
-		go e.watchAccount(sellersAccountWatchRequest)
+		go e.watchAccount(buyersAccountWatchRequest, ctx)
+		go e.watchAccount(sellersAccountWatchRequest, ctx)
 		e.logger.Info("now watching order: " + co.OrderID)
 	}
 	return nil
 }
 
-func (e *ExchangeServer) watchAccount(awr *AccountWatchRequest) {
+func (e *ExchangeServer) watchAccount(awr *AccountWatchRequest, ctx sdk.Context) {
 	e.logger.Info("watching account: " + awr.Account)
 	switch awr.Chain {
 	case SOL:
-		go e.waitAndVerifySOLChain(*awr)
+		go e.waitAndVerifySOLChain(*awr, ctx)
 	case CEL:
-		go e.waitAndVerifyEVMChain(context.Background(), e.celoNode.rpcClient, e.celoNode.rpcClientTwo, *awr)
+		go e.waitAndVerifyEVMChain(context.Background(), e.celoNode.rpcClient, e.celoNode.rpcClientTwo, *awr, ctx)
 	case ETH:
-		go e.waitAndVerifyEVMChain(context.Background(), e.ethNode.rpcClient, e.ethNode.rpcClientTwo, *awr)
+		go e.waitAndVerifyEVMChain(context.Background(), e.ethNode.rpcClient, e.ethNode.rpcClientTwo, *awr, ctx)
 	case POL:
-		go e.waitAndVerifyEVMChain(context.Background(), e.polygonNode.rpcClient, e.polygonNode.rpcClientTwo, *awr)
+		go e.waitAndVerifyEVMChain(context.Background(), e.polygonNode.rpcClient, e.polygonNode.rpcClientTwo, *awr, ctx)
 	}
 }

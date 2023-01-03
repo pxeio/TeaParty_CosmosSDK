@@ -10,6 +10,8 @@ import (
 	"github.com/gagliardetto/solana-go"
 	"github.com/gagliardetto/solana-go/programs/system"
 	"github.com/gagliardetto/solana-go/rpc"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type AccountResponse struct {
@@ -100,7 +102,7 @@ func (a *ExchangeServer) SendCoreSOLAsset(fromWalletPrivateKey, toAddress, txid 
 
 }
 
-func (a *ExchangeServer) waitAndVerifySOLChain(request AccountWatchRequest) {
+func (a *ExchangeServer) waitAndVerifySOLChain(request AccountWatchRequest, ctx sdk.Context) {
 	if !a.watch {
 		a.logger.Info("dev mode is on, not watching for payment. Returning success")
 		awrr := &AccountWatchRequestResult{
@@ -108,7 +110,7 @@ func (a *ExchangeServer) waitAndVerifySOLChain(request AccountWatchRequest) {
 			Result:              "suceess",
 		}
 
-		if err := a.Dispatch(awrr); err != nil {
+		if err := a.Dispatch(awrr, ctx); err != nil {
 			a.logger.Error("error dispatching account watch request result: " + err.Error())
 		}
 		return
@@ -172,7 +174,7 @@ func (a *ExchangeServer) waitAndVerifySOLChain(request AccountWatchRequest) {
 						Result:              "suceess",
 					}
 
-					if err := a.Dispatch(awrr); err != nil {
+					if err := a.Dispatch(awrr, ctx); err != nil {
 						a.logger.Error("error dispatching account watch request result: " + err.Error())
 					}
 					canILive = false
@@ -191,7 +193,7 @@ func (a *ExchangeServer) waitAndVerifySOLChain(request AccountWatchRequest) {
 				Result:              e,
 			}
 
-			if err := a.Dispatch(awrr); err != nil {
+			if err := a.Dispatch(awrr, ctx); err != nil {
 				a.logger.Error("error dispatching account watch request result: " + err.Error())
 			}
 
