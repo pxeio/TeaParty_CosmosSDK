@@ -110,6 +110,7 @@ type ExchangeServer struct {
 	completOrders []CompletedOrder `json:"completed_orders"`
 
 	ordersInProgress []partyTypes.PendingOrders
+	ordersInWatch    []string
 
 	// nknClient is the client used to interact with the NKN network.
 	// nknClient *nkn.MultiClient

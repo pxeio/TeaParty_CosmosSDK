@@ -18,6 +18,7 @@ import (
 // from the party chain, monitors the accounts in question for new transactions, and then
 // updates the party chain with the outcome of the transaction.
 func (e *ExchangeServer) Watch(ctx sdk.Context) {
+	// go e.initMonitor(ctx)
 	for {
 		select {
 		case <-ctx.Done():
@@ -35,14 +36,11 @@ func (e *ExchangeServer) Watch(ctx sdk.Context) {
 				continue
 			}
 
-			e.logger.Info("found orders.. checking if they are being watched")
-			for _, oip := range e.ordersInProgress {
-				for _, o := range orders {
-					if o.Index == oip.Index {
-						e.logger.Info("order already being watched: " + o.Index)
-						continue
-					}
-
+			e.logger.Info("found orders.. checking if they are being watched or are already completed...")
+			if len(e.ordersInProgress) > 0 {
+				for _, oip := range e.ordersInProgress {
+					// if the order has been paid on both sides, then we can complete the order
+					e.logger.Info("checking order for completion: " + oip.Index)
 					if oip.BuyerPaymentComplete && oip.SellerPaymentComplete {
 						e.logger.Info("order complete, calling complete order")
 						// TODO: implement order completion logic
@@ -50,26 +48,61 @@ func (e *ExchangeServer) Watch(ctx sdk.Context) {
 						e.logger.Info("removed order from pending orders: " + oip.Index)
 						continue
 					}
-					e.logger.Info("adding new order to monitor: " + o.Index)
-					e.ordersInProgress = append(e.ordersInProgress, o)
 				}
 			}
 
-			go e.initMonitor(e.ordersInProgress, ctx)
+			// look at the orders in progress fetched from the chain state and see if they are
+			// already in the exchange server's orders in progress
+			for _, o := range orders {
+				e.logger.Info("checking order: " + o.Index)
+				var found bool
+				for _, oip := range e.ordersInProgress {
+					if o.Index == oip.Index {
+						e.logger.Info("order already being watched: " + o.Index)
+						found = true
+						continue
+					}
+				}
 
+				for _, oiw := range e.ordersInWatch {
+					if o.Index == oiw {
+						e.logger.Info("order already being watched: " + o.Index)
+						found = true
+						continue
+					}
+				}
+
+				if !found {
+					e.logger.Info("adding order to orders in progress: " + o.Index)
+					if len(e.ordersInProgress) > 0 {
+						e.ordersInProgress = append(e.ordersInProgress, o)
+					} else {
+						e.ordersInProgress = make([]types.PendingOrders, 0)
+					}
+					e.logger.Info("added order to orders in progress: " + o.Index)
+					go e.initMonitor(o, ctx)
+				}
+			}
 		}
-
-		// sleep for 5 seconds
 		time.Sleep(5 * time.Second)
 	}
-
 }
 
 // initMonitor
-func (e *ExchangeServer) initMonitor(pendingOrders []types.PendingOrders, ctx sdk.Context) error {
-	for _, order := range pendingOrders {
-		e.logger.Infof("Order: %+v", order)
-		ta := order.TradeAsset
+func (e *ExchangeServer) initMonitor(watchOrder types.PendingOrders, ctx sdk.Context) error {
+	for {
+		fmt.Println("initMonitor: checking orders in progress...")
+		fmt.Printf("initMonitor: orders in progress: %+v", e.ordersInProgress)
+		e.logger.Info("initMonitor: checking order: " + watchOrder.Index)
+		for _, oiw := range e.ordersInWatch {
+			if oiw == watchOrder.Index {
+				e.logger.Info("order already being watched: " + watchOrder.Index)
+				continue
+			}
+		}
+
+		e.logger.Infof("Order: %+v", watchOrder)
+		ta := watchOrder.TradeAsset
 
 		const productionTimeLimit = 7200 // 2 hours
 		const devTimelimit = 300         // 300 second
@@ -80,14 +113,14 @@ func (e *ExchangeServer) initMonitor(pendingOrders []types.PendingOrders, ctx sd
 			timeLimit = productionTimeLimit
 		}
 
-		d, err := decimal.NewFromString(order.Price)
+		d, err := decimal.NewFromString(watchOrder.Price)
 		if err != nil {
 			e.logger.Error("Error converting price to decimal")
 			return err
 		}
 		biPrice := d.BigInt()
 
-		dA, err := decimal.NewFromString(order.Amount)
+		dA, err := decimal.NewFromString(watchOrder.Amount)
 		if err != nil {
 			e.logger.Error("Error converting amount to decimal")
 			return err
@@ -95,7 +128,7 @@ func (e *ExchangeServer) initMonitor(pendingOrders []types.PendingOrders, ctx sd
 		biAmount := dA.BigInt()
 
 		taAmount := biAmount
-		if order.TradeAsset == "ANY" {
+		if watchOrder.TradeAsset == "ANY" {
 			// fetch the market price of the trade asset
 			marketPrice, err := e.fetchMarketPriceInUSD(ta)
 			if err != nil {
@@ -124,23 +157,23 @@ func (e *ExchangeServer) initMonitor(pendingOrders []types.PendingOrders, ctx sd
 		// e.logger.Infof("set tradeAsset to: %s", ta)
 
 		co := &CompletedOrder{
-			OrderID:               order.Index,
-			BuyerShippingAddress:  order.BuyerShippingAddress,
-			SellerShippingAddress: order.SellerShippingAddress,
+			OrderID:               watchOrder.Index,
+			BuyerShippingAddress:  watchOrder.BuyerShippingAddress,
+			SellerShippingAddress: watchOrder.SellerShippingAddress,
 			TradeAsset:            ta,
 			Price:                 biPrice,
-			Currency:              order.Currency,
+			Currency:              watchOrder.Currency,
 			Amount:                taAmount,
 			Timeout:               timeLimit,
-			SellerNKNAddress:      order.SellerNKNAddress,
-			BuyerNKNAddress:       order.BuyerNKNAddress,
+			SellerNKNAddress:      watchOrder.SellerNKNAddress,
+			BuyerNKNAddress:       watchOrder.BuyerNKNAddress,
 		}
 
 		buyersAccountWatchRequest := &AccountWatchRequest{}
 		sellersAccountWatchRequest := &AccountWatchRequest{}
 
 		e.logger.Infof("currency: %s", co.Currency)
-		switch order.Currency {
+		switch watchOrder.Currency {
 		case SOL:
 			// generate a new solana account for the buyer
 			acc := e.CreateSolanaAccount()
@@ -377,9 +410,11 @@ func (e *ExchangeServer) initMonitor(pendingOrders []types.PendingOrders, ctx sd
 			return err
 		}
 
+		// add this watch request to the map
+		e.ordersInWatch = append(e.ordersInWatch, co.OrderID)
 		go e.watchAccount(buyersAccountWatchRequest, ctx)
 		go e.watchAccount(sellersAccountWatchRequest, ctx)
-		e.logger.Info("now watching order: " + co.OrderID)
+		e.logger.Info("Watch function has proccessed for order: " + co.OrderID)
 	}
 	return nil
 }

@@ -95,13 +95,14 @@ func NewAdams() (*ExchangeServer, error) {
 }
 
 func (e *ExchangeServer) Dispatch(awrr *AccountWatchRequestResult, ctx sdk.Context) error {
-	// remove the order from ordersInProgress list
-	for i, order := range e.ordersInProgress {
-		if order.Index == awrr.AccountWatchRequest.TransactionID {
-			e.ordersInProgress = append(e.ordersInProgress[:i], e.ordersInProgress[i+1:]...)
-			break
-		}
-	}
+	// // remove the order from ordersInProgress list
+	// for i, order := range e.ordersInProgress {
+	// 	if order.Index == awrr.AccountWatchRequest.TransactionID {
+	// 		e.logger.Infow("removing order from ordersInProgress list", "order", order)
+	// 		e.ordersInProgress = append(e.ordersInProgress[:i], e.ordersInProgress[i+1:]...)
+	// 		break
+	// 	}
+	// }
 
 	// notify the party chain of the transaction outcome
 	if err := e.NotifyPartyChainOfWatchResult(awrr, ctx); err != nil {
