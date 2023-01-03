@@ -38,7 +38,6 @@ export interface MsgCancelResponse {
 export interface MsgAccountWatchOutcome {
   creator: string;
   txID: string;
-  paymentTransactionID: string;
   buyer: boolean;
   paymentOutcome: string;
 }
@@ -425,7 +424,7 @@ export const MsgCancelResponse = {
 };
 
 function createBaseMsgAccountWatchOutcome(): MsgAccountWatchOutcome {
-  return { creator: "", txID: "", paymentTransactionID: "", buyer: false, paymentOutcome: "" };
+  return { creator: "", txID: "", buyer: false, paymentOutcome: "" };
 }
 
 export const MsgAccountWatchOutcome = {
@@ -436,14 +435,11 @@ export const MsgAccountWatchOutcome = {
     if (message.txID !== "") {
       writer.uint32(18).string(message.txID);
     }
-    if (message.paymentTransactionID !== "") {
-      writer.uint32(26).string(message.paymentTransactionID);
-    }
     if (message.buyer === true) {
-      writer.uint32(32).bool(message.buyer);
+      writer.uint32(24).bool(message.buyer);
     }
     if (message.paymentOutcome !== "") {
-      writer.uint32(42).string(message.paymentOutcome);
+      writer.uint32(34).string(message.paymentOutcome);
     }
     return writer;
   },
@@ -462,12 +458,9 @@ export const MsgAccountWatchOutcome = {
           message.txID = reader.string();
           break;
         case 3:
-          message.paymentTransactionID = reader.string();
-          break;
-        case 4:
           message.buyer = reader.bool();
           break;
-        case 5:
+        case 4:
           message.paymentOutcome = reader.string();
           break;
         default:
@@ -482,7 +475,6 @@ export const MsgAccountWatchOutcome = {
     return {
       creator: isSet(object.creator) ? String(object.creator) : "",
       txID: isSet(object.txID) ? String(object.txID) : "",
-      paymentTransactionID: isSet(object.paymentTransactionID) ? String(object.paymentTransactionID) : "",
       buyer: isSet(object.buyer) ? Boolean(object.buyer) : false,
       paymentOutcome: isSet(object.paymentOutcome) ? String(object.paymentOutcome) : "",
     };
@@ -492,7 +484,6 @@ export const MsgAccountWatchOutcome = {
     const obj: any = {};
     message.creator !== undefined && (obj.creator = message.creator);
     message.txID !== undefined && (obj.txID = message.txID);
-    message.paymentTransactionID !== undefined && (obj.paymentTransactionID = message.paymentTransactionID);
     message.buyer !== undefined && (obj.buyer = message.buyer);
     message.paymentOutcome !== undefined && (obj.paymentOutcome = message.paymentOutcome);
     return obj;
@@ -502,7 +493,6 @@ export const MsgAccountWatchOutcome = {
     const message = createBaseMsgAccountWatchOutcome();
     message.creator = object.creator ?? "";
     message.txID = object.txID ?? "";
-    message.paymentTransactionID = object.paymentTransactionID ?? "";
     message.buyer = object.buyer ?? false;
     message.paymentOutcome = object.paymentOutcome ?? "";
     return message;

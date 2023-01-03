@@ -50,9 +50,8 @@ message MsgCancelResponse {
 message MsgAccountWatchOutcome {
   string creator = 1;
   string txID = 2;
-  string paymentTransactionID = 3;
-  bool buyer = 4;
-  string paymentOutcome = 5;
+  bool buyer = 3;
+  string paymentOutcome = 4;
 }
 
 message MsgAccountWatchOutcomeResponse {

@@ -15,17 +15,16 @@ var _ = strconv.Itoa(0)
 
 func CmdAccountWatchOutcome() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "account-watch-outcome [tx-id] [payment-transaction-id] [buyer] [payment-outcome]",
+		Use:   "account-watch-outcome [tx-id] [buyer] [payment-outcome]",
 		Short: "Broadcast message account-watch-outcome",
-		Args:  cobra.ExactArgs(4),
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			argTxID := args[0]
-			argPaymentTransactionID := args[1]
-			argBuyer, err := cast.ToBoolE(args[2])
+			argBuyer, err := cast.ToBoolE(args[1])
 			if err != nil {
 				return err
 			}
-			argPaymentOutcome := args[3]
+			argPaymentOutcome := args[2]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -35,7 +34,6 @@ func CmdAccountWatchOutcome() *cobra.Command {
 			msg := types.NewMsgAccountWatchOutcome(
 				clientCtx.GetFromAddress().String(),
 				argTxID,
-				argPaymentTransactionID,
 				argBuyer,
 				argPaymentOutcome,
 			)

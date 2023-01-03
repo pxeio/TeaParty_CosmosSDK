@@ -9,13 +9,12 @@ const TypeMsgAccountWatchOutcome = "account_watch_outcome"
 
 var _ sdk.Msg = &MsgAccountWatchOutcome{}
 
-func NewMsgAccountWatchOutcome(creator string, txID string, paymentTransactionID string, buyer bool, paymentOutcome string) *MsgAccountWatchOutcome {
+func NewMsgAccountWatchOutcome(creator string, txID string, buyer bool, paymentOutcome string) *MsgAccountWatchOutcome {
 	return &MsgAccountWatchOutcome{
-		Creator:              creator,
-		TxID:                 txID,
-		PaymentTransactionID: paymentTransactionID,
-		Buyer:                buyer,
-		PaymentOutcome:       paymentOutcome,
+		Creator:        creator,
+		TxID:           txID,
+		Buyer:          buyer,
+		PaymentOutcome: paymentOutcome,
 	}
 }
 

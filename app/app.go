@@ -15,6 +15,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/server/api"
 	"github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
+	"github.com/cosmos/cosmos-sdk/simapp"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
@@ -101,7 +102,6 @@ import (
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	"github.com/tendermint/tendermint/libs/log"
 	tmos "github.com/tendermint/tendermint/libs/os"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 	dbm "github.com/tendermint/tm-db"
 
 	partymodule "github.com/TeaPartyCrypto/partychain/x/party"
@@ -112,8 +112,6 @@ import (
 
 	appparams "github.com/TeaPartyCrypto/partychain/app/params"
 	"github.com/TeaPartyCrypto/partychain/docs"
-
-	adams "github.com/TeaPartyCrypto/partychain/app/adams"
 )
 
 const (
@@ -188,7 +186,7 @@ var (
 
 var (
 	_ servertypes.Application = (*App)(nil)
-	// _ simapp.App              = (*App)(nil)
+	_ simapp.App              = (*App)(nil)
 )
 
 func init() {
@@ -251,8 +249,6 @@ type App struct {
 	// sm is the simulation manager
 	sm           *module.SimulationManager
 	configurator module.Configurator
-
-	Exchange *adams.ExchangeServer
 }
 
 // New returns a reference to an initialized blockchain app
@@ -715,18 +711,6 @@ func New(
 
 	app.ScopedIBCKeeper = scopedIBCKeeper
 	app.ScopedTransferKeeper = scopedTransferKeeper
-	// retrieve the apps public key
-	// pubKey, err := app.ModuleAccountAddrs()
-	adm, err := adams.NewAdams()
-	if err != nil {
-		panic(err)
-	}
-	adm.PartyKeeper = &app.PartyKeeper
-	app.Exchange = adm
-	// create a new cosmos sdk context
-	ctx := app.BaseApp.NewContext(true, tmproto.Header{})
-	go adm.Watch(ctx)
-
 	// this line is used by starport scaffolding # stargate/app/beforeInitReturn
 
 	return app
