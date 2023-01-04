@@ -28,14 +28,12 @@ func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyR
 	}
 
 	// create a new escrow wallet for the buyer
-	// buyerEscrowWallet := "0x0000000000000000000000000000000000000001"
 	err, buyerPrivateKey, buyerPublicKey := generateEVMAccount()
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Failed to generate escrow wallet for buyer.")
 	}
 
 	// create a new escrow wallet for the seller
-	// sellerEscrowWallet := "0x0000000000000000000000000000000000000002"
 	err, sellerPrivateKey, sellerPublicKey := generateEVMAccount()
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Failed to generate escrow wallet for seller.")
@@ -79,6 +77,7 @@ func generateEVMAccount() (error, *ecdsa.PrivateKey, string) {
 		return err, nil, ""
 	}
 
+	// TODO:: fix this again. was lost in a bad git commit
 	privateKeyBytes := crypto.FromECDSA(privateKey)
 	publicKey := hexutil.Encode(privateKeyBytes)[2:]
 	return nil, privateKey, publicKey

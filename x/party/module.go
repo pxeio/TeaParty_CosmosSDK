@@ -180,6 +180,8 @@ func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 				return
 			}
 
+			// TODO::  Double check that the buyer and seller have the correct amount of funds in their escrow accounts
+
 			// create a new order awaiting finalizer for the buyer
 			buyeroaf := partyTypes.OrdersAwaitingFinalizer{
 				Index:            order.SellerEscrowWalletPublicKey,
@@ -208,12 +210,6 @@ func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 			am.keeper.SetOrdersAwaitingFinalizer(ctx, selleroaf)
 			am.keeper.RemovePendingOrders(ctx, order.Index)
 		}
-
-		// look at the list of accounts awaiting finalizer and see if any of them
-		// have ben finalized
-		// if they have, then we need to remove the account from the list
-		// for _, account := range am.keeper.GetAllAccountsAwaitingFinalizer(ctx) {
-		// 	for
 
 	}
 

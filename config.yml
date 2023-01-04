@@ -1,12 +1,22 @@
 version: 1
 accounts:
   - name: alice
-    coins: ["20000token", "200000000stake"]
+    coins: ["200000000000ugrm"]
   - name: bob
-    coins: ["10000token", "100000000stake"]
+    coins: ["200000000000ugrm"]
+  - name: joe
+    coins: ["200000000000ugrm"]
+  - name: bank
+    coins: ["200000000000ugrm"]
+  - name: fauci
+    coins: ["2000000ugrm"]
 validators:
   - name: alice
-    bonded: "100000000stake"
+    bonded: "200000000000ugrm"
+  - name: bob
+    bonded: "200000000000ugrm"
+  - name: joe
+    bonded: "200000000000ugrm"
 client:
   openapi:
     path: "docs/static/openapi.yml"
@@ -15,5 +25,27 @@ client:
   vuex:
     path: "vue/src/store"
 faucet:
-  name: bob
-  coins: ["5token", "100000stake"]
+  name: fauci
+  coins: ["2ugrm"]
+genesis:
+  app_state:
+    staking:
+      params:
+        bond_denom: "ugrm"
+    # party:
+    #   warrenList:
+    #     - index: "1"
+    #       apiKey: "192.168.0.1"
+    #       creator: "0x"
+    governance:
+      params:
+        bond_denom: "ugrm"
+    mint:
+      params:
+        mint_denom: "ugrm"
+    staking:
+      params:
+        bond_denom: "ugrm"
+        unbonding_time: "10000s"
+
+
