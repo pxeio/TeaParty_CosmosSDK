@@ -7,26 +7,15 @@ import { msgTypes } from './registry';
 import { IgniteClient } from "../client"
 import { MissingWalletError } from "../helpers"
 import { Api } from "./rest";
-import { MsgSubmitSell } from "./types/partychain/party/tx";
-import { MsgBuy } from "./types/partychain/party/tx";
 import { MsgAccountWatchOutcome } from "./types/partychain/party/tx";
 import { MsgCancel } from "./types/partychain/party/tx";
+import { MsgBuy } from "./types/partychain/party/tx";
 import { MsgAccountWatchFailure } from "./types/partychain/party/tx";
+import { MsgTransactionResult } from "./types/partychain/party/tx";
+import { MsgSubmitSell } from "./types/partychain/party/tx";
 
 
-export { MsgSubmitSell, MsgBuy, MsgAccountWatchOutcome, MsgCancel, MsgAccountWatchFailure };
-
-type sendMsgSubmitSellParams = {
-  value: MsgSubmitSell,
-  fee?: StdFee,
-  memo?: string
-};
-
-type sendMsgBuyParams = {
-  value: MsgBuy,
-  fee?: StdFee,
-  memo?: string
-};
+export { MsgAccountWatchOutcome, MsgCancel, MsgBuy, MsgAccountWatchFailure, MsgTransactionResult, MsgSubmitSell };
 
 type sendMsgAccountWatchOutcomeParams = {
   value: MsgAccountWatchOutcome,
@@ -40,20 +29,30 @@ type sendMsgCancelParams = {
   memo?: string
 };
 
+type sendMsgBuyParams = {
+  value: MsgBuy,
+  fee?: StdFee,
+  memo?: string
+};
+
 type sendMsgAccountWatchFailureParams = {
   value: MsgAccountWatchFailure,
   fee?: StdFee,
   memo?: string
 };
 
+type sendMsgTransactionResultParams = {
+  value: MsgTransactionResult,
+  fee?: StdFee,
+  memo?: string
+};
 
-type msgSubmitSellParams = {
+type sendMsgSubmitSellParams = {
   value: MsgSubmitSell,
+  fee?: StdFee,
+  memo?: string
 };
 
-type msgBuyParams = {
-  value: MsgBuy,
-};
 
 type msgAccountWatchOutcomeParams = {
   value: MsgAccountWatchOutcome,
@@ -63,8 +62,20 @@ type msgCancelParams = {
   value: MsgCancel,
 };
 
+type msgBuyParams = {
+  value: MsgBuy,
+};
+
 type msgAccountWatchFailureParams = {
   value: MsgAccountWatchFailure,
+};
+
+type msgTransactionResultParams = {
+  value: MsgTransactionResult,
+};
+
+type msgSubmitSellParams = {
+  value: MsgSubmitSell,
 };
 
 
@@ -84,34 +95,6 @@ interface TxClientOptions {
 export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "http://localhost:26657", prefix: "cosmos" }) => {
 
   return {
-		
-		async sendMsgSubmitSell({ value, fee, memo }: sendMsgSubmitSellParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgSubmitSell: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgSubmitSell({ value: MsgSubmitSell.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgSubmitSell: Could not broadcast Tx: '+ e.message)
-			}
-		},
-		
-		async sendMsgBuy({ value, fee, memo }: sendMsgBuyParams): Promise<DeliverTxResponse> {
-			if (!signer) {
-					throw new Error('TxClient:sendMsgBuy: Unable to sign Tx. Signer is not present.')
-			}
-			try {			
-				const { address } = (await signer.getAccounts())[0]; 
-				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
-				let msg = this.msgBuy({ value: MsgBuy.fromPartial(value) })
-				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
-			} catch (e: any) {
-				throw new Error('TxClient:sendMsgBuy: Could not broadcast Tx: '+ e.message)
-			}
-		},
 		
 		async sendMsgAccountWatchOutcome({ value, fee, memo }: sendMsgAccountWatchOutcomeParams): Promise<DeliverTxResponse> {
 			if (!signer) {
@@ -141,6 +124,20 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
+		async sendMsgBuy({ value, fee, memo }: sendMsgBuyParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgBuy: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgBuy({ value: MsgBuy.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
+			} catch (e: any) {
+				throw new Error('TxClient:sendMsgBuy: Could not broadcast Tx: '+ e.message)
+			}
+		},
+		
 		async sendMsgAccountWatchFailure({ value, fee, memo }: sendMsgAccountWatchFailureParams): Promise<DeliverTxResponse> {
 			if (!signer) {
 					throw new Error('TxClient:sendMsgAccountWatchFailure: Unable to sign Tx. Signer is not present.')
@@ -155,22 +152,34 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
-		
-		msgSubmitSell({ value }: msgSubmitSellParams): EncodeObject {
-			try {
-				return { typeUrl: "/teapartycrypto.partychain.party.MsgSubmitSell", value: MsgSubmitSell.fromPartial( value ) }  
+		async sendMsgTransactionResult({ value, fee, memo }: sendMsgTransactionResultParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgTransactionResult: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgTransactionResult({ value: MsgTransactionResult.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
 			} catch (e: any) {
-				throw new Error('TxClient:MsgSubmitSell: Could not create message: ' + e.message)
+				throw new Error('TxClient:sendMsgTransactionResult: Could not broadcast Tx: '+ e.message)
 			}
 		},
 		
-		msgBuy({ value }: msgBuyParams): EncodeObject {
-			try {
-				return { typeUrl: "/teapartycrypto.partychain.party.MsgBuy", value: MsgBuy.fromPartial( value ) }  
+		async sendMsgSubmitSell({ value, fee, memo }: sendMsgSubmitSellParams): Promise<DeliverTxResponse> {
+			if (!signer) {
+					throw new Error('TxClient:sendMsgSubmitSell: Unable to sign Tx. Signer is not present.')
+			}
+			try {			
+				const { address } = (await signer.getAccounts())[0]; 
+				const signingClient = await SigningStargateClient.connectWithSigner(addr,signer,{registry, prefix});
+				let msg = this.msgSubmitSell({ value: MsgSubmitSell.fromPartial(value) })
+				return await signingClient.signAndBroadcast(address, [msg], fee ? fee : defaultFee, memo)
 			} catch (e: any) {
-				throw new Error('TxClient:MsgBuy: Could not create message: ' + e.message)
+				throw new Error('TxClient:sendMsgSubmitSell: Could not broadcast Tx: '+ e.message)
 			}
 		},
+		
 		
 		msgAccountWatchOutcome({ value }: msgAccountWatchOutcomeParams): EncodeObject {
 			try {
@@ -188,11 +197,35 @@ export const txClient = ({ signer, prefix, addr }: TxClientOptions = { addr: "ht
 			}
 		},
 		
+		msgBuy({ value }: msgBuyParams): EncodeObject {
+			try {
+				return { typeUrl: "/teapartycrypto.partychain.party.MsgBuy", value: MsgBuy.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgBuy: Could not create message: ' + e.message)
+			}
+		},
+		
 		msgAccountWatchFailure({ value }: msgAccountWatchFailureParams): EncodeObject {
 			try {
 				return { typeUrl: "/teapartycrypto.partychain.party.MsgAccountWatchFailure", value: MsgAccountWatchFailure.fromPartial( value ) }  
 			} catch (e: any) {
 				throw new Error('TxClient:MsgAccountWatchFailure: Could not create message: ' + e.message)
+			}
+		},
+		
+		msgTransactionResult({ value }: msgTransactionResultParams): EncodeObject {
+			try {
+				return { typeUrl: "/teapartycrypto.partychain.party.MsgTransactionResult", value: MsgTransactionResult.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgTransactionResult: Could not create message: ' + e.message)
+			}
+		},
+		
+		msgSubmitSell({ value }: msgSubmitSellParams): EncodeObject {
+			try {
+				return { typeUrl: "/teapartycrypto.partychain.party.MsgSubmitSell", value: MsgSubmitSell.fromPartial( value ) }  
+			} catch (e: any) {
+				throw new Error('TxClient:MsgSubmitSell: Could not create message: ' + e.message)
 			}
 		},
 		
