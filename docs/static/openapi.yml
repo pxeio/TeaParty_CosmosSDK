@@ -44935,8 +44935,14 @@ paths:
                       type: string
                     sellerPaymentComplete:
                       type: boolean
+                    sellerPaymentCompleteBlockHeight:
+                      type: integer
+                      format: int32
                     buyerPaymentComplete:
                       type: boolean
+                    buyerPaymentCompleteBlockHeight:
+                      type: integer
+                      format: int32
                     amount:
                       type: string
                     buyerShippingAddress:
@@ -44958,7 +44964,8 @@ paths:
                     price:
                       type: string
                     blockHeight:
-                      type: string
+                      type: integer
+                      format: int32
               pagination:
                 type: object
                 properties:
@@ -45089,8 +45096,14 @@ paths:
                     type: string
                   sellerPaymentComplete:
                     type: boolean
+                  sellerPaymentCompleteBlockHeight:
+                    type: integer
+                    format: int32
                   buyerPaymentComplete:
                     type: boolean
+                  buyerPaymentCompleteBlockHeight:
+                    type: integer
+                    format: int32
                   amount:
                     type: string
                   buyerShippingAddress:
@@ -45112,7 +45125,8 @@ paths:
                   price:
                     type: string
                   blockHeight:
-                    type: string
+                    type: integer
+                    format: int32
         default:
           description: An unexpected error response.
           schema:
@@ -74891,8 +74905,6 @@ definitions:
     type: object
   teapartycrypto.partychain.party.MsgSubmitSellResponse:
     type: object
-  teapartycrypto.partychain.party.MsgTransactionResultResponse:
-    type: object
   teapartycrypto.partychain.party.OrdersAwaitingFinalizer:
     type: object
     properties:
@@ -74930,8 +74942,14 @@ definitions:
         type: string
       sellerPaymentComplete:
         type: boolean
+      sellerPaymentCompleteBlockHeight:
+        type: integer
+        format: int32
       buyerPaymentComplete:
         type: boolean
+      buyerPaymentCompleteBlockHeight:
+        type: integer
+        format: int32
       amount:
         type: string
       buyerShippingAddress:
@@ -74953,7 +74971,8 @@ definitions:
       price:
         type: string
       blockHeight:
-        type: string
+        type: integer
+        format: int32
   teapartycrypto.partychain.party.QueryAllOrdersAwaitingFinalizerResponse:
     type: object
     properties:
@@ -75024,8 +75043,14 @@ definitions:
               type: string
             sellerPaymentComplete:
               type: boolean
+            sellerPaymentCompleteBlockHeight:
+              type: integer
+              format: int32
             buyerPaymentComplete:
               type: boolean
+            buyerPaymentCompleteBlockHeight:
+              type: integer
+              format: int32
             amount:
               type: string
             buyerShippingAddress:
@@ -75047,7 +75072,8 @@ definitions:
             price:
               type: string
             blockHeight:
-              type: string
+              type: integer
+              format: int32
       pagination:
         type: object
         properties:
@@ -75164,8 +75190,14 @@ definitions:
             type: string
           sellerPaymentComplete:
             type: boolean
+          sellerPaymentCompleteBlockHeight:
+            type: integer
+            format: int32
           buyerPaymentComplete:
             type: boolean
+          buyerPaymentCompleteBlockHeight:
+            type: integer
+            format: int32
           amount:
             type: string
           buyerShippingAddress:
@@ -75187,7 +75219,8 @@ definitions:
           price:
             type: string
           blockHeight:
-            type: string
+            type: integer
+            format: int32
   teapartycrypto.partychain.party.QueryGetTradeOrdersResponse:
     type: object
     properties:

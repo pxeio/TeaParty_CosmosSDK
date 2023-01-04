@@ -12,7 +12,6 @@ service Msg {
   rpc Cancel(MsgCancel) returns (MsgCancelResponse);
   rpc AccountWatchOutcome(MsgAccountWatchOutcome) returns (MsgAccountWatchOutcomeResponse);
   rpc AccountWatchFailure(MsgAccountWatchFailure) returns (MsgAccountWatchFailureResponse);
-  rpc TransactionResult(MsgTransactionResult) returns (MsgTransactionResultResponse);
 // this line is used by starport scaffolding # proto/tx/rpc
 }
 
@@ -64,15 +63,6 @@ message MsgAccountWatchFailure {
 }
 
 message MsgAccountWatchFailureResponse {
-}
-
-message MsgTransactionResult {
-  string creator = 1;
-  string txID = 2;
-  string outcome = 3;
-}
-
-message MsgTransactionResultResponse {
 }
 
 // this line is used by starport scaffolding # proto/tx/message

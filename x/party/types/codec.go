@@ -13,7 +13,6 @@ func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgCancel{}, "party/Cancel", nil)
 	cdc.RegisterConcrete(&MsgAccountWatchOutcome{}, "party/AccountWatchOutcome", nil)
 	cdc.RegisterConcrete(&MsgAccountWatchFailure{}, "party/AccountWatchFailure", nil)
-	cdc.RegisterConcrete(&MsgTransactionResult{}, "party/TransactionResult", nil)
 	// this line is used by starport scaffolding # 2
 }
 
@@ -32,9 +31,6 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	)
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgAccountWatchFailure{},
-	)
-	registry.RegisterImplementations((*sdk.Msg)(nil),
-		&MsgTransactionResult{},
 	)
 	// this line is used by starport scaffolding # 3
 

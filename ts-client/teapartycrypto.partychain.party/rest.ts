@@ -19,8 +19,6 @@ export type PartyMsgCancelResponse = object;
 
 export type PartyMsgSubmitSellResponse = object;
 
-export type PartyMsgTransactionResultResponse = object;
-
 export interface PartyOrdersAwaitingFinalizer {
   index?: string;
   nknAddress?: string;
@@ -44,7 +42,13 @@ export interface PartyPendingOrders {
   sellerEscrowWalletPublicKey?: string;
   sellerEscrowWalletPrivateKey?: string;
   sellerPaymentComplete?: boolean;
+
+  /** @format int32 */
+  sellerPaymentCompleteBlockHeight?: number;
   buyerPaymentComplete?: boolean;
+
+  /** @format int32 */
+  buyerPaymentCompleteBlockHeight?: number;
   amount?: string;
   buyerShippingAddress?: string;
   buyerRefundAddress?: string;
@@ -55,7 +59,9 @@ export interface PartyPendingOrders {
   tradeAsset?: string;
   currency?: string;
   price?: string;
-  blockHeight?: string;
+
+  /** @format int32 */
+  blockHeight?: number;
 }
 
 export interface PartyQueryAllOrdersAwaitingFinalizerResponse {

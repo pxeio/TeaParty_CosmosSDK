@@ -10,18 +10,20 @@ message PendingOrders {
   string sellerEscrowWalletPublicKey = 4; 
   string sellerEscrowWalletPrivateKey = 5; 
   bool sellerPaymentComplete = 6; 
-  bool buyerPaymentComplete = 7; 
-  string amount = 8; 
-  string buyerShippingAddress = 9; 
-  string buyerRefundAddress = 10; 
-  string buyerNKNAddress = 11; 
-  string sellerRefundAddress = 12; 
-  string sellerShippingAddress = 13; 
-  string sellerNKNAddress = 14; 
-  string tradeAsset = 15; 
-  string currency = 16; 
-  string price = 17; 
-  string blockHeight = 18; 
+  int32 sellerPaymentCompleteBlockHeight = 7; 
+  bool buyerPaymentComplete = 8; 
+  int32 buyerPaymentCompleteBlockHeight = 9; 
+  string amount = 10; 
+  string buyerShippingAddress = 11; 
+  string buyerRefundAddress = 12; 
+  string buyerNKNAddress = 13; 
+  string sellerRefundAddress = 14; 
+  string sellerShippingAddress = 15; 
+  string sellerNKNAddress = 16; 
+  string tradeAsset = 17; 
+  string currency = 18; 
+  string price = 19; 
+  int32 blockHeight = 20; 
   
 }
 

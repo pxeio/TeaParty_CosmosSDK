@@ -167,11 +167,18 @@ func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 		// escrow account to the seller and buyer || send the Private keys via NKN
 		// and remove the order from the list of pending orders
 		if order.BuyerPaymentComplete && order.SellerPaymentComplete {
-			// TODO:: check that the number of blocks since the order was created is greater than
-			// the number of blocks required for the order to be finalized
-
-			// add the order to the list of orders awaiting finalizer
-			// get the current order index
+			// check that the number of blocks since the payments were completed
+			// if it has been more then 24 blocks, then create the finalizers
+			// if less then 24 blocks, then return
+			currentBlockHeight := int32(ctx.BlockHeight())
+			sellerPaymentCompleteBlockHeight := order.SellerPaymentCompleteBlockHeight
+			buyerPaymentCompleteBlockHeight := order.BuyerPaymentCompleteBlockHeight
+			blocksSinceSellerPaymentComplete := currentBlockHeight - sellerPaymentCompleteBlockHeight
+			blocksSinceBuyerPaymentComplete := currentBlockHeight - buyerPaymentCompleteBlockHeight
+			if blocksSinceSellerPaymentComplete < 24 && blocksSinceBuyerPaymentComplete < 24 {
+				// return because the order needs more confirmations
+				return
+			}
 
 			// create a new order awaiting finalizer for the buyer
 			buyeroaf := partyTypes.OrdersAwaitingFinalizer{

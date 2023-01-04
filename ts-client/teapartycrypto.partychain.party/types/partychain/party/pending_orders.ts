@@ -10,7 +10,9 @@ export interface PendingOrders {
   sellerEscrowWalletPublicKey: string;
   sellerEscrowWalletPrivateKey: string;
   sellerPaymentComplete: boolean;
+  sellerPaymentCompleteBlockHeight: number;
   buyerPaymentComplete: boolean;
+  buyerPaymentCompleteBlockHeight: number;
   amount: string;
   buyerShippingAddress: string;
   buyerRefundAddress: string;
@@ -21,7 +23,7 @@ export interface PendingOrders {
   tradeAsset: string;
   currency: string;
   price: string;
-  blockHeight: string;
+  blockHeight: number;
 }
 
 function createBasePendingOrders(): PendingOrders {
@@ -32,7 +34,9 @@ function createBasePendingOrders(): PendingOrders {
     sellerEscrowWalletPublicKey: "",
     sellerEscrowWalletPrivateKey: "",
     sellerPaymentComplete: false,
+    sellerPaymentCompleteBlockHeight: 0,
     buyerPaymentComplete: false,
+    buyerPaymentCompleteBlockHeight: 0,
     amount: "",
     buyerShippingAddress: "",
     buyerRefundAddress: "",
@@ -43,7 +47,7 @@ function createBasePendingOrders(): PendingOrders {
     tradeAsset: "",
     currency: "",
     price: "",
-    blockHeight: "",
+    blockHeight: 0,
   };
 }
 
@@ -67,41 +71,47 @@ export const PendingOrders = {
     if (message.sellerPaymentComplete === true) {
       writer.uint32(48).bool(message.sellerPaymentComplete);
     }
+    if (message.sellerPaymentCompleteBlockHeight !== 0) {
+      writer.uint32(56).int32(message.sellerPaymentCompleteBlockHeight);
+    }
     if (message.buyerPaymentComplete === true) {
-      writer.uint32(56).bool(message.buyerPaymentComplete);
+      writer.uint32(64).bool(message.buyerPaymentComplete);
+    }
+    if (message.buyerPaymentCompleteBlockHeight !== 0) {
+      writer.uint32(72).int32(message.buyerPaymentCompleteBlockHeight);
     }
     if (message.amount !== "") {
-      writer.uint32(66).string(message.amount);
+      writer.uint32(82).string(message.amount);
     }
     if (message.buyerShippingAddress !== "") {
-      writer.uint32(74).string(message.buyerShippingAddress);
+      writer.uint32(90).string(message.buyerShippingAddress);
     }
     if (message.buyerRefundAddress !== "") {
-      writer.uint32(82).string(message.buyerRefundAddress);
+      writer.uint32(98).string(message.buyerRefundAddress);
     }
     if (message.buyerNKNAddress !== "") {
-      writer.uint32(90).string(message.buyerNKNAddress);
+      writer.uint32(106).string(message.buyerNKNAddress);
     }
     if (message.sellerRefundAddress !== "") {
-      writer.uint32(98).string(message.sellerRefundAddress);
+      writer.uint32(114).string(message.sellerRefundAddress);
     }
     if (message.sellerShippingAddress !== "") {
-      writer.uint32(106).string(message.sellerShippingAddress);
+      writer.uint32(122).string(message.sellerShippingAddress);
     }
     if (message.sellerNKNAddress !== "") {
-      writer.uint32(114).string(message.sellerNKNAddress);
+      writer.uint32(130).string(message.sellerNKNAddress);
     }
     if (message.tradeAsset !== "") {
-      writer.uint32(122).string(message.tradeAsset);
+      writer.uint32(138).string(message.tradeAsset);
     }
     if (message.currency !== "") {
-      writer.uint32(130).string(message.currency);
+      writer.uint32(146).string(message.currency);
     }
     if (message.price !== "") {
-      writer.uint32(138).string(message.price);
+      writer.uint32(154).string(message.price);
     }
-    if (message.blockHeight !== "") {
-      writer.uint32(146).string(message.blockHeight);
+    if (message.blockHeight !== 0) {
+      writer.uint32(160).int32(message.blockHeight);
     }
     return writer;
   },
@@ -132,40 +142,46 @@ export const PendingOrders = {
           message.sellerPaymentComplete = reader.bool();
           break;
         case 7:
-          message.buyerPaymentComplete = reader.bool();
+          message.sellerPaymentCompleteBlockHeight = reader.int32();
           break;
         case 8:
-          message.amount = reader.string();
+          message.buyerPaymentComplete = reader.bool();
           break;
         case 9:
-          message.buyerShippingAddress = reader.string();
+          message.buyerPaymentCompleteBlockHeight = reader.int32();
           break;
         case 10:
-          message.buyerRefundAddress = reader.string();
+          message.amount = reader.string();
           break;
         case 11:
-          message.buyerNKNAddress = reader.string();
+          message.buyerShippingAddress = reader.string();
           break;
         case 12:
-          message.sellerRefundAddress = reader.string();
+          message.buyerRefundAddress = reader.string();
           break;
         case 13:
-          message.sellerShippingAddress = reader.string();
+          message.buyerNKNAddress = reader.string();
           break;
         case 14:
-          message.sellerNKNAddress = reader.string();
+          message.sellerRefundAddress = reader.string();
           break;
         case 15:
-          message.tradeAsset = reader.string();
+          message.sellerShippingAddress = reader.string();
           break;
         case 16:
-          message.currency = reader.string();
+          message.sellerNKNAddress = reader.string();
           break;
         case 17:
-          message.price = reader.string();
+          message.tradeAsset = reader.string();
           break;
         case 18:
-          message.blockHeight = reader.string();
+          message.currency = reader.string();
+          break;
+        case 19:
+          message.price = reader.string();
+          break;
+        case 20:
+          message.blockHeight = reader.int32();
           break;
         default:
           reader.skipType(tag & 7);
@@ -191,7 +207,13 @@ export const PendingOrders = {
         ? String(object.sellerEscrowWalletPrivateKey)
         : "",
       sellerPaymentComplete: isSet(object.sellerPaymentComplete) ? Boolean(object.sellerPaymentComplete) : false,
+      sellerPaymentCompleteBlockHeight: isSet(object.sellerPaymentCompleteBlockHeight)
+        ? Number(object.sellerPaymentCompleteBlockHeight)
+        : 0,
       buyerPaymentComplete: isSet(object.buyerPaymentComplete) ? Boolean(object.buyerPaymentComplete) : false,
+      buyerPaymentCompleteBlockHeight: isSet(object.buyerPaymentCompleteBlockHeight)
+        ? Number(object.buyerPaymentCompleteBlockHeight)
+        : 0,
       amount: isSet(object.amount) ? String(object.amount) : "",
       buyerShippingAddress: isSet(object.buyerShippingAddress) ? String(object.buyerShippingAddress) : "",
       buyerRefundAddress: isSet(object.buyerRefundAddress) ? String(object.buyerRefundAddress) : "",
@@ -202,7 +224,7 @@ export const PendingOrders = {
       tradeAsset: isSet(object.tradeAsset) ? String(object.tradeAsset) : "",
       currency: isSet(object.currency) ? String(object.currency) : "",
       price: isSet(object.price) ? String(object.price) : "",
-      blockHeight: isSet(object.blockHeight) ? String(object.blockHeight) : "",
+      blockHeight: isSet(object.blockHeight) ? Number(object.blockHeight) : 0,
     };
   },
 
@@ -218,7 +240,11 @@ export const PendingOrders = {
     message.sellerEscrowWalletPrivateKey !== undefined
       && (obj.sellerEscrowWalletPrivateKey = message.sellerEscrowWalletPrivateKey);
     message.sellerPaymentComplete !== undefined && (obj.sellerPaymentComplete = message.sellerPaymentComplete);
+    message.sellerPaymentCompleteBlockHeight !== undefined
+      && (obj.sellerPaymentCompleteBlockHeight = Math.round(message.sellerPaymentCompleteBlockHeight));
     message.buyerPaymentComplete !== undefined && (obj.buyerPaymentComplete = message.buyerPaymentComplete);
+    message.buyerPaymentCompleteBlockHeight !== undefined
+      && (obj.buyerPaymentCompleteBlockHeight = Math.round(message.buyerPaymentCompleteBlockHeight));
     message.amount !== undefined && (obj.amount = message.amount);
     message.buyerShippingAddress !== undefined && (obj.buyerShippingAddress = message.buyerShippingAddress);
     message.buyerRefundAddress !== undefined && (obj.buyerRefundAddress = message.buyerRefundAddress);
@@ -229,7 +255,7 @@ export const PendingOrders = {
     message.tradeAsset !== undefined && (obj.tradeAsset = message.tradeAsset);
     message.currency !== undefined && (obj.currency = message.currency);
     message.price !== undefined && (obj.price = message.price);
-    message.blockHeight !== undefined && (obj.blockHeight = message.blockHeight);
+    message.blockHeight !== undefined && (obj.blockHeight = Math.round(message.blockHeight));
     return obj;
   },
 
@@ -241,7 +267,9 @@ export const PendingOrders = {
     message.sellerEscrowWalletPublicKey = object.sellerEscrowWalletPublicKey ?? "";
     message.sellerEscrowWalletPrivateKey = object.sellerEscrowWalletPrivateKey ?? "";
     message.sellerPaymentComplete = object.sellerPaymentComplete ?? false;
+    message.sellerPaymentCompleteBlockHeight = object.sellerPaymentCompleteBlockHeight ?? 0;
     message.buyerPaymentComplete = object.buyerPaymentComplete ?? false;
+    message.buyerPaymentCompleteBlockHeight = object.buyerPaymentCompleteBlockHeight ?? 0;
     message.amount = object.amount ?? "";
     message.buyerShippingAddress = object.buyerShippingAddress ?? "";
     message.buyerRefundAddress = object.buyerRefundAddress ?? "";
@@ -252,7 +280,7 @@ export const PendingOrders = {
     message.tradeAsset = object.tradeAsset ?? "";
     message.currency = object.currency ?? "";
     message.price = object.price ?? "";
-    message.blockHeight = object.blockHeight ?? "";
+    message.blockHeight = object.blockHeight ?? 0;
     return message;
   },
 };

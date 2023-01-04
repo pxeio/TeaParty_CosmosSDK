@@ -23,24 +23,26 @@ var _ = math.Inf
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 type PendingOrders struct {
-	Index                        string `protobuf:"bytes,1,opt,name=index,proto3" json:"index,omitempty"`
-	BuyerEscrowWalletPublicKey   string `protobuf:"bytes,2,opt,name=buyerEscrowWalletPublicKey,proto3" json:"buyerEscrowWalletPublicKey,omitempty"`
-	BuyerEscrowWalletPrivateKey  string `protobuf:"bytes,3,opt,name=buyerEscrowWalletPrivateKey,proto3" json:"buyerEscrowWalletPrivateKey,omitempty"`
-	SellerEscrowWalletPublicKey  string `protobuf:"bytes,4,opt,name=sellerEscrowWalletPublicKey,proto3" json:"sellerEscrowWalletPublicKey,omitempty"`
-	SellerEscrowWalletPrivateKey string `protobuf:"bytes,5,opt,name=sellerEscrowWalletPrivateKey,proto3" json:"sellerEscrowWalletPrivateKey,omitempty"`
-	SellerPaymentComplete        bool   `protobuf:"varint,6,opt,name=sellerPaymentComplete,proto3" json:"sellerPaymentComplete,omitempty"`
-	BuyerPaymentComplete         bool   `protobuf:"varint,7,opt,name=buyerPaymentComplete,proto3" json:"buyerPaymentComplete,omitempty"`
-	Amount                       string `protobuf:"bytes,8,opt,name=amount,proto3" json:"amount,omitempty"`
-	BuyerShippingAddress         string `protobuf:"bytes,9,opt,name=buyerShippingAddress,proto3" json:"buyerShippingAddress,omitempty"`
-	BuyerRefundAddress           string `protobuf:"bytes,10,opt,name=buyerRefundAddress,proto3" json:"buyerRefundAddress,omitempty"`
-	BuyerNKNAddress              string `protobuf:"bytes,11,opt,name=buyerNKNAddress,proto3" json:"buyerNKNAddress,omitempty"`
-	SellerRefundAddress          string `protobuf:"bytes,12,opt,name=sellerRefundAddress,proto3" json:"sellerRefundAddress,omitempty"`
-	SellerShippingAddress        string `protobuf:"bytes,13,opt,name=sellerShippingAddress,proto3" json:"sellerShippingAddress,omitempty"`
-	SellerNKNAddress             string `protobuf:"bytes,14,opt,name=sellerNKNAddress,proto3" json:"sellerNKNAddress,omitempty"`
-	TradeAsset                   string `protobuf:"bytes,15,opt,name=tradeAsset,proto3" json:"tradeAsset,omitempty"`
-	Currency                     string `protobuf:"bytes,16,opt,name=currency,proto3" json:"currency,omitempty"`
-	Price                        string `protobuf:"bytes,17,opt,name=price,proto3" json:"price,omitempty"`
-	BlockHeight                  string `protobuf:"bytes,18,opt,name=blockHeight,proto3" json:"blockHeight,omitempty"`
+	Index                            string `protobuf:"bytes,1,opt,name=index,proto3" json:"index,omitempty"`
+	BuyerEscrowWalletPublicKey       string `protobuf:"bytes,2,opt,name=buyerEscrowWalletPublicKey,proto3" json:"buyerEscrowWalletPublicKey,omitempty"`
+	BuyerEscrowWalletPrivateKey      string `protobuf:"bytes,3,opt,name=buyerEscrowWalletPrivateKey,proto3" json:"buyerEscrowWalletPrivateKey,omitempty"`
+	SellerEscrowWalletPublicKey      string `protobuf:"bytes,4,opt,name=sellerEscrowWalletPublicKey,proto3" json:"sellerEscrowWalletPublicKey,omitempty"`
+	SellerEscrowWalletPrivateKey     string `protobuf:"bytes,5,opt,name=sellerEscrowWalletPrivateKey,proto3" json:"sellerEscrowWalletPrivateKey,omitempty"`
+	SellerPaymentComplete            bool   `protobuf:"varint,6,opt,name=sellerPaymentComplete,proto3" json:"sellerPaymentComplete,omitempty"`
+	SellerPaymentCompleteBlockHeight int32  `protobuf:"varint,7,opt,name=sellerPaymentCompleteBlockHeight,proto3" json:"sellerPaymentCompleteBlockHeight,omitempty"`
+	BuyerPaymentComplete             bool   `protobuf:"varint,8,opt,name=buyerPaymentComplete,proto3" json:"buyerPaymentComplete,omitempty"`
+	BuyerPaymentCompleteBlockHeight  int32  `protobuf:"varint,9,opt,name=buyerPaymentCompleteBlockHeight,proto3" json:"buyerPaymentCompleteBlockHeight,omitempty"`
+	Amount                           string `protobuf:"bytes,10,opt,name=amount,proto3" json:"amount,omitempty"`
+	BuyerShippingAddress             string `protobuf:"bytes,11,opt,name=buyerShippingAddress,proto3" json:"buyerShippingAddress,omitempty"`
+	BuyerRefundAddress               string `protobuf:"bytes,12,opt,name=buyerRefundAddress,proto3" json:"buyerRefundAddress,omitempty"`
+	BuyerNKNAddress                  string `protobuf:"bytes,13,opt,name=buyerNKNAddress,proto3" json:"buyerNKNAddress,omitempty"`
+	SellerRefundAddress              string `protobuf:"bytes,14,opt,name=sellerRefundAddress,proto3" json:"sellerRefundAddress,omitempty"`
+	SellerShippingAddress            string `protobuf:"bytes,15,opt,name=sellerShippingAddress,proto3" json:"sellerShippingAddress,omitempty"`
+	SellerNKNAddress                 string `protobuf:"bytes,16,opt,name=sellerNKNAddress,proto3" json:"sellerNKNAddress,omitempty"`
+	TradeAsset                       string `protobuf:"bytes,17,opt,name=tradeAsset,proto3" json:"tradeAsset,omitempty"`
+	Currency                         string `protobuf:"bytes,18,opt,name=currency,proto3" json:"currency,omitempty"`
+	Price                            string `protobuf:"bytes,19,opt,name=price,proto3" json:"price,omitempty"`
+	BlockHeight                      int32  `protobuf:"varint,20,opt,name=blockHeight,proto3" json:"blockHeight,omitempty"`
 }
 
 func (m *PendingOrders) Reset()         { *m = PendingOrders{} }
@@ -118,11 +120,25 @@ func (m *PendingOrders) GetSellerPaymentComplete() bool {
 	return false
 }
 
+func (m *PendingOrders) GetSellerPaymentCompleteBlockHeight() int32 {
+	if m != nil {
+		return m.SellerPaymentCompleteBlockHeight
+	}
+	return 0
+}
+
 func (m *PendingOrders) GetBuyerPaymentComplete() bool {
 	if m != nil {
 		return m.BuyerPaymentComplete
 	}
 	return false
+}
+
+func (m *PendingOrders) GetBuyerPaymentCompleteBlockHeight() int32 {
+	if m != nil {
+		return m.BuyerPaymentCompleteBlockHeight
+	}
+	return 0
 }
 
 func (m *PendingOrders) GetAmount() string {
@@ -195,11 +211,11 @@ func (m *PendingOrders) GetPrice() string {
 	return ""
 }
 
-func (m *PendingOrders) GetBlockHeight() string {
+func (m *PendingOrders) GetBlockHeight() int32 {
 	if m != nil {
 		return m.BlockHeight
 	}
-	return ""
+	return 0
 }
 
 func init() {
@@ -211,36 +227,38 @@ func init() {
 }
 
 var fileDescriptor_a6bac0cc0b8c6155 = []byte{
-	// 455 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x7c, 0x93, 0x51, 0x6b, 0x13, 0x41,
-	0x10, 0xc7, 0x73, 0x6a, 0x63, 0x3a, 0xb5, 0xb6, 0x8e, 0x55, 0x96, 0x2a, 0x67, 0x10, 0x84, 0xe0,
-	0x43, 0x22, 0xd5, 0x67, 0xb1, 0x2d, 0x82, 0x50, 0xa9, 0x21, 0x0a, 0x82, 0x2f, 0xb2, 0x77, 0x37,
-	0x26, 0x8b, 0x97, 0xdd, 0x65, 0x6f, 0x4f, 0x7b, 0xdf, 0xc2, 0x2f, 0x25, 0xf8, 0xd8, 0x47, 0x1f,
-	0x25, 0xf9, 0x22, 0x92, 0xd9, 0xb6, 0x89, 0xc9, 0x99, 0xb7, 0x9b, 0xf9, 0xfd, 0xff, 0x7f, 0x66,
-	0x8e, 0x1d, 0x78, 0x62, 0xa5, 0xf3, 0x55, 0x3a, 0x92, 0x4a, 0xf7, 0xf8, 0xb3, 0x67, 0x49, 0x67,
-	0x4a, 0x0f, 0x3f, 0x1b, 0x97, 0x91, 0x2b, 0xba, 0xd6, 0x19, 0x6f, 0xf0, 0x91, 0x27, 0x19, 0x94,
-	0xae, 0xb2, 0xde, 0x74, 0xe7, 0xae, 0xf0, 0xf9, 0xf8, 0x67, 0x13, 0xb6, 0xfb, 0xc1, 0xf9, 0x8e,
-	0x8d, 0xb8, 0x07, 0x1b, 0x4a, 0x67, 0x74, 0x26, 0xa2, 0x76, 0xd4, 0xd9, 0x1c, 0x84, 0x02, 0x5f,
-	0xc2, 0x7e, 0x52, 0x56, 0xe4, 0x5e, 0x17, 0xa9, 0x33, 0xdf, 0x3f, 0xca, 0x3c, 0x27, 0xdf, 0x2f,
-	0x93, 0x5c, 0xa5, 0x27, 0x54, 0x89, 0x6b, 0x2c, 0x5d, 0xa3, 0xc0, 0x57, 0xf0, 0x60, 0x95, 0x3a,
-	0xf5, 0x4d, 0x7a, 0x9a, 0x05, 0x5c, 0xe7, 0x80, 0x75, 0x92, 0x59, 0x42, 0x41, 0x79, 0xfe, 0xbf,
-	0x11, 0x6e, 0x84, 0x84, 0x35, 0x12, 0x3c, 0x82, 0x87, 0x35, 0x78, 0x3e, 0xc4, 0x06, 0x47, 0xac,
-	0xd5, 0xe0, 0x0b, 0xb8, 0x17, 0x78, 0x5f, 0x56, 0x63, 0xd2, 0xfe, 0xd8, 0x8c, 0x6d, 0x4e, 0x9e,
-	0x44, 0xb3, 0x1d, 0x75, 0x5a, 0x83, 0x7a, 0x88, 0x07, 0xb0, 0xc7, 0xab, 0x2d, 0x9b, 0x6e, 0xb2,
-	0xa9, 0x96, 0xe1, 0x7d, 0x68, 0xca, 0xb1, 0x29, 0xb5, 0x17, 0x2d, 0x9e, 0xeb, 0xa2, 0xba, 0xca,
-	0x7a, 0x3f, 0x52, 0xd6, 0x2a, 0x3d, 0x3c, 0xcc, 0x32, 0x47, 0x45, 0x21, 0x36, 0x59, 0x55, 0xcb,
-	0xb0, 0x0b, 0xc8, 0xfd, 0x01, 0x7d, 0x29, 0x75, 0x76, 0xe9, 0x00, 0x76, 0xd4, 0x10, 0xec, 0xc0,
-	0x0e, 0x77, 0x4f, 0x4f, 0x4e, 0x2f, 0xc5, 0x5b, 0x2c, 0x5e, 0x6e, 0xe3, 0x33, 0xb8, 0x1b, 0x56,
-	0xfe, 0x37, 0xfa, 0x16, 0xab, 0xeb, 0xd0, 0xfc, 0x0f, 0x2e, 0x2f, 0xb0, 0xcd, 0x9e, 0x7a, 0x88,
-	0x4f, 0x61, 0x37, 0x80, 0x85, 0x91, 0x6e, 0xb3, 0x61, 0xa5, 0x8f, 0x31, 0x80, 0x77, 0x32, 0xa3,
-	0xc3, 0xa2, 0x20, 0x2f, 0x76, 0x58, 0xb5, 0xd0, 0xc1, 0x7d, 0x68, 0xa5, 0xa5, 0x73, 0xa4, 0xd3,
-	0x4a, 0xec, 0x32, 0xbd, 0xaa, 0x67, 0xaf, 0xdf, 0x3a, 0x95, 0x92, 0xb8, 0x13, 0x5e, 0x3f, 0x17,
-	0xd8, 0x86, 0xad, 0x24, 0x37, 0xe9, 0xd7, 0x37, 0xa4, 0x86, 0x23, 0x2f, 0x90, 0xd9, 0x62, 0xeb,
-	0xe8, 0xed, 0xaf, 0x49, 0x1c, 0x9d, 0x4f, 0xe2, 0xe8, 0xcf, 0x24, 0x8e, 0x7e, 0x4c, 0xe3, 0xc6,
-	0xf9, 0x34, 0x6e, 0xfc, 0x9e, 0xc6, 0x8d, 0x4f, 0x07, 0x43, 0xe5, 0x47, 0x65, 0xd2, 0x4d, 0xcd,
-	0xb8, 0xf7, 0x81, 0x64, 0x7f, 0x76, 0x76, 0xc7, 0x7c, 0x8d, 0xbd, 0x85, 0x1b, 0x3e, 0xbb, 0xb8,
-	0x62, 0x5f, 0x59, 0x2a, 0x92, 0x26, 0x5f, 0xef, 0xf3, 0xbf, 0x01, 0x00, 0x00, 0xff, 0xff, 0xda,
-	0x9f, 0xff, 0x52, 0xe6, 0x03, 0x00, 0x00,
+	// 488 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x94, 0xdf, 0x6a, 0x13, 0x41,
+	0x14, 0xc6, 0xb3, 0x6a, 0xd2, 0xf4, 0xd4, 0xda, 0x7a, 0x1a, 0x65, 0xa9, 0xb2, 0x0d, 0x82, 0x10,
+	0xbc, 0x48, 0xa4, 0x7a, 0x2d, 0x36, 0x45, 0x28, 0x56, 0x6a, 0x88, 0x82, 0xe0, 0x8d, 0xec, 0x9f,
+	0x63, 0x32, 0xb8, 0xd9, 0x19, 0x66, 0x67, 0xb5, 0xfb, 0x16, 0x3e, 0x96, 0x97, 0xbd, 0x14, 0xbc,
+	0x91, 0xe4, 0x45, 0x24, 0x67, 0xda, 0x66, 0x4d, 0xa7, 0xe9, 0xdd, 0x9e, 0xef, 0xfb, 0x7d, 0x67,
+	0xcf, 0xce, 0xb0, 0x07, 0x9e, 0xaa, 0x50, 0x9b, 0x32, 0x1e, 0x87, 0x22, 0xeb, 0xf1, 0x63, 0x4f,
+	0x51, 0x96, 0x88, 0x6c, 0xf4, 0x45, 0xea, 0x84, 0x74, 0xde, 0x55, 0x5a, 0x1a, 0x89, 0x7b, 0x86,
+	0x42, 0x4b, 0xea, 0x52, 0x19, 0xd9, 0x5d, 0xa4, 0xec, 0xe3, 0x93, 0x3f, 0x6b, 0xb0, 0x39, 0xb0,
+	0xc9, 0xf7, 0x1c, 0xc4, 0x16, 0xd4, 0x45, 0x96, 0xd0, 0xa9, 0xef, 0xb5, 0xbd, 0xce, 0xfa, 0xd0,
+	0x16, 0xf8, 0x0a, 0x76, 0xa3, 0xa2, 0x24, 0xfd, 0x26, 0x8f, 0xb5, 0xfc, 0xf1, 0x29, 0x4c, 0x53,
+	0x32, 0x83, 0x22, 0x4a, 0x45, 0x7c, 0x4c, 0xa5, 0x7f, 0x8b, 0xd1, 0x15, 0x04, 0xbe, 0x86, 0x47,
+	0x57, 0x5d, 0x2d, 0xbe, 0x87, 0x86, 0xe6, 0x0d, 0x6e, 0x73, 0x83, 0x55, 0xc8, 0xbc, 0x43, 0x4e,
+	0x69, 0x7a, 0xdd, 0x08, 0x77, 0x6c, 0x87, 0x15, 0x08, 0xf6, 0xe1, 0xb1, 0xc3, 0x5e, 0x0c, 0x51,
+	0xe7, 0x16, 0x2b, 0x19, 0x7c, 0x09, 0x0f, 0xac, 0x3f, 0x08, 0xcb, 0x09, 0x65, 0xe6, 0x50, 0x4e,
+	0x54, 0x4a, 0x86, 0xfc, 0x46, 0xdb, 0xeb, 0x34, 0x87, 0x6e, 0x13, 0xdf, 0x42, 0xdb, 0x69, 0xf4,
+	0x53, 0x19, 0x7f, 0x3b, 0x22, 0x31, 0x1a, 0x1b, 0x7f, 0xad, 0xed, 0x75, 0xea, 0xc3, 0x1b, 0x39,
+	0xdc, 0x87, 0x16, 0x1f, 0xd3, 0xf2, 0x00, 0x4d, 0x1e, 0xc0, 0xe9, 0xe1, 0x11, 0xec, 0xb9, 0xf4,
+	0xea, 0xeb, 0xd7, 0xf9, 0xf5, 0x37, 0x61, 0xf8, 0x10, 0x1a, 0xe1, 0x44, 0x16, 0x99, 0xf1, 0x81,
+	0x4f, 0xeb, 0xbc, 0xba, 0x9c, 0xea, 0xc3, 0x58, 0x28, 0x25, 0xb2, 0xd1, 0x41, 0x92, 0x68, 0xca,
+	0x73, 0x7f, 0x83, 0x29, 0xa7, 0x87, 0x5d, 0x40, 0xd6, 0x87, 0xf4, 0xb5, 0xc8, 0x92, 0x8b, 0xc4,
+	0x5d, 0x4e, 0x38, 0x1c, 0xec, 0xc0, 0x16, 0xab, 0x27, 0xc7, 0x27, 0x17, 0xf0, 0x26, 0xc3, 0xcb,
+	0x32, 0x3e, 0x87, 0x1d, 0x7b, 0x8e, 0xff, 0xb7, 0xbe, 0xc7, 0xb4, 0xcb, 0x5a, 0xdc, 0xeb, 0xf2,
+	0x07, 0x6c, 0x71, 0xc6, 0x6d, 0xe2, 0x33, 0xd8, 0xb6, 0x46, 0x65, 0xa4, 0x6d, 0x0e, 0x5c, 0xd1,
+	0x31, 0x00, 0x30, 0x3a, 0x4c, 0xe8, 0x20, 0xcf, 0xc9, 0xf8, 0xf7, 0x99, 0xaa, 0x28, 0xb8, 0x0b,
+	0xcd, 0xb8, 0xd0, 0x9a, 0xb2, 0xb8, 0xf4, 0x91, 0xdd, 0xcb, 0x7a, 0xfe, 0x4f, 0x2a, 0x2d, 0x62,
+	0xf2, 0x77, 0xec, 0x3f, 0xc9, 0x05, 0xb6, 0x61, 0x23, 0xaa, 0xdc, 0x60, 0x8b, 0x6f, 0xb0, 0x2a,
+	0xf5, 0xdf, 0xfd, 0x9a, 0x06, 0xde, 0xd9, 0x34, 0xf0, 0xfe, 0x4e, 0x03, 0xef, 0xe7, 0x2c, 0xa8,
+	0x9d, 0xcd, 0x82, 0xda, 0xef, 0x59, 0x50, 0xfb, 0xbc, 0x3f, 0x12, 0x66, 0x5c, 0x44, 0xdd, 0x58,
+	0x4e, 0x7a, 0x1f, 0x29, 0x1c, 0xcc, 0x97, 0xc1, 0x21, 0xef, 0x88, 0x5e, 0x65, 0xb3, 0x9c, 0x9e,
+	0xef, 0x16, 0x53, 0x2a, 0xca, 0xa3, 0x06, 0xef, 0x94, 0x17, 0xff, 0x02, 0x00, 0x00, 0xff, 0xff,
+	0xdc, 0xe1, 0xa1, 0x50, 0x7c, 0x04, 0x00, 0x00,
 }
 
 func (m *PendingOrders) Marshal() (dAtA []byte, err error) {
@@ -263,14 +281,12 @@ func (m *PendingOrders) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.BlockHeight) > 0 {
-		i -= len(m.BlockHeight)
-		copy(dAtA[i:], m.BlockHeight)
-		i = encodeVarintPendingOrders(dAtA, i, uint64(len(m.BlockHeight)))
+	if m.BlockHeight != 0 {
+		i = encodeVarintPendingOrders(dAtA, i, uint64(m.BlockHeight))
 		i--
 		dAtA[i] = 0x1
 		i--
-		dAtA[i] = 0x92
+		dAtA[i] = 0xa0
 	}
 	if len(m.Price) > 0 {
 		i -= len(m.Price)
@@ -279,7 +295,7 @@ func (m *PendingOrders) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x1
 		i--
-		dAtA[i] = 0x8a
+		dAtA[i] = 0x9a
 	}
 	if len(m.Currency) > 0 {
 		i -= len(m.Currency)
@@ -288,63 +304,72 @@ func (m *PendingOrders) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x1
 		i--
-		dAtA[i] = 0x82
+		dAtA[i] = 0x92
 	}
 	if len(m.TradeAsset) > 0 {
 		i -= len(m.TradeAsset)
 		copy(dAtA[i:], m.TradeAsset)
 		i = encodeVarintPendingOrders(dAtA, i, uint64(len(m.TradeAsset)))
 		i--
-		dAtA[i] = 0x7a
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x8a
 	}
 	if len(m.SellerNKNAddress) > 0 {
 		i -= len(m.SellerNKNAddress)
 		copy(dAtA[i:], m.SellerNKNAddress)
 		i = encodeVarintPendingOrders(dAtA, i, uint64(len(m.SellerNKNAddress)))
 		i--
-		dAtA[i] = 0x72
+		dAtA[i] = 0x1
+		i--
+		dAtA[i] = 0x82
 	}
 	if len(m.SellerShippingAddress) > 0 {
 		i -= len(m.SellerShippingAddress)
 		copy(dAtA[i:], m.SellerShippingAddress)
 		i = encodeVarintPendingOrders(dAtA, i, uint64(len(m.SellerShippingAddress)))
 		i--
-		dAtA[i] = 0x6a
+		dAtA[i] = 0x7a
 	}
 	if len(m.SellerRefundAddress) > 0 {
 		i -= len(m.SellerRefundAddress)
 		copy(dAtA[i:], m.SellerRefundAddress)
 		i = encodeVarintPendingOrders(dAtA, i, uint64(len(m.SellerRefundAddress)))
 		i--
-		dAtA[i] = 0x62
+		dAtA[i] = 0x72
 	}
 	if len(m.BuyerNKNAddress) > 0 {
 		i -= len(m.BuyerNKNAddress)
 		copy(dAtA[i:], m.BuyerNKNAddress)
 		i = encodeVarintPendingOrders(dAtA, i, uint64(len(m.BuyerNKNAddress)))
 		i--
-		dAtA[i] = 0x5a
+		dAtA[i] = 0x6a
 	}
 	if len(m.BuyerRefundAddress) > 0 {
 		i -= len(m.BuyerRefundAddress)
 		copy(dAtA[i:], m.BuyerRefundAddress)
 		i = encodeVarintPendingOrders(dAtA, i, uint64(len(m.BuyerRefundAddress)))
 		i--
-		dAtA[i] = 0x52
+		dAtA[i] = 0x62
 	}
 	if len(m.BuyerShippingAddress) > 0 {
 		i -= len(m.BuyerShippingAddress)
 		copy(dAtA[i:], m.BuyerShippingAddress)
 		i = encodeVarintPendingOrders(dAtA, i, uint64(len(m.BuyerShippingAddress)))
 		i--
-		dAtA[i] = 0x4a
+		dAtA[i] = 0x5a
 	}
 	if len(m.Amount) > 0 {
 		i -= len(m.Amount)
 		copy(dAtA[i:], m.Amount)
 		i = encodeVarintPendingOrders(dAtA, i, uint64(len(m.Amount)))
 		i--
-		dAtA[i] = 0x42
+		dAtA[i] = 0x52
+	}
+	if m.BuyerPaymentCompleteBlockHeight != 0 {
+		i = encodeVarintPendingOrders(dAtA, i, uint64(m.BuyerPaymentCompleteBlockHeight))
+		i--
+		dAtA[i] = 0x48
 	}
 	if m.BuyerPaymentComplete {
 		i--
@@ -353,6 +378,11 @@ func (m *PendingOrders) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		} else {
 			dAtA[i] = 0
 		}
+		i--
+		dAtA[i] = 0x40
+	}
+	if m.SellerPaymentCompleteBlockHeight != 0 {
+		i = encodeVarintPendingOrders(dAtA, i, uint64(m.SellerPaymentCompleteBlockHeight))
 		i--
 		dAtA[i] = 0x38
 	}
@@ -444,8 +474,14 @@ func (m *PendingOrders) Size() (n int) {
 	if m.SellerPaymentComplete {
 		n += 2
 	}
+	if m.SellerPaymentCompleteBlockHeight != 0 {
+		n += 1 + sovPendingOrders(uint64(m.SellerPaymentCompleteBlockHeight))
+	}
 	if m.BuyerPaymentComplete {
 		n += 2
+	}
+	if m.BuyerPaymentCompleteBlockHeight != 0 {
+		n += 1 + sovPendingOrders(uint64(m.BuyerPaymentCompleteBlockHeight))
 	}
 	l = len(m.Amount)
 	if l > 0 {
@@ -473,11 +509,11 @@ func (m *PendingOrders) Size() (n int) {
 	}
 	l = len(m.SellerNKNAddress)
 	if l > 0 {
-		n += 1 + l + sovPendingOrders(uint64(l))
+		n += 2 + l + sovPendingOrders(uint64(l))
 	}
 	l = len(m.TradeAsset)
 	if l > 0 {
-		n += 1 + l + sovPendingOrders(uint64(l))
+		n += 2 + l + sovPendingOrders(uint64(l))
 	}
 	l = len(m.Currency)
 	if l > 0 {
@@ -487,9 +523,8 @@ func (m *PendingOrders) Size() (n int) {
 	if l > 0 {
 		n += 2 + l + sovPendingOrders(uint64(l))
 	}
-	l = len(m.BlockHeight)
-	if l > 0 {
-		n += 2 + l + sovPendingOrders(uint64(l))
+	if m.BlockHeight != 0 {
+		n += 2 + sovPendingOrders(uint64(m.BlockHeight))
 	}
 	return n
 }
@@ -711,6 +746,25 @@ func (m *PendingOrders) Unmarshal(dAtA []byte) error {
 			m.SellerPaymentComplete = bool(v != 0)
 		case 7:
 			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SellerPaymentCompleteBlockHeight", wireType)
+			}
+			m.SellerPaymentCompleteBlockHeight = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPendingOrders
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.SellerPaymentCompleteBlockHeight |= int32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 8:
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field BuyerPaymentComplete", wireType)
 			}
 			var v int
@@ -729,7 +783,26 @@ func (m *PendingOrders) Unmarshal(dAtA []byte) error {
 				}
 			}
 			m.BuyerPaymentComplete = bool(v != 0)
-		case 8:
+		case 9:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field BuyerPaymentCompleteBlockHeight", wireType)
+			}
+			m.BuyerPaymentCompleteBlockHeight = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowPendingOrders
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.BuyerPaymentCompleteBlockHeight |= int32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 10:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
 			}
@@ -761,7 +834,7 @@ func (m *PendingOrders) Unmarshal(dAtA []byte) error {
 			}
 			m.Amount = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 9:
+		case 11:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field BuyerShippingAddress", wireType)
 			}
@@ -793,7 +866,7 @@ func (m *PendingOrders) Unmarshal(dAtA []byte) error {
 			}
 			m.BuyerShippingAddress = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 10:
+		case 12:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field BuyerRefundAddress", wireType)
 			}
@@ -825,7 +898,7 @@ func (m *PendingOrders) Unmarshal(dAtA []byte) error {
 			}
 			m.BuyerRefundAddress = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 11:
+		case 13:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field BuyerNKNAddress", wireType)
 			}
@@ -857,7 +930,7 @@ func (m *PendingOrders) Unmarshal(dAtA []byte) error {
 			}
 			m.BuyerNKNAddress = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 12:
+		case 14:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SellerRefundAddress", wireType)
 			}
@@ -889,7 +962,7 @@ func (m *PendingOrders) Unmarshal(dAtA []byte) error {
 			}
 			m.SellerRefundAddress = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 13:
+		case 15:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SellerShippingAddress", wireType)
 			}
@@ -921,7 +994,7 @@ func (m *PendingOrders) Unmarshal(dAtA []byte) error {
 			}
 			m.SellerShippingAddress = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 14:
+		case 16:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field SellerNKNAddress", wireType)
 			}
@@ -953,7 +1026,7 @@ func (m *PendingOrders) Unmarshal(dAtA []byte) error {
 			}
 			m.SellerNKNAddress = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 15:
+		case 17:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field TradeAsset", wireType)
 			}
@@ -985,7 +1058,7 @@ func (m *PendingOrders) Unmarshal(dAtA []byte) error {
 			}
 			m.TradeAsset = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 16:
+		case 18:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Currency", wireType)
 			}
@@ -1017,7 +1090,7 @@ func (m *PendingOrders) Unmarshal(dAtA []byte) error {
 			}
 			m.Currency = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 17:
+		case 19:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Price", wireType)
 			}
@@ -1049,11 +1122,11 @@ func (m *PendingOrders) Unmarshal(dAtA []byte) error {
 			}
 			m.Price = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
-		case 18:
-			if wireType != 2 {
+		case 20:
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field BlockHeight", wireType)
 			}
-			var stringLen uint64
+			m.BlockHeight = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowPendingOrders
@@ -1063,24 +1136,11 @@ func (m *PendingOrders) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				m.BlockHeight |= int32(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthPendingOrders
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthPendingOrders
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.BlockHeight = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipPendingOrders(dAtA[iNdEx:])

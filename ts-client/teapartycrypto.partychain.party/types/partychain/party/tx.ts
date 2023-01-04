@@ -53,15 +53,6 @@ export interface MsgAccountWatchFailure {
 export interface MsgAccountWatchFailureResponse {
 }
 
-export interface MsgTransactionResult {
-  creator: string;
-  txID: string;
-  outcome: string;
-}
-
-export interface MsgTransactionResultResponse {
-}
-
 function createBaseMsgSubmitSell(): MsgSubmitSell {
   return {
     creator: "",
@@ -644,121 +635,14 @@ export const MsgAccountWatchFailureResponse = {
   },
 };
 
-function createBaseMsgTransactionResult(): MsgTransactionResult {
-  return { creator: "", txID: "", outcome: "" };
-}
-
-export const MsgTransactionResult = {
-  encode(message: MsgTransactionResult, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.creator !== "") {
-      writer.uint32(10).string(message.creator);
-    }
-    if (message.txID !== "") {
-      writer.uint32(18).string(message.txID);
-    }
-    if (message.outcome !== "") {
-      writer.uint32(26).string(message.outcome);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgTransactionResult {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgTransactionResult();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          message.creator = reader.string();
-          break;
-        case 2:
-          message.txID = reader.string();
-          break;
-        case 3:
-          message.outcome = reader.string();
-          break;
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(object: any): MsgTransactionResult {
-    return {
-      creator: isSet(object.creator) ? String(object.creator) : "",
-      txID: isSet(object.txID) ? String(object.txID) : "",
-      outcome: isSet(object.outcome) ? String(object.outcome) : "",
-    };
-  },
-
-  toJSON(message: MsgTransactionResult): unknown {
-    const obj: any = {};
-    message.creator !== undefined && (obj.creator = message.creator);
-    message.txID !== undefined && (obj.txID = message.txID);
-    message.outcome !== undefined && (obj.outcome = message.outcome);
-    return obj;
-  },
-
-  fromPartial<I extends Exact<DeepPartial<MsgTransactionResult>, I>>(object: I): MsgTransactionResult {
-    const message = createBaseMsgTransactionResult();
-    message.creator = object.creator ?? "";
-    message.txID = object.txID ?? "";
-    message.outcome = object.outcome ?? "";
-    return message;
-  },
-};
-
-function createBaseMsgTransactionResultResponse(): MsgTransactionResultResponse {
-  return {};
-}
-
-export const MsgTransactionResultResponse = {
-  encode(_: MsgTransactionResultResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): MsgTransactionResultResponse {
-    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgTransactionResultResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        default:
-          reader.skipType(tag & 7);
-          break;
-      }
-    }
-    return message;
-  },
-
-  fromJSON(_: any): MsgTransactionResultResponse {
-    return {};
-  },
-
-  toJSON(_: MsgTransactionResultResponse): unknown {
-    const obj: any = {};
-    return obj;
-  },
-
-  fromPartial<I extends Exact<DeepPartial<MsgTransactionResultResponse>, I>>(_: I): MsgTransactionResultResponse {
-    const message = createBaseMsgTransactionResultResponse();
-    return message;
-  },
-};
-
 /** Msg defines the Msg service. */
 export interface Msg {
   SubmitSell(request: MsgSubmitSell): Promise<MsgSubmitSellResponse>;
   Buy(request: MsgBuy): Promise<MsgBuyResponse>;
   Cancel(request: MsgCancel): Promise<MsgCancelResponse>;
   AccountWatchOutcome(request: MsgAccountWatchOutcome): Promise<MsgAccountWatchOutcomeResponse>;
-  AccountWatchFailure(request: MsgAccountWatchFailure): Promise<MsgAccountWatchFailureResponse>;
   /** this line is used by starport scaffolding # proto/tx/rpc */
-  TransactionResult(request: MsgTransactionResult): Promise<MsgTransactionResultResponse>;
+  AccountWatchFailure(request: MsgAccountWatchFailure): Promise<MsgAccountWatchFailureResponse>;
 }
 
 export class MsgClientImpl implements Msg {
@@ -770,7 +654,6 @@ export class MsgClientImpl implements Msg {
     this.Cancel = this.Cancel.bind(this);
     this.AccountWatchOutcome = this.AccountWatchOutcome.bind(this);
     this.AccountWatchFailure = this.AccountWatchFailure.bind(this);
-    this.TransactionResult = this.TransactionResult.bind(this);
   }
   SubmitSell(request: MsgSubmitSell): Promise<MsgSubmitSellResponse> {
     const data = MsgSubmitSell.encode(request).finish();
@@ -800,12 +683,6 @@ export class MsgClientImpl implements Msg {
     const data = MsgAccountWatchFailure.encode(request).finish();
     const promise = this.rpc.request("teapartycrypto.partychain.party.Msg", "AccountWatchFailure", data);
     return promise.then((data) => MsgAccountWatchFailureResponse.decode(new _m0.Reader(data)));
-  }
-
-  TransactionResult(request: MsgTransactionResult): Promise<MsgTransactionResultResponse> {
-    const data = MsgTransactionResult.encode(request).finish();
-    const promise = this.rpc.request("teapartycrypto.partychain.party.Msg", "TransactionResult", data);
-    return promise.then((data) => MsgTransactionResultResponse.decode(new _m0.Reader(data)));
   }
 }
 

@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"crypto/ecdsa"
 
 	"github.com/TeaPartyCrypto/partychain/x/party/types"
 
@@ -28,14 +29,14 @@ func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyR
 
 	// create a new escrow wallet for the buyer
 	// buyerEscrowWallet := "0x0000000000000000000000000000000000000001"
-	buyerPrivateKey, buyerPublicKey, err := generateEVMAccount()
+	err, buyerPrivateKey, buyerPublicKey := generateEVMAccount()
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Failed to generate escrow wallet for buyer.")
 	}
 
 	// create a new escrow wallet for the seller
 	// sellerEscrowWallet := "0x0000000000000000000000000000000000000002"
-	sellerPrivateKey, sellerPublicKey, err := generateEVMAccount()
+	err, sellerPrivateKey, sellerPublicKey := generateEVMAccount()
 	if err != nil {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Failed to generate escrow wallet for seller.")
 	}
@@ -44,9 +45,9 @@ func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyR
 	po := types.PendingOrders{
 		Index:                        tradeOrder.Index,
 		BuyerEscrowWalletPublicKey:   buyerPublicKey,
-		BuyerEscrowWalletPrivateKey:  buyerPrivateKey,
+		BuyerEscrowWalletPrivateKey:  buyerPrivateKey.D.String(),
 		SellerEscrowWalletPublicKey:  sellerPublicKey,
-		SellerEscrowWalletPrivateKey: sellerPrivateKey,
+		SellerEscrowWalletPrivateKey: sellerPrivateKey.D.String(),
 		SellerPaymentComplete:        false,
 		BuyerPaymentComplete:         false,
 		Amount:                       tradeOrder.Amount,
@@ -72,15 +73,13 @@ func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyR
 
 // generateEVMAccount generates a new Ethereum account
 // returning error, private key, and public address
-func generateEVMAccount() (string, string, error) {
+func generateEVMAccount() (error, *ecdsa.PrivateKey, string) {
 	privateKey, err := crypto.GenerateKey()
 	if err != nil {
-		return "", "", err
+		return err, nil, ""
 	}
 
 	privateKeyBytes := crypto.FromECDSA(privateKey)
-	publicKey := crypto.PubkeyToAddress(privateKey.PublicKey).Hex()
-	// convert the private key to a string
-	privateKeyString := hexutil.Encode(privateKeyBytes)[2:]
-	return privateKeyString, publicKey, err
+	publicKey := hexutil.Encode(privateKeyBytes)[2:]
+	return nil, privateKey, publicKey
 }

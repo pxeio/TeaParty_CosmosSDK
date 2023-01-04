@@ -22,8 +22,10 @@ func (k msgServer) AccountWatchOutcome(goCtx context.Context, msg *types.MsgAcco
 			case OUTCOME_SUCCESS:
 				if msg.Buyer {
 					p.BuyerPaymentComplete = true
+					p.BuyerPaymentCompleteBlockHeight = int32(ctx.BlockHeight())
 				} else {
 					p.SellerPaymentComplete = true
+					p.SellerPaymentCompleteBlockHeight = int32(ctx.BlockHeight())
 				}
 			case OUTCOME_FAILURE:
 				if msg.Buyer {
