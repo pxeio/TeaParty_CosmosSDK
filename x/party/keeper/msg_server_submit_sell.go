@@ -21,7 +21,7 @@ func (k msgServer) SubmitSell(goCtx context.Context, msg *types.MsgSubmitSell) (
 
 	// create a new sell order
 	order = types.TradeOrders{
-		Index:              msg.Creator,
+		Index:              msg.SellerNknAddr,
 		TradeAsset:         msg.TradeAsset,
 		Price:              msg.Price,
 		Currency:           msg.Currency,
