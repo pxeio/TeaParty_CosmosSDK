@@ -170,15 +170,15 @@ func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 			// check that the number of blocks since the payments were completed
 			// if it has been more then 24 blocks, then create the finalizers
 			// if less then 24 blocks, then return
-			currentBlockHeight := int32(ctx.BlockHeight())
-			sellerPaymentCompleteBlockHeight := order.SellerPaymentCompleteBlockHeight
-			buyerPaymentCompleteBlockHeight := order.BuyerPaymentCompleteBlockHeight
-			blocksSinceSellerPaymentComplete := currentBlockHeight - sellerPaymentCompleteBlockHeight
-			blocksSinceBuyerPaymentComplete := currentBlockHeight - buyerPaymentCompleteBlockHeight
-			if blocksSinceSellerPaymentComplete < 24 && blocksSinceBuyerPaymentComplete < 24 {
-				// return because the order needs more confirmations
-				return
-			}
+			// currentBlockHeight := int32(ctx.BlockHeight())
+			// sellerPaymentCompleteBlockHeight := order.SellerPaymentCompleteBlockHeight
+			// buyerPaymentCompleteBlockHeight := order.BuyerPaymentCompleteBlockHeight
+			// blocksSinceSellerPaymentComplete := currentBlockHeight - sellerPaymentCompleteBlockHeight
+			// blocksSinceBuyerPaymentComplete := currentBlockHeight - buyerPaymentCompleteBlockHeight
+			// if blocksSinceSellerPaymentComplete < 24 && blocksSinceBuyerPaymentComplete < 24 {
+			// 	// return because the order needs more confirmations
+			// 	return
+			// }
 
 			// TODO::  Double check that the buyer and seller have the correct amount of funds in their escrow accounts
 

@@ -5,6 +5,8 @@ import (
 
 	"github.com/TeaPartyCrypto/partychain/x/party/types"
 
+	"github.com/google/uuid"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -14,14 +16,15 @@ func (k msgServer) SubmitSell(goCtx context.Context, msg *types.MsgSubmitSell) (
 	// atempt to find a open sell order from the same seller
 	// if found, deny the sell order
 	// if not found, create a new sell order
-	order, found := k.GetTradeOrders(ctx, msg.Creator)
+	// NOTE: We could obmit this... and allow users to update their sell orders?
+	order, found := k.GetTradeOrders(ctx, msg.SellerNknAddr)
 	if found {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Account already has an existing open sell order.")
 	}
 
 	// create a new sell order
 	order = types.TradeOrders{
-		Index:              msg.SellerNknAddr,
+		Index:              uuid.New().String(),
 		TradeAsset:         msg.TradeAsset,
 		Price:              msg.Price,
 		Currency:           msg.Currency,
