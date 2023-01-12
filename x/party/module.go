@@ -206,6 +206,7 @@ type AppModule struct {
 	keeper        keeper.Keeper
 	accountKeeper types.AccountKeeper
 	bankKeeper    types.BankKeeper
+	ordersInWatch []string
 }
 
 func NewAppModule(
@@ -575,7 +576,25 @@ func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 
 		// check the status of every active order
 		// TODO:: This does not scale. Come up with a better solution
-		go am.initMonitor(ctx, order)
+		// add this to a queue and process it in a separate go routine
+
+		if len(am.ordersInWatch) == 0 {
+			am.keeper.RemovePendingOrders(ctx, order.Index)
+			go am.initMonitor(ctx, order)
+			am.ordersInWatch = append(am.ordersInWatch, order.Index)
+		} else {
+			found := false
+			for _, oiw := range am.ordersInWatch {
+				if oiw == order.Index {
+					found = true
+				}
+			}
+			if !found {
+				am.keeper.RemovePendingOrders(ctx, order.Index)
+				go am.initMonitor(ctx, order)
+				am.ordersInWatch = append(am.ordersInWatch, order.Index)
+			}
+		}
 
 		// look at the list of pending-orders and see if any of them
 		// have both buyer and seller payments made
