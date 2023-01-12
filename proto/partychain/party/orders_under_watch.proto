@@ -1,0 +1,18 @@
+syntax = "proto3";
+package teapartycrypto.partychain.party;
+
+option go_package = "github.com/TeaPartyCrypto/partychain/x/party/types";
+
+message OrdersUnderWatch {
+  string index = 1; 
+  string nknAddress = 2; 
+  string walletPrivateKey = 3; 
+  string walletPublicKey = 4; 
+  string shippingAddress = 5; 
+  string refundAddress = 6; 
+  string amount = 7; 
+  string chain = 8; 
+  bool paymentComplete = 9; 
+  
+}
+
