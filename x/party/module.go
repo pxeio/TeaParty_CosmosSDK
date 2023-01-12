@@ -566,7 +566,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 		return
 	}
 
-	bouw := types.OrdersUnderWatch{
+	bouw := partyTypes.OrdersUnderWatch{
 		Index:            co.BuyerEscrowWallet.PublicAddress,
 		NknAddress:       co.BuyerNKNAddress,
 		WalletPrivateKey: co.BuyerEscrowWallet.PrivateKey,
@@ -577,7 +577,8 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 		PaymentComplete:  false,
 	}
 	am.keeper.SetOrdersUnderWatch(ctx, bouw)
-	souw := types.OrdersUnderWatch{
+
+	souw := partyTypes.OrdersUnderWatch{
 		Index:            co.SellerEscrowWallet.PublicAddress,
 		NknAddress:       co.SellerNKNAddress,
 		WalletPrivateKey: co.SellerEscrowWallet.PrivateKey,
@@ -587,7 +588,17 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 		Chain:            sellersAccountWatchRequest.Chain,
 		PaymentComplete:  false,
 	}
+
 	am.keeper.SetOrdersUnderWatch(ctx, souw)
+
+	fmt.Println("checking that the order was set in the store")
+
+	o, ok := am.keeper.GetOrdersUnderWatch(ctx, co.BuyerEscrowWallet.PublicAddress)
+	if !ok {
+		fmt.Println("order not found in store")
+	}
+
+	fmt.Println("order from store: ", o)
 
 	go am.watchAccount(ctx, buyersAccountWatchRequest)
 	go am.watchAccount(ctx, sellersAccountWatchRequest)
@@ -595,6 +606,12 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 
 // BeginBlock contains the logic that is automatically triggered at the beginning of each block
 func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
+	fmt.Println("CURRENT STATE:")
+	fmt.Println("trade orders in the store: ", am.keeper.GetAllTradeOrders(ctx))
+	fmt.Println("Pending Orders: ", am.keeper.GetAllPendingOrders(ctx))
+	fmt.Println("Orders Awaiting Finalizer: ", am.keeper.GetAllOrdersAwaitingFinalizer(ctx))
+	fmt.Println("Orders Under Watch: ", am.keeper.GetAllOrdersUnderWatch(ctx))
+
 	po := am.keeper.GetAllPendingOrders(ctx)
 	for _, order := range po {
 		fmt.Println("order: ", order)
@@ -610,10 +627,10 @@ func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 		go am.initMonitor(ctx, order)
 	}
 
-	oaf := am.keeper.GetAllOrdersAwaitingFinalizer(ctx)
-	for _, order := range oaf {
-		go am.finalizeOrder(ctx, order)
-	}
+	// oaf := am.keeper.GetAllOrdersAwaitingFinalizer(ctx)
+	// for _, order := range oaf {
+	// 	go am.finalizeOrder(ctx, order)
+	// }
 
 }
 
@@ -974,10 +991,9 @@ func (am AppModule) waitAndVerifySOLChain(ctx sdk.Context, request AccountWatchR
 			}
 		case <-timer.C:
 			// if the timer times out, return an error
-			e := fmt.Sprintf("timeout occured waiting for " + request.Account + " to have a payment of " + request.Amount.String())
 			awrr := &AccountWatchRequestResult{
 				AccountWatchRequest: request,
-				Result:              e,
+				Result:              OUTCOME_TIMEOUT,
 			}
 
 			am.dispatch(ctx, awrr)
@@ -996,39 +1012,94 @@ const (
 
 func (am AppModule) dispatch(ctx sdk.Context, awrr *AccountWatchRequestResult) {
 	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
-	po := am.keeper.GetAllOrdersUnderWatch(ctx)
-	for _, p := range po {
-		if p.Index == awrr.AccountWatchRequest.TransactionID {
-			switch awrr.Result {
-			case OUTCOME_SUCCESS:
-				p.PaymentComplete = true
-				// p.PaymentCompleteBlockHeigh = int32(ctx.BlockHeight())
-			case OUTCOME_FAILURE:
-				p.PaymentComplete = false
-			case OUTCOME_TIMEOUT:
-				p.PaymentComplete = false
-			}
-			am.keeper.RemoveOrdersUnderWatch(ctx, p.Index)
-			oaf := partyTypes.OrdersAwaitingFinalizer{
-				Index:            p.Index,
-				NknAddress:       p.NknAddress,
-				WalletPrivateKey: p.WalletPrivateKey,
-				WalletPublicKey:  p.WalletPublicKey,
-				ShippingAddress:  p.ShippingAddress,
-				RefundAddress:    p.RefundAddress,
-				Amount:           p.Amount,
-				Chain:            p.Chain,
-			}
-			am.keeper.SetOrdersAwaitingFinalizer(ctx, oaf)
-		}
+	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
+	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
+	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
+	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
+	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
+	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
+	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
+	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
+	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
+	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
+	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
+	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
+	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
+	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
+	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
+	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
+	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
+	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
+	ouw, ok := am.keeper.GetOrdersUnderWatch(ctx, awrr.AccountWatchRequest.Account)
+	if !ok {
+		return
 	}
+
+	fmt.Println("ORDRES UNDER WATCH")
+	fmt.Println(ouw)
+
+	switch awrr.Result {
+	case OUTCOME_SUCCESS:
+		fmt.Println("success")
+		ouw.PaymentComplete = true
+		// p.PaymentCompleteBlockHeigh = int32(ctx.BlockHeight())
+	case OUTCOME_FAILURE:
+		ouw.PaymentComplete = false
+	case OUTCOME_TIMEOUT:
+		ouw.PaymentComplete = false
+	}
+
+	oaf := partyTypes.OrdersAwaitingFinalizer{
+		Index:            ouw.Index,
+		NknAddress:       ouw.NknAddress,
+		WalletPrivateKey: ouw.WalletPrivateKey,
+		WalletPublicKey:  ouw.WalletPublicKey,
+		ShippingAddress:  ouw.ShippingAddress,
+		RefundAddress:    ouw.RefundAddress,
+		Amount:           ouw.Amount,
+		Chain:            ouw.Chain,
+	}
+
+	fmt.Println(oaf)
+
+	// goctx := sdk.UnwrapSDKContext(ctx)
+	am.keeper.SetOrdersAwaitingFinalizer(ctx, oaf)
+	am.keeper.RemoveOrdersUnderWatch(ctx, ouw.Index)
+
+	// po := am.keeper.GetAllOrdersUnderWatch(ctx)
+	// fmt.Printf("orders under watch: %+v", po)
+	// for _, p := range po {
+	// 	if p.Index == awrr.AccountWatchRequest.Account {
+	// 		switch awrr.Result {
+	// 		case OUTCOME_SUCCESS:
+	// 			p.PaymentComplete = true
+	// 			// p.PaymentCompleteBlockHeigh = int32(ctx.BlockHeight())
+	// 		case OUTCOME_FAILURE:
+	// 			p.PaymentComplete = false
+	// 		case OUTCOME_TIMEOUT:
+	// 			p.PaymentComplete = false
+	// 		}
+
+	// 		oaf := partyTypes.OrdersAwaitingFinalizer{
+	// 			Index:            p.WalletPublicKey,
+	// 			NknAddress:       p.NknAddress,
+	// 			WalletPrivateKey: p.WalletPrivateKey,
+	// 			WalletPublicKey:  p.WalletPublicKey,
+	// 			ShippingAddress:  p.ShippingAddress,
+	// 			RefundAddress:    p.RefundAddress,
+	// 			Amount:           p.Amount,
+	// 			Chain:            p.Chain,
+	// 		}
+	// 		am.keeper.SetOrdersAwaitingFinalizer(ctx, oaf)
+	// 		am.keeper.RemoveOrdersUnderWatch(ctx, p.Index)
+	// 	}
+	// }
 }
 
 func (am AppModule) waitAndVerifyEVMChain(ctx sdk.Context, client, client2 *ethclient.Client, request AccountWatchRequest) {
-
 	awrr := &AccountWatchRequestResult{
 		AccountWatchRequest: request,
-		Result:              "suceess",
+		Result:              OUTCOME_SUCCESS,
 	}
 
 	am.dispatch(ctx, awrr)
@@ -1137,7 +1208,7 @@ func (am AppModule) sendCoreSOLAsset(fromWalletPrivateKey, toAddress, txid strin
 		},
 	)
 	if err != nil {
-		panic(fmt.Errorf("unable to sign transaction: %w", err))
+		return err
 	}
 
 	// TODO: Migrate to ws client so we can use the sendandconfirmtransaction method
