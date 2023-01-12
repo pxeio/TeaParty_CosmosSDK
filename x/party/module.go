@@ -7,8 +7,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/big"
-	"math/rand"
 	"strconv"
+	"sync"
 	"time"
 
 	// this line is used by starport scaffolding # 1
@@ -207,6 +207,8 @@ type AppModule struct {
 	accountKeeper types.AccountKeeper
 	bankKeeper    types.BankKeeper
 	ordersInWatch []string
+	mx            sync.Mutex
+	wg            sync.WaitGroup
 }
 
 func NewAppModule(
@@ -264,6 +266,7 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 func (AppModule) ConsensusVersion() uint64 { return 1 }
 
 func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders) {
+	am.mx.Lock()
 	ta := order.TradeAsset
 	const productionTimeLimit = 7200 // 2 hours
 	const devTimelimit = 300         // 300 second
@@ -561,8 +564,9 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 		return
 	}
 
-	go am.watchAccount(buyersAccountWatchRequest)
-	go am.watchAccount(sellersAccountWatchRequest)
+	go am.watchAccount(ctx, buyersAccountWatchRequest)
+	go am.watchAccount(ctx, sellersAccountWatchRequest)
+	am.mx.Unlock()
 }
 
 // BeginBlock contains the logic that is automatically triggered at the beginning of each block
@@ -579,8 +583,10 @@ func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 		// add this to a queue and process it in a separate go routine
 
 		if len(am.ordersInWatch) == 0 {
-			am.keeper.RemovePendingOrders(ctx, order.Index)
+			// am.keeper.RemovePendingOrders(ctx, order.Index)
+			am.wg.Add(1)
 			go am.initMonitor(ctx, order)
+			am.wg.Wait()
 			am.ordersInWatch = append(am.ordersInWatch, order.Index)
 		} else {
 			found := false
@@ -590,7 +596,7 @@ func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 				}
 			}
 			if !found {
-				am.keeper.RemovePendingOrders(ctx, order.Index)
+				// am.keeper.RemovePendingOrders(ctx, order.Index)
 				go am.initMonitor(ctx, order)
 				am.ordersInWatch = append(am.ordersInWatch, order.Index)
 			}
@@ -759,7 +765,7 @@ func sendBuyerPayInfo(co CompletedOrder) error {
 	}
 }
 
-func (am AppModule) watchAccount(awr *AccountWatchRequest) error {
+func (am AppModule) watchAccount(ctx sdk.Context, awr *AccountWatchRequest) error {
 	switch awr.Chain {
 	case SOL:
 		solClient := solRPC.New("https://api.testnet.solana.com")
@@ -773,7 +779,7 @@ func (am AppModule) watchAccount(awr *AccountWatchRequest) error {
 		if err != nil {
 			return err
 		}
-		go am.waitAndVerifySOLChain(*awr, solClient, solClient2)
+		go am.waitAndVerifySOLChain(ctx, *awr, solClient, solClient2)
 	case CEL:
 		// create a new client for the second node
 		// initialize the ethereum nodes.
@@ -785,7 +791,7 @@ func (am AppModule) watchAccount(awr *AccountWatchRequest) error {
 		if err != nil {
 			return err
 		}
-		go am.waitAndVerifyEVMChain(context.Background(), celClient1, celClient2, *awr)
+		go am.waitAndVerifyEVMChain(ctx, celClient1, celClient2, *awr)
 	case ETH:
 		// initialize the ethereum nodes.
 		ethClient1, err := ethclient.Dial("https://goerli.infura.io/v3/61979797a8bb4bfe9dddd4ff9675db7e")
@@ -796,7 +802,7 @@ func (am AppModule) watchAccount(awr *AccountWatchRequest) error {
 		if err != nil {
 			return err
 		}
-		go am.waitAndVerifyEVMChain(context.Background(), ethClient1, ethClient2, *awr)
+		go am.waitAndVerifyEVMChain(ctx, ethClient1, ethClient2, *awr)
 	case POL:
 		// initialize the ethereum nodes.
 		polyClient1, err := ethclient.Dial("https://polygon-mumbai.infura.io/v3/61979797a8bb4bfe9dddd4ff9675db7e")
@@ -807,18 +813,18 @@ func (am AppModule) watchAccount(awr *AccountWatchRequest) error {
 		if err != nil {
 			return err
 		}
-		go am.waitAndVerifyEVMChain(context.Background(), polyClient1, polyClient2, *awr)
+		go am.waitAndVerifyEVMChain(ctx, polyClient1, polyClient2, *awr)
 	}
 	return nil
 }
 
-func (am AppModule) waitAndVerifySOLChain(request AccountWatchRequest, rpcClient, rpcClientTwo *solRPC.Client) error {
+func (am AppModule) waitAndVerifySOLChain(ctx sdk.Context, request AccountWatchRequest, rpcClient, rpcClientTwo *solRPC.Client) error {
 	awrr := &AccountWatchRequestResult{
 		AccountWatchRequest: request,
-		Result:              "suceess",
+		Result:              OUTCOME_SUCCESS,
 	}
 
-	am.dispatch(awrr)
+	am.dispatch(ctx, awrr)
 	return nil
 
 	// the request.Amount is currently in ETH big.Int format convert to uint64
@@ -866,10 +872,10 @@ func (am AppModule) waitAndVerifySOLChain(request AccountWatchRequest, rpcClient
 					// send a complete order event
 					awrr := &AccountWatchRequestResult{
 						AccountWatchRequest: request,
-						Result:              "suceess",
+						Result:              OUTCOME_SUCCESS,
 					}
 
-					am.dispatch(awrr)
+					am.dispatch(ctx, awrr)
 					canILive = false
 					return nil
 				} else {
@@ -884,7 +890,7 @@ func (am AppModule) waitAndVerifySOLChain(request AccountWatchRequest, rpcClient
 				Result:              e,
 			}
 
-			am.dispatch(awrr)
+			am.dispatch(ctx, awrr)
 			canILive = false
 			return nil
 		}
@@ -892,39 +898,57 @@ func (am AppModule) waitAndVerifySOLChain(request AccountWatchRequest, rpcClient
 	return nil
 }
 
-func (am AppModule) dispatch(awrr *AccountWatchRequestResult) {
+const (
+	OUTCOME_SUCCESS = "success"
+	OUTCOME_FAILURE = "failure"
+	OUTCOME_TIMEOUT = "timeout"
+)
+
+func (am AppModule) dispatch(ctx sdk.Context, awrr *AccountWatchRequestResult) {
 	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
-	// notify the party chain of the transaction outcome
-	// if err := notifyPartyChainOfWatchResult(awrr); err != nil {
-	// 	time.Sleep(10 * time.Second)
-	// 	return e.Dispatch(awrr)
-	// }
-
 	// update the order in the database
+	// po := am.keeper.GetAllPendingOrders(ctx)
+	// for _, p := range po {
+	// 	if p.Index == awrr.AccountWatchRequest.TransactionID {
+	// 		switch awrr.Result {
+	// 		case OUTCOME_SUCCESS:
+	// 			if !awrr.AccountWatchRequest.Seller {
+	// 				p.BuyerPaymentComplete = true
+	// 				p.BuyerPaymentCompleteBlockHeight = int32(ctx.BlockHeight())
+	// 			} else {
+	// 				p.SellerPaymentComplete = true
+	// 				p.SellerPaymentCompleteBlockHeight = int32(ctx.BlockHeight())
+	// 			}
+	// 		case OUTCOME_FAILURE:
+	// 			if !awrr.AccountWatchRequest.Seller {
+	// 				p.BuyerPaymentComplete = false
+	// 			} else {
+	// 				p.SellerPaymentComplete = false
+	// 			}
+	// 		case OUTCOME_TIMEOUT:
+	// 			if !awrr.AccountWatchRequest.Seller {
+	// 				p.BuyerPaymentComplete = false
+	// 			} else {
+	// 				p.SellerPaymentComplete = false
+	// 			}
+	// 		}
 
-	// // remove the order from the list e.watchsInProgress
-	// newcwip := make([]string, 0)
-	// for i, v := range e.watchsInProgress {
-	// 	if v != awrr.AccountWatchRequest.TransactionID {
-	// 		newcwip = append(newcwip, e.watchsInProgress[i])
+	// 		am.keeper.RemovePendingOrders(ctx, p.Index)
+	// 		am.keeper.SetPendingOrders(ctx, p)
 	// 	}
 	// }
-	// e.watchsInProgress = newcwip
+
 	return
 }
 
-func (am AppModule) waitAndVerifyEVMChain(ctx context.Context, client, client2 *ethclient.Client, request AccountWatchRequest) {
+func (am AppModule) waitAndVerifyEVMChain(ctx sdk.Context, client, client2 *ethclient.Client, request AccountWatchRequest) {
 
 	awrr := &AccountWatchRequestResult{
 		AccountWatchRequest: request,
 		Result:              "suceess",
 	}
 
-	// sleep for a random amount of time between 5 and 30 seconds
-	rand.Seed(time.Now().UnixNano())
-	time.Sleep(time.Duration(rand.Intn(25)+5) * time.Second)
-
-	am.dispatch(awrr)
+	am.dispatch(ctx, awrr)
 
 	return
 
@@ -961,10 +985,10 @@ func (am AppModule) waitAndVerifyEVMChain(ctx context.Context, client, client2 *
 					// send a complete order event
 					awrr := &AccountWatchRequestResult{
 						AccountWatchRequest: request,
-						Result:              "suceess",
+						Result:              OUTCOME_SUCCESS,
 					}
 
-					am.dispatch(awrr)
+					am.dispatch(ctx, awrr)
 					canILive = false
 					return
 				} else {
@@ -974,13 +998,12 @@ func (am AppModule) waitAndVerifyEVMChain(ctx context.Context, client, client2 *
 		case <-timer.C:
 			// if the timer times out, return an error
 			// if the timer times out, return an error
-			e := fmt.Sprintf("timeout occured waiting for " + request.Account + " to have a payment of " + request.Amount.String())
 			awrr := &AccountWatchRequestResult{
 				AccountWatchRequest: request,
-				Result:              e,
+				Result:              OUTCOME_TIMEOUT,
 			}
 
-			am.dispatch(awrr)
+			am.dispatch(ctx, awrr)
 			canILive = false
 			return
 		}
