@@ -931,13 +931,13 @@ func (am AppModule) watchAccount(ctx sdk.Context, awr *AccountWatchRequest) erro
 }
 
 func (am AppModule) waitAndVerifySOLChain(ctx sdk.Context, request AccountWatchRequest, rpcClient, rpcClientTwo *solRPC.Client) error {
-	awrr := &AccountWatchRequestResult{
-		AccountWatchRequest: request,
-		Result:              OUTCOME_SUCCESS,
-	}
+	// awrr := &AccountWatchRequestResult{
+	// 	AccountWatchRequest: request,
+	// 	Result:              OUTCOME_SUCCESS,
+	// }
 
-	am.dispatch(ctx, awrr)
-	return nil
+	// am.dispatch(ctx, awrr)
+	// return nil
 
 	// the request.Amount is currently in ETH big.Int format convert to uint64
 	amount, err := strconv.ParseUint(request.Amount.String(), 10, 64)
@@ -1051,46 +1051,17 @@ func (am AppModule) dispatch(ctx sdk.Context, awrr *AccountWatchRequestResult) {
 	// goctx := sdk.UnwrapSDKContext(ctx)
 	am.keeper.SetOrdersAwaitingFinalizer(ctx, oaf)
 	am.keeper.RemoveOrdersUnderWatch(ctx, ouw.Index)
-
-	// po := am.keeper.GetAllOrdersUnderWatch(ctx)
-	// fmt.Printf("orders under watch: %+v", po)
-	// for _, p := range po {
-	// 	if p.Index == awrr.AccountWatchRequest.Account {
-	// 		switch awrr.Result {
-	// 		case OUTCOME_SUCCESS:
-	// 			p.PaymentComplete = true
-	// 			// p.PaymentCompleteBlockHeigh = int32(ctx.BlockHeight())
-	// 		case OUTCOME_FAILURE:
-	// 			p.PaymentComplete = false
-	// 		case OUTCOME_TIMEOUT:
-	// 			p.PaymentComplete = false
-	// 		}
-
-	// 		oaf := partyTypes.OrdersAwaitingFinalizer{
-	// 			Index:            p.WalletPublicKey,
-	// 			NknAddress:       p.NknAddress,
-	// 			WalletPrivateKey: p.WalletPrivateKey,
-	// 			WalletPublicKey:  p.WalletPublicKey,
-	// 			ShippingAddress:  p.ShippingAddress,
-	// 			RefundAddress:    p.RefundAddress,
-	// 			Amount:           p.Amount,
-	// 			Chain:            p.Chain,
-	// 		}
-	// 		am.keeper.SetOrdersAwaitingFinalizer(ctx, oaf)
-	// 		am.keeper.RemoveOrdersUnderWatch(ctx, p.Index)
-	// 	}
-	// }
 }
 
 func (am AppModule) waitAndVerifyEVMChain(ctx sdk.Context, client, client2 *ethclient.Client, request AccountWatchRequest) {
-	awrr := &AccountWatchRequestResult{
-		AccountWatchRequest: request,
-		Result:              OUTCOME_SUCCESS,
-	}
+	// awrr := &AccountWatchRequestResult{
+	// 	AccountWatchRequest: request,
+	// 	Result:              OUTCOME_SUCCESS,
+	// }
 
-	am.dispatch(ctx, awrr)
+	// am.dispatch(ctx, awrr)
 
-	return
+	// return
 
 	// create a ticker that ticks every 30 seconds
 	// ticker := time.NewTicker(time.Second * 30)
@@ -1136,19 +1107,15 @@ func (am AppModule) waitAndVerifyEVMChain(ctx sdk.Context, client, client2 *ethc
 				}
 			}
 		case <-timer.C:
-			// if the timer times out, return an error
-			// if the timer times out, return an error
 			awrr := &AccountWatchRequestResult{
 				AccountWatchRequest: request,
 				Result:              OUTCOME_TIMEOUT,
 			}
-
 			am.dispatch(ctx, awrr)
 			canILive = false
 			return
 		}
 	}
-	return
 }
 
 func (am AppModule) sendCoreSOLAsset(fromWalletPrivateKey, toAddress, txid string, amount *big.Int, rpcClient *solRPC.Client) error {
