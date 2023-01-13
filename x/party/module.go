@@ -650,10 +650,13 @@ func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 		}
 	}
 
-	// oaf := am.keeper.GetAllOrdersAwaitingFinalizer(ctx)
-	// for _, order := range oaf {
-	// 	go am.finalizeOrder(ctx, order)
-	// }
+	oaf := am.keeper.GetAllOrdersAwaitingFinalizer(ctx)
+	for _, order := range oaf {
+		if err := am.finalizeOrder(ctx, order); err != nil {
+			// TODO: handle error
+			fmt.Println("error: ", err)
+		}
+	}
 
 }
 
@@ -703,16 +706,14 @@ func (am AppModule) sendPrivateKey(order partyTypes.OrdersAwaitingFinalizer) err
 	return nil
 }
 
-func (am AppModule) finalizeOrder(ctx sdk.Context, order partyTypes.OrdersAwaitingFinalizer) {
-	am.mx.Lock()
-	defer am.mx.Unlock()
+func (am AppModule) finalizeOrder(ctx sdk.Context, order partyTypes.OrdersAwaitingFinalizer) error {
 	if err := am.sendPrivateKey(order); err != nil {
 		if err := am.sendFunds(order); err != nil {
 			// am.keeper.SetFailedOrders()
 			// TODO: we need to notify the party chain that this has happend &|
 			// we need to build a reconciler to adjust the parameters in the order
 			// and try to force it through again.
-			return
+			return err
 		}
 	}
 
@@ -724,7 +725,7 @@ func (am AppModule) finalizeOrder(ctx sdk.Context, order partyTypes.OrdersAwaiti
 	// }
 
 	am.keeper.RemoveOrdersAwaitingFinalizer(ctx, order.Index)
-
+	return nil
 }
 
 func (am AppModule) sendFunds(order partyTypes.OrdersAwaitingFinalizer) error {
@@ -1034,25 +1035,6 @@ const (
 )
 
 func (am AppModule) dispatch(ctx sdk.Context, awrr *AccountWatchRequestResult) {
-	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
-	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
-	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
-	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
-	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
-	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
-	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
-	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
-	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
-	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
-	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
-	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
-	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
-	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
-	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
-	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
-	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
-	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
-	fmt.Println("dispatched : " + awrr.AccountWatchRequest.TransactionID)
 	ouw, ok := am.keeper.GetOrdersUnderWatch(ctx, awrr.AccountWatchRequest.Account)
 	if !ok {
 		return
