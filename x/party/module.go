@@ -601,25 +601,6 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 	}
 
 	am.keeper.SetOrdersUnderWatch(ctx, souw)
-
-	fmt.Println("checking that the order was set in the store")
-
-	o, ok := am.keeper.GetOrdersUnderWatch(ctx, co.BuyerEscrowWallet.PublicAddress)
-	if !ok {
-		fmt.Println("order not found in store")
-	}
-
-	fmt.Println("order from store: ", o)
-	fmt.Println("order from store: ", o)
-	fmt.Println("order from store: ", o)
-	fmt.Println("order from store: ", o)
-	fmt.Println("order from store: ", o)
-	fmt.Println("order from store: ", o)
-	fmt.Println("order from store: ", o)
-	fmt.Println("order from store: ", o)
-	fmt.Println("order from store: ", o)
-	fmt.Println("order from store: ", o)
-
 	go am.watchAccount(ctx, buyersAccountWatchRequest)
 	go am.watchAccount(ctx, sellersAccountWatchRequest)
 	return nil
