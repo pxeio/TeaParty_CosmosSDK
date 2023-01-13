@@ -13,6 +13,7 @@ func DefaultGenesis() *GenesisState {
 		TradeOrdersList:             []TradeOrders{},
 		PendingOrdersList:           []PendingOrders{},
 		OrdersAwaitingFinalizerList: []OrdersAwaitingFinalizer{},
+		OrdersUnderWatchList:        []OrdersUnderWatch{},
 		// this line is used by starport scaffolding # genesis/types/default
 		Params: DefaultParams(),
 	}
@@ -50,6 +51,16 @@ func (gs GenesisState) Validate() error {
 			return fmt.Errorf("duplicated index for ordersAwaitingFinalizer")
 		}
 		ordersAwaitingFinalizerIndexMap[index] = struct{}{}
+	}
+	// Check for duplicated index in ordersUnderWatch
+	ordersUnderWatchIndexMap := make(map[string]struct{})
+
+	for _, elem := range gs.OrdersUnderWatchList {
+		index := string(OrdersUnderWatchKey(elem.Index))
+		if _, ok := ordersUnderWatchIndexMap[index]; ok {
+			return fmt.Errorf("duplicated index for ordersUnderWatch")
+		}
+		ordersUnderWatchIndexMap[index] = struct{}{}
 	}
 	// this line is used by starport scaffolding # genesis/types/validate
 

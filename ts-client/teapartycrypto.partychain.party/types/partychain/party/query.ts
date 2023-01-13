@@ -2,6 +2,7 @@
 import _m0 from "protobufjs/minimal";
 import { PageRequest, PageResponse } from "../../cosmos/base/query/v1beta1/pagination";
 import { OrdersAwaitingFinalizer } from "./orders_awaiting_finalizer";
+import { OrdersUnderWatch } from "./orders_under_watch";
 import { Params } from "./params";
 import { PendingOrders } from "./pending_orders";
 import { TradeOrders } from "./trade_orders";
@@ -66,6 +67,23 @@ export interface QueryAllOrdersAwaitingFinalizerRequest {
 
 export interface QueryAllOrdersAwaitingFinalizerResponse {
   ordersAwaitingFinalizer: OrdersAwaitingFinalizer[];
+  pagination: PageResponse | undefined;
+}
+
+export interface QueryGetOrdersUnderWatchRequest {
+  index: string;
+}
+
+export interface QueryGetOrdersUnderWatchResponse {
+  ordersUnderWatch: OrdersUnderWatch | undefined;
+}
+
+export interface QueryAllOrdersUnderWatchRequest {
+  pagination: PageRequest | undefined;
+}
+
+export interface QueryAllOrdersUnderWatchResponse {
+  ordersUnderWatch: OrdersUnderWatch[];
   pagination: PageResponse | undefined;
 }
 
@@ -820,6 +838,231 @@ export const QueryAllOrdersAwaitingFinalizerResponse = {
   },
 };
 
+function createBaseQueryGetOrdersUnderWatchRequest(): QueryGetOrdersUnderWatchRequest {
+  return { index: "" };
+}
+
+export const QueryGetOrdersUnderWatchRequest = {
+  encode(message: QueryGetOrdersUnderWatchRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.index !== "") {
+      writer.uint32(10).string(message.index);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGetOrdersUnderWatchRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetOrdersUnderWatchRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.index = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetOrdersUnderWatchRequest {
+    return { index: isSet(object.index) ? String(object.index) : "" };
+  },
+
+  toJSON(message: QueryGetOrdersUnderWatchRequest): unknown {
+    const obj: any = {};
+    message.index !== undefined && (obj.index = message.index);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryGetOrdersUnderWatchRequest>, I>>(
+    object: I,
+  ): QueryGetOrdersUnderWatchRequest {
+    const message = createBaseQueryGetOrdersUnderWatchRequest();
+    message.index = object.index ?? "";
+    return message;
+  },
+};
+
+function createBaseQueryGetOrdersUnderWatchResponse(): QueryGetOrdersUnderWatchResponse {
+  return { ordersUnderWatch: undefined };
+}
+
+export const QueryGetOrdersUnderWatchResponse = {
+  encode(message: QueryGetOrdersUnderWatchResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.ordersUnderWatch !== undefined) {
+      OrdersUnderWatch.encode(message.ordersUnderWatch, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGetOrdersUnderWatchResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetOrdersUnderWatchResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.ordersUnderWatch = OrdersUnderWatch.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetOrdersUnderWatchResponse {
+    return {
+      ordersUnderWatch: isSet(object.ordersUnderWatch) ? OrdersUnderWatch.fromJSON(object.ordersUnderWatch) : undefined,
+    };
+  },
+
+  toJSON(message: QueryGetOrdersUnderWatchResponse): unknown {
+    const obj: any = {};
+    message.ordersUnderWatch !== undefined && (obj.ordersUnderWatch = message.ordersUnderWatch
+      ? OrdersUnderWatch.toJSON(message.ordersUnderWatch)
+      : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryGetOrdersUnderWatchResponse>, I>>(
+    object: I,
+  ): QueryGetOrdersUnderWatchResponse {
+    const message = createBaseQueryGetOrdersUnderWatchResponse();
+    message.ordersUnderWatch = (object.ordersUnderWatch !== undefined && object.ordersUnderWatch !== null)
+      ? OrdersUnderWatch.fromPartial(object.ordersUnderWatch)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseQueryAllOrdersUnderWatchRequest(): QueryAllOrdersUnderWatchRequest {
+  return { pagination: undefined };
+}
+
+export const QueryAllOrdersUnderWatchRequest = {
+  encode(message: QueryAllOrdersUnderWatchRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryAllOrdersUnderWatchRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllOrdersUnderWatchRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllOrdersUnderWatchRequest {
+    return { pagination: isSet(object.pagination) ? PageRequest.fromJSON(object.pagination) : undefined };
+  },
+
+  toJSON(message: QueryAllOrdersUnderWatchRequest): unknown {
+    const obj: any = {};
+    message.pagination !== undefined
+      && (obj.pagination = message.pagination ? PageRequest.toJSON(message.pagination) : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryAllOrdersUnderWatchRequest>, I>>(
+    object: I,
+  ): QueryAllOrdersUnderWatchRequest {
+    const message = createBaseQueryAllOrdersUnderWatchRequest();
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PageRequest.fromPartial(object.pagination)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseQueryAllOrdersUnderWatchResponse(): QueryAllOrdersUnderWatchResponse {
+  return { ordersUnderWatch: [], pagination: undefined };
+}
+
+export const QueryAllOrdersUnderWatchResponse = {
+  encode(message: QueryAllOrdersUnderWatchResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.ordersUnderWatch) {
+      OrdersUnderWatch.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryAllOrdersUnderWatchResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllOrdersUnderWatchResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.ordersUnderWatch.push(OrdersUnderWatch.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllOrdersUnderWatchResponse {
+    return {
+      ordersUnderWatch: Array.isArray(object?.ordersUnderWatch)
+        ? object.ordersUnderWatch.map((e: any) => OrdersUnderWatch.fromJSON(e))
+        : [],
+      pagination: isSet(object.pagination) ? PageResponse.fromJSON(object.pagination) : undefined,
+    };
+  },
+
+  toJSON(message: QueryAllOrdersUnderWatchResponse): unknown {
+    const obj: any = {};
+    if (message.ordersUnderWatch) {
+      obj.ordersUnderWatch = message.ordersUnderWatch.map((e) => e ? OrdersUnderWatch.toJSON(e) : undefined);
+    } else {
+      obj.ordersUnderWatch = [];
+    }
+    message.pagination !== undefined
+      && (obj.pagination = message.pagination ? PageResponse.toJSON(message.pagination) : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryAllOrdersUnderWatchResponse>, I>>(
+    object: I,
+  ): QueryAllOrdersUnderWatchResponse {
+    const message = createBaseQueryAllOrdersUnderWatchResponse();
+    message.ordersUnderWatch = object.ordersUnderWatch?.map((e) => OrdersUnderWatch.fromPartial(e)) || [];
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PageResponse.fromPartial(object.pagination)
+      : undefined;
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -840,6 +1083,10 @@ export interface Query {
   OrdersAwaitingFinalizerAll(
     request: QueryAllOrdersAwaitingFinalizerRequest,
   ): Promise<QueryAllOrdersAwaitingFinalizerResponse>;
+  /** Queries a OrdersUnderWatch by index. */
+  OrdersUnderWatch(request: QueryGetOrdersUnderWatchRequest): Promise<QueryGetOrdersUnderWatchResponse>;
+  /** Queries a list of OrdersUnderWatch items. */
+  OrdersUnderWatchAll(request: QueryAllOrdersUnderWatchRequest): Promise<QueryAllOrdersUnderWatchResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -853,6 +1100,8 @@ export class QueryClientImpl implements Query {
     this.PendingOrdersAll = this.PendingOrdersAll.bind(this);
     this.OrdersAwaitingFinalizer = this.OrdersAwaitingFinalizer.bind(this);
     this.OrdersAwaitingFinalizerAll = this.OrdersAwaitingFinalizerAll.bind(this);
+    this.OrdersUnderWatch = this.OrdersUnderWatch.bind(this);
+    this.OrdersUnderWatchAll = this.OrdersUnderWatchAll.bind(this);
   }
   Params(request: QueryParamsRequest): Promise<QueryParamsResponse> {
     const data = QueryParamsRequest.encode(request).finish();
@@ -898,6 +1147,18 @@ export class QueryClientImpl implements Query {
     const data = QueryAllOrdersAwaitingFinalizerRequest.encode(request).finish();
     const promise = this.rpc.request("teapartycrypto.partychain.party.Query", "OrdersAwaitingFinalizerAll", data);
     return promise.then((data) => QueryAllOrdersAwaitingFinalizerResponse.decode(new _m0.Reader(data)));
+  }
+
+  OrdersUnderWatch(request: QueryGetOrdersUnderWatchRequest): Promise<QueryGetOrdersUnderWatchResponse> {
+    const data = QueryGetOrdersUnderWatchRequest.encode(request).finish();
+    const promise = this.rpc.request("teapartycrypto.partychain.party.Query", "OrdersUnderWatch", data);
+    return promise.then((data) => QueryGetOrdersUnderWatchResponse.decode(new _m0.Reader(data)));
+  }
+
+  OrdersUnderWatchAll(request: QueryAllOrdersUnderWatchRequest): Promise<QueryAllOrdersUnderWatchResponse> {
+    const data = QueryAllOrdersUnderWatchRequest.encode(request).finish();
+    const promise = this.rpc.request("teapartycrypto.partychain.party.Query", "OrdersUnderWatchAll", data);
+    return promise.then((data) => QueryAllOrdersUnderWatchResponse.decode(new _m0.Reader(data)));
   }
 }
 

@@ -38,6 +38,14 @@ func TestGenesis(t *testing.T) {
 				Index: "1",
 			},
 		},
+		OrdersUnderWatchList: []types.OrdersUnderWatch{
+			{
+				Index: "0",
+			},
+			{
+				Index: "1",
+			},
+		},
 		// this line is used by starport scaffolding # genesis/test/state
 	}
 
@@ -52,5 +60,6 @@ func TestGenesis(t *testing.T) {
 	require.ElementsMatch(t, genesisState.TradeOrdersList, got.TradeOrdersList)
 	require.ElementsMatch(t, genesisState.PendingOrdersList, got.PendingOrdersList)
 	require.ElementsMatch(t, genesisState.OrdersAwaitingFinalizerList, got.OrdersAwaitingFinalizerList)
+	require.ElementsMatch(t, genesisState.OrdersUnderWatchList, got.OrdersUnderWatchList)
 	// this line is used by starport scaffolding # genesis/test/assert
 }

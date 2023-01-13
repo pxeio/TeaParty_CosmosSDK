@@ -8,6 +8,7 @@ import "partychain/party/params.proto";
 import "partychain/party/trade_orders.proto";
 import "partychain/party/pending_orders.proto";
 import "partychain/party/orders_awaiting_finalizer.proto";
+import "partychain/party/orders_under_watch.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/TeaPartyCrypto/partychain/x/party/types";
@@ -46,6 +47,16 @@ service Query {
 	// Queries a list of OrdersAwaitingFinalizer items.
 	rpc OrdersAwaitingFinalizerAll(QueryAllOrdersAwaitingFinalizerRequest) returns (QueryAllOrdersAwaitingFinalizerResponse) {
 		option (google.api.http).get = "/TeaPartyCrypto/partychain/party/orders_awaiting_finalizer";
+	}
+
+// Queries a OrdersUnderWatch by index.
+	rpc OrdersUnderWatch(QueryGetOrdersUnderWatchRequest) returns (QueryGetOrdersUnderWatchResponse) {
+		option (google.api.http).get = "/TeaPartyCrypto/partychain/party/orders_under_watch/{index}";
+	}
+
+	// Queries a list of OrdersUnderWatch items.
+	rpc OrdersUnderWatchAll(QueryAllOrdersUnderWatchRequest) returns (QueryAllOrdersUnderWatchResponse) {
+		option (google.api.http).get = "/TeaPartyCrypto/partychain/party/orders_under_watch";
 	}
 
 // this line is used by starport scaffolding # 2
@@ -111,6 +122,24 @@ message QueryAllOrdersAwaitingFinalizerRequest {
 
 message QueryAllOrdersAwaitingFinalizerResponse {
 	repeated OrdersAwaitingFinalizer ordersAwaitingFinalizer = 1 [(gogoproto.nullable) = false];
+	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryGetOrdersUnderWatchRequest {
+	  string index = 1;
+
+}
+
+message QueryGetOrdersUnderWatchResponse {
+	OrdersUnderWatch ordersUnderWatch = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllOrdersUnderWatchRequest {
+	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllOrdersUnderWatchResponse {
+	repeated OrdersUnderWatch ordersUnderWatch = 1 [(gogoproto.nullable) = false];
 	cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
