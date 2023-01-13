@@ -6,6 +6,7 @@ import (
 	"crypto/elliptic"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math/big"
 	"strconv"
@@ -268,7 +269,7 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 // ConsensusVersion is a sequence number for state-breaking change of the module. It should be incremented on each consensus-breaking change introduced by the module. To avoid wrong/empty versions, the initial version should be set to 1
 func (AppModule) ConsensusVersion() uint64 { return 1 }
 
-func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders) {
+func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders) error {
 	ta := order.TradeAsset
 	const productionTimeLimit = 7200 // 2 hours
 	const devTimelimit = 300         // 300 second
@@ -352,6 +353,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 
 		if err := notifySellerOfBuyer(*co); err != nil {
 			// TODO:: Cancle the order
+			return err
 		}
 
 		sellersAccountWatchRequest = &AccountWatchRequest{
@@ -374,6 +376,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 
 		if err := notifySellerOfBuyer(*co); err != nil {
 			// TODO:: Cancle the order
+			return err
 		}
 
 		sellersAccountWatchRequest = &AccountWatchRequest{
@@ -396,6 +399,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 
 		if err := notifySellerOfBuyer(*co); err != nil {
 			// TODO:: Cancle the order
+			return err
 		}
 
 		sellersAccountWatchRequest = &AccountWatchRequest{
@@ -418,6 +422,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 
 		if err := notifySellerOfBuyer(*co); err != nil {
 			// TODO:: Cancle the order
+			return err
 		}
 
 		sellersAccountWatchRequest = &AccountWatchRequest{
@@ -440,6 +445,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 
 		if err := notifySellerOfBuyer(*co); err != nil {
 			// TODO:: Cancle the order
+			return err
 		}
 
 		sellersAccountWatchRequest = &AccountWatchRequest{
@@ -451,7 +457,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 			Seller:        true,
 		}
 	default:
-		return
+		return errors.New("invalid currency")
 	}
 
 	switch ta {
@@ -465,6 +471,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 
 		if err := sendBuyerPayInfo(*co); err != nil {
 			// TODO:: Cancle the order
+			return err
 		}
 
 		buyersAccountWatchRequest = &AccountWatchRequest{
@@ -487,6 +494,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 
 		if err := sendBuyerPayInfo(*co); err != nil {
 			// TODO:: Cancle the order
+			return err
 		}
 		buyersAccountWatchRequest = &AccountWatchRequest{
 			Account:       co.BuyerEscrowWallet.PublicAddress,
@@ -508,6 +516,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 
 		if err := sendBuyerPayInfo(*co); err != nil {
 			// TODO:: Cancle the order
+			return err
 		}
 
 		buyersAccountWatchRequest = &AccountWatchRequest{
@@ -529,6 +538,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 
 		if err := sendBuyerPayInfo(*co); err != nil {
 			// TODO:: Cancle the order
+			return err
 		}
 
 		buyersAccountWatchRequest = &AccountWatchRequest{
@@ -551,6 +561,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 
 		if err := sendBuyerPayInfo(*co); err != nil {
 			// TODO:: Cancle the order
+			return err
 		}
 
 		// emit a new event to let Warren know that we need to start watching a new account
@@ -563,7 +574,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 			TransactionID: co.OrderID,
 		}
 	default:
-		return
+		return errors.New("invalid currency")
 	}
 
 	bouw := partyTypes.OrdersUnderWatch{
@@ -599,9 +610,19 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 	}
 
 	fmt.Println("order from store: ", o)
+	fmt.Println("order from store: ", o)
+	fmt.Println("order from store: ", o)
+	fmt.Println("order from store: ", o)
+	fmt.Println("order from store: ", o)
+	fmt.Println("order from store: ", o)
+	fmt.Println("order from store: ", o)
+	fmt.Println("order from store: ", o)
+	fmt.Println("order from store: ", o)
+	fmt.Println("order from store: ", o)
 
 	go am.watchAccount(ctx, buyersAccountWatchRequest)
 	go am.watchAccount(ctx, sellersAccountWatchRequest)
+	return nil
 }
 
 // BeginBlock contains the logic that is automatically triggered at the beginning of each block
@@ -624,7 +645,9 @@ func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 		// add this to a queue and process it in a separate go routine
 
 		am.keeper.RemovePendingOrders(ctx, order.Index)
-		go am.initMonitor(ctx, order)
+		if err := am.initMonitor(ctx, order); err != nil {
+			fmt.Println("error: ", err)
+		}
 	}
 
 	// oaf := am.keeper.GetAllOrdersAwaitingFinalizer(ctx)
