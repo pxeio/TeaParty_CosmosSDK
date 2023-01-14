@@ -1,3 +1,4 @@
+GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build . 
 # partychain
 **partychain** is a blockchain built using Cosmos SDK and Tendermint and created with [Ignite CLI](https://ignite.com/cli).
 

@@ -274,11 +274,11 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 	const productionTimeLimit = 7200 // 2 hours
 	const devTimelimit = 300         // 300 second
 	var timeLimit int64
-	timeLimit = devTimelimit
+	// timeLimit = devTimelimit
 	// if e.dev {
 	// 	timeLimit = devTimelimit
 	// } else {
-	// 	timeLimit = productionTimeLimit
+	timeLimit = productionTimeLimit
 	// }
 
 	biPrice := new(big.Int)
@@ -616,7 +616,6 @@ func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 
 	po := am.keeper.GetAllPendingOrders(ctx)
 	for _, order := range po {
-		fmt.Println("order: ", order)
 		// TODO:: check if order has expired
 		// if it has, then refund the escrowed funds
 		// and remove the order from the list of pending orders
@@ -1021,9 +1020,6 @@ func (am AppModule) dispatch(ctx sdk.Context, awrr *AccountWatchRequestResult) {
 		return
 	}
 
-	fmt.Println("ORDRES UNDER WATCH")
-	fmt.Println(ouw)
-
 	switch awrr.Result {
 	case OUTCOME_SUCCESS:
 		fmt.Println("success")
@@ -1082,13 +1078,16 @@ func (am AppModule) waitAndVerifyEVMChain(ctx sdk.Context, client, client2 *ethc
 		case <-ticker.C:
 			balance, err := client.BalanceAt(context.Background(), account, nil)
 			if err != nil {
+				fmt.Println("error getting balance: " + err.Error())
 				continue
 			}
 			// if the balance is equal to the amount, verify with the
 			// second RPC server.
+			fmt.Printf("balance of %s is %s. looking for ammount %s", request.Account, balance.String(), request.Amount.String())
 			if balance.Cmp(request.Amount) == 0 || balance.Cmp(request.Amount) == 1 {
 				verifiedBalance, err := client2.BalanceAt(context.Background(), account, nil)
 				if err != nil {
+					fmt.Println("error getting balance: " + err.Error())
 					continue
 				}
 
@@ -1098,15 +1097,16 @@ func (am AppModule) waitAndVerifyEVMChain(ctx sdk.Context, client, client2 *ethc
 						AccountWatchRequest: request,
 						Result:              OUTCOME_SUCCESS,
 					}
-
+					fmt.Printf("dispatching %s", awrr.Result)
 					am.dispatch(ctx, awrr)
 					canILive = false
 					return
 				} else {
-					return
+					continue
 				}
 			}
 		case <-timer.C:
+			fmt.Printf("account: %s timed out", request.Account)
 			awrr := &AccountWatchRequestResult{
 				AccountWatchRequest: request,
 				Result:              OUTCOME_TIMEOUT,
