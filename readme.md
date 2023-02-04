@@ -534,9 +534,8 @@ replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alp
 
 rm -rf ~/.partychain
 ./partychaind init party 
-./partychaind keys add alice  --keyring-backend test
-
-./partychaind add-genesis-account party1wwqr3m6nk4t8fyl06kp5pjqpn7rse4vdwzuuwk 5000000000000000000000stake 
+./partychaind keys add alice  --keyring-backend test 
+./partychaind add-genesis-account alice 5000000000000000000000stake 
 ./partychaind gentx alice  100000000stake   --keyring-backend test
 ./partychaind collect-gentxs
 go run .  start --log_level error
