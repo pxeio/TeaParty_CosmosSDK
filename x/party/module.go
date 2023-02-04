@@ -777,6 +777,16 @@ func (am AppModule) finalizeOrder(ctx sdk.Context, order partyTypes.OrdersAwaiti
 			// and try to force it through again.
 			return err
 		}
+
+		// find the matching order in the finalizing orders list by seller nkn address
+		// and remove it from the list of finalizing orders
+		fo := am.keeper.GetAllFinalizingOrders(ctx)
+		for _, o := range fo {
+			if o.SellerNKNAddress == order.NknAddress || o.BuyerNKNAddress == order.NknAddress {
+				am.keeper.RemoveFinalizingOrders(ctx, o.Index)
+			}
+		}
+
 	}
 
 	// TODO:: notify the party chain that the order has been finished and the funds have been sent
@@ -1012,14 +1022,14 @@ func (am AppModule) watchAccount(ctx sdk.Context, awr *AccountWatchRequest) erro
 }
 
 func (am AppModule) waitAndVerifySOLChain(ctx sdk.Context, request AccountWatchRequest, rpcClient, rpcClientTwo *solRPC.Client) error {
-	awrr := &AccountWatchRequestResult{
-		AccountWatchRequest: request,
-		Result:              OUTCOME_SUCCESS,
-	}
-	am.wg.Add(1)
-	am.dispatch(ctx, awrr)
-	am.wg.Wait()
-	return nil
+	// awrr := &AccountWatchRequestResult{
+	// 	AccountWatchRequest: request,
+	// 	Result:              OUTCOME_SUCCESS,
+	// }
+	// am.wg.Add(1)
+	// am.dispatch(ctx, awrr)
+	// am.wg.Wait()
+	// return nil
 
 	// the request.Amount is currently in ETH big.Int format convert to uint64
 	amount, err := strconv.ParseUint(request.Amount.String(), 10, 64)

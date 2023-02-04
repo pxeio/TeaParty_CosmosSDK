@@ -417,7 +417,7 @@ K!1poiv^F6fs8XtOdxwqRpp6
 
 docker run --rm -it \
     -v $(pwd)/docker/bob/:/root/.partychaind/ \
-    partychaind \
+    tmjeff/partychaind  \
     init party-1
 
 
@@ -425,7 +425,7 @@ mkdir -p docker/bob/keys
 echo -n password > docker/bob/keys/passphrase.txt
 docker run --rm -it \
     -v $(pwd)/docker/bob:/root/.partychaind \
-    partychaind \
+    tmjeff/partychaind  \
     keys \
     --keyring-backend file --keyring-dir /root/.partychaind/keys \
     add bob --home /root/.partychaind/
@@ -443,7 +443,7 @@ estate mobile afford toilet love useless few clock exhaust apple taste organ shr
 
 docker run --rm -it \f
     -v $(pwd)/docker/bob/:/root/.partychaind/ \
-    partychaind \
+    tmjeff/partychaind  \
     gentx cosmos18n4nyucwu436nx4czhg43kdzyh64lfv4wj6cqa 500000000000000tea  --account-number 0 --sequence 0  --chain-id party --pubkey '{"@type":"/cosmos.crypto.secp256k1.PubKey","key":"A7JbUfXrrO1f+F8LokSv4i4nK4f1Uv+jvOy/bSNq15q7"}'   --gas 1000000 --gas-prices 0.1ngram  --keyring-backend file --home /root/.partychaind/
 
 
