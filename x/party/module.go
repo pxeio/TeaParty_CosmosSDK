@@ -357,7 +357,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 		}
 
 		sellersAccountWatchRequest = &AccountWatchRequest{
-			Account:       co.SellerEscrowWallet.PublicAddress,
+			Account:       co.SellerNKNAddress,
 			TimeOut:       co.Timeout,
 			Chain:         SOL,
 			Amount:        co.Amount,
@@ -380,7 +380,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 		}
 
 		sellersAccountWatchRequest = &AccountWatchRequest{
-			Account:       co.SellerEscrowWallet.PublicAddress,
+			Account:       co.SellerNKNAddress,
 			TimeOut:       co.Timeout,
 			Chain:         CEL,
 			Amount:        co.Amount,
@@ -403,7 +403,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 		}
 
 		sellersAccountWatchRequest = &AccountWatchRequest{
-			Account:       co.SellerEscrowWallet.PublicAddress,
+			Account:       co.SellerNKNAddress,
 			TimeOut:       co.Timeout,
 			Chain:         ETH,
 			Amount:        co.Amount,
@@ -426,7 +426,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 		}
 
 		sellersAccountWatchRequest = &AccountWatchRequest{
-			Account:       co.SellerEscrowWallet.PublicAddress,
+			Account:       co.SellerNKNAddress,
 			TimeOut:       co.Timeout,
 			Chain:         POL,
 			Amount:        co.Amount,
@@ -449,7 +449,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 		}
 
 		sellersAccountWatchRequest = &AccountWatchRequest{
-			Account:       co.SellerEscrowWallet.PublicAddress,
+			Account:       co.SellerNKNAddress,
 			TimeOut:       co.Timeout,
 			Chain:         MO,
 			Amount:        co.Amount,
@@ -475,7 +475,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 		}
 
 		buyersAccountWatchRequest = &AccountWatchRequest{
-			Account:       co.BuyerEscrowWallet.PublicAddress,
+			Account:       co.BuyerNKNAddress,
 			TimeOut:       co.Timeout,
 			Chain:         SOL,
 			Amount:        co.Price,
@@ -497,7 +497,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 			return err
 		}
 		buyersAccountWatchRequest = &AccountWatchRequest{
-			Account:       co.BuyerEscrowWallet.PublicAddress,
+			Account:       co.BuyerNKNAddress,
 			TimeOut:       co.Timeout,
 			Chain:         MO,
 			Amount:        co.Price,
@@ -520,7 +520,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 		}
 
 		buyersAccountWatchRequest = &AccountWatchRequest{
-			Account:       co.BuyerEscrowWallet.PublicAddress,
+			Account:       co.BuyerNKNAddress,
 			TimeOut:       co.Timeout,
 			Chain:         ETH,
 			Amount:        co.Price,
@@ -542,7 +542,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 		}
 
 		buyersAccountWatchRequest = &AccountWatchRequest{
-			Account:       co.BuyerEscrowWallet.PublicAddress,
+			Account:       co.BuyerNKNAddress,
 			TimeOut:       co.Timeout,
 			Chain:         CEL,
 			Amount:        co.Price,
@@ -566,7 +566,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 
 		// emit a new event to let Warren know that we need to start watching a new account
 		buyersAccountWatchRequest = &AccountWatchRequest{
-			Account:       co.BuyerEscrowWallet.PublicAddress,
+			Account:       co.BuyerNKNAddress,
 			TimeOut:       co.Timeout,
 			Chain:         POL,
 			Amount:        co.Price,
@@ -578,7 +578,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 	}
 
 	bouw := partyTypes.OrdersUnderWatch{
-		Index:            co.BuyerEscrowWallet.PublicAddress,
+		Index:            co.BuyerNKNAddress,
 		NknAddress:       co.BuyerNKNAddress,
 		WalletPrivateKey: co.BuyerEscrowWallet.PrivateKey,
 		WalletPublicKey:  co.BuyerEscrowWallet.PublicAddress,
@@ -590,7 +590,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 	am.keeper.SetOrdersUnderWatch(ctx, bouw)
 
 	souw := partyTypes.OrdersUnderWatch{
-		Index:            co.SellerEscrowWallet.PublicAddress,
+		Index:            co.SellerNKNAddress,
 		NknAddress:       co.SellerNKNAddress,
 		WalletPrivateKey: co.SellerEscrowWallet.PrivateKey,
 		WalletPublicKey:  co.SellerEscrowWallet.PublicAddress,
@@ -608,14 +608,68 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 
 // BeginBlock contains the logic that is automatically triggered at the beginning of each block
 func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
+	fmt.Println("")
+	fmt.Println("")
 	fmt.Println("CURRENT STATE:")
-	fmt.Println("trade orders in the store: ", am.keeper.GetAllTradeOrders(ctx))
-	fmt.Println("Pending Orders: ", am.keeper.GetAllPendingOrders(ctx))
-	fmt.Println("Orders Awaiting Finalizer: ", am.keeper.GetAllOrdersAwaitingFinalizer(ctx))
-	fmt.Println("Orders Under Watch: ", am.keeper.GetAllOrdersUnderWatch(ctx))
+	fmt.Println("")
+	fmt.Println("")
+	fmt.Println("trade orders in the store: ")
+	// fmt.Println("trade orders in the store: ", am.keeper.GetAllTradeOrders(ctx))
+	for _, order := range am.keeper.GetAllTradeOrders(ctx) {
+		b, err := json.MarshalIndent(order, "", "  ")
+		if err != nil {
+			fmt.Println("error: ", err)
+		}
+		fmt.Println(string(b))
+	}
+	fmt.Println("")
+	fmt.Println("")
+	// fmt.Println("Pending Orders: ", am.keeper.GetAllPendingOrders(ctx))
+	fmt.Println("Pending Orders: ")
+	for _, order := range am.keeper.GetAllPendingOrders(ctx) {
+		b, err := json.MarshalIndent(order, "", "  ")
+		if err != nil {
+			fmt.Println("error: ", err)
+		}
+		fmt.Println(string(b))
+	}
+	fmt.Println("")
+	fmt.Println("")
+	// fmt.Println("Orders Awaiting Finalizer: ", am.keeper.GetAllOrdersAwaitingFinalizer(ctx))
+	fmt.Println("Orders Awaiting Finalizer: ")
+	for _, order := range am.keeper.GetAllOrdersAwaitingFinalizer(ctx) {
+		b, err := json.MarshalIndent(order, "", "  ")
+		if err != nil {
+			fmt.Println("error: ", err)
+		}
+		fmt.Println(string(b))
+	}
+	fmt.Println("")
+	fmt.Println("")
+	// fmt.Println("Orders Under Watch: ", am.keeper.GetAllOrdersUnderWatch(ctx))
+	fmt.Println("Orders Under Watch: ")
+	// pretty print the orders under watch
+	for _, order := range am.keeper.GetAllOrdersUnderWatch(ctx) {
+		b, err := json.MarshalIndent(order, "", "  ")
+		if err != nil {
+			fmt.Println("error: ", err)
+		}
+		fmt.Println(string(b))
+	}
+	fmt.Println("")
+	fmt.Println("")
 
 	po := am.keeper.GetAllPendingOrders(ctx)
 	for _, order := range po {
+		for _, oiw := range am.ordersInWatch {
+			if oiw == order.Index {
+				fmt.Println("order already in watch. skipping : ", order.Index)
+				continue
+			}
+		}
+		fmt.Println("adding order to watch: ", order.Index)
+		am.ordersInWatch = append(am.ordersInWatch, order.Index)
+
 		// TODO:: check if order has expired
 		// if it has, then refund the escrowed funds
 		// and remove the order from the list of pending orders
@@ -624,7 +678,7 @@ func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 		// TODO:: This does not scale. Come up with a better solution
 		// add this to a queue and process it in a separate go routine
 
-		am.keeper.RemovePendingOrders(ctx, order.Index)
+		// am.keeper.RemovePendingOrders(ctx, order.SellerNKNAddress)
 		if err := am.initMonitor(ctx, order); err != nil {
 			fmt.Println("error: ", err)
 		}
@@ -930,13 +984,13 @@ func (am AppModule) watchAccount(ctx sdk.Context, awr *AccountWatchRequest) erro
 }
 
 func (am AppModule) waitAndVerifySOLChain(ctx sdk.Context, request AccountWatchRequest, rpcClient, rpcClientTwo *solRPC.Client) error {
-	// awrr := &AccountWatchRequestResult{
-	// 	AccountWatchRequest: request,
-	// 	Result:              OUTCOME_SUCCESS,
-	// }
+	awrr := &AccountWatchRequestResult{
+		AccountWatchRequest: request,
+		Result:              OUTCOME_SUCCESS,
+	}
 
-	// am.dispatch(ctx, awrr)
-	// return nil
+	am.dispatch(ctx, awrr)
+	return nil
 
 	// the request.Amount is currently in ETH big.Int format convert to uint64
 	amount, err := strconv.ParseUint(request.Amount.String(), 10, 64)
@@ -1015,49 +1069,114 @@ const (
 )
 
 func (am AppModule) dispatch(ctx sdk.Context, awrr *AccountWatchRequestResult) {
-	ouw, ok := am.keeper.GetOrdersUnderWatch(ctx, awrr.AccountWatchRequest.Account)
+	ouw, ok := am.keeper.GetOrdersUnderWatch(ctx, awrr.AccountWatchRequest.TransactionID)
 	if !ok {
+		fmt.Println("no orders under watch")
+		return
+	}
+
+	fmt.Printf("looking for pending order for %+v", ouw)
+
+	fmt.Println("in the list of pending orders:")
+	for _, pendingOrder := range am.keeper.GetAllPendingOrders(ctx) {
+		// pretty json
+		b, err := json.MarshalIndent(pendingOrder, "", "  ")
+		if err != nil {
+			fmt.Println("error:", err)
+		}
+		fmt.Print(string(b))
+	}
+
+	pendingCompleteOrder, ok := am.keeper.GetPendingOrders(ctx, ouw.Index)
+	if !ok {
+		fmt.Println("no pending order")
 		return
 	}
 
 	switch awrr.Result {
 	case OUTCOME_SUCCESS:
 		fmt.Println("success")
+		// TODO:: remove this
 		ouw.PaymentComplete = true
-		// p.PaymentCompleteBlockHeigh = int32(ctx.BlockHeight())
+
+		// compare owu.Chain to the Curency of the pendingCompleteOrder
+		// if they match we know that we have the Buyer's payment completion status
+		if ouw.Chain == pendingCompleteOrder.Currency {
+			pendingCompleteOrder.BuyerPaymentComplete = true
+		}
+		if ouw.Chain == pendingCompleteOrder.TradeAsset {
+			pendingCompleteOrder.SellerPaymentComplete = true
+		}
 	case OUTCOME_FAILURE:
+		// TODO:: remove this
 		ouw.PaymentComplete = false
+
+		if ouw.Chain == pendingCompleteOrder.Currency {
+			pendingCompleteOrder.BuyerPaymentComplete = false
+		}
+		if ouw.Chain == pendingCompleteOrder.TradeAsset {
+			pendingCompleteOrder.SellerPaymentComplete = false
+		}
 	case OUTCOME_TIMEOUT:
+		// TODO:: remove this
 		ouw.PaymentComplete = false
+
+		if ouw.Chain == pendingCompleteOrder.Currency {
+			pendingCompleteOrder.BuyerPaymentComplete = false
+		}
+		if ouw.Chain == pendingCompleteOrder.TradeAsset {
+			pendingCompleteOrder.SellerPaymentComplete = false
+		}
 	}
 
-	oaf := partyTypes.OrdersAwaitingFinalizer{
-		Index:            ouw.Index,
-		NknAddress:       ouw.NknAddress,
-		WalletPrivateKey: ouw.WalletPrivateKey,
-		WalletPublicKey:  ouw.WalletPublicKey,
-		ShippingAddress:  ouw.ShippingAddress,
-		RefundAddress:    ouw.RefundAddress,
-		Amount:           ouw.Amount,
-		Chain:            ouw.Chain,
+	// check if the buyer and seller have both completed payment
+	if pendingCompleteOrder.BuyerPaymentComplete && pendingCompleteOrder.SellerPaymentComplete {
+		// Create the OrdersAwaitingFinalizer for both the buyer and seller
+
+		boaf := partyTypes.OrdersAwaitingFinalizer{
+			Index:            pendingCompleteOrder.BuyerNKNAddress,
+			NknAddress:       pendingCompleteOrder.BuyerNKNAddress,
+			WalletPrivateKey: pendingCompleteOrder.SellerEscrowWalletPrivateKey,
+			WalletPublicKey:  pendingCompleteOrder.SellerEscrowWalletPublicKey,
+			ShippingAddress:  pendingCompleteOrder.BuyerShippingAddress,
+			RefundAddress:    pendingCompleteOrder.BuyerRefundAddress,
+			Amount:           pendingCompleteOrder.Amount,
+			Chain:            pendingCompleteOrder.Currency,
+		}
+
+		soaf := partyTypes.OrdersAwaitingFinalizer{
+			Index:            pendingCompleteOrder.SellerNKNAddress,
+			NknAddress:       pendingCompleteOrder.SellerNKNAddress,
+			WalletPrivateKey: pendingCompleteOrder.BuyerEscrowWalletPrivateKey,
+			WalletPublicKey:  pendingCompleteOrder.BuyerEscrowWalletPublicKey,
+			ShippingAddress:  pendingCompleteOrder.SellerShippingAddress,
+			RefundAddress:    pendingCompleteOrder.SellerRefundAddress,
+			Amount:           pendingCompleteOrder.Amount,
+			Chain:            pendingCompleteOrder.TradeAsset,
+		}
+
+		am.keeper.SetOrdersAwaitingFinalizer(ctx, boaf)
+		am.keeper.SetOrdersAwaitingFinalizer(ctx, soaf)
+		am.keeper.RemovePendingOrders(ctx, pendingCompleteOrder.Index)
+		am.keeper.RemoveOrdersUnderWatch(ctx, ouw.Index)
+		return
+	} else {
+		// remove the order under watch
+		am.keeper.RemoveOrdersUnderWatch(ctx, ouw.Index)
+		// update the pending order
+		am.keeper.SetPendingOrders(ctx, pendingCompleteOrder)
 	}
-
-	fmt.Println(oaf)
-
-	// goctx := sdk.UnwrapSDKContext(ctx)
-	am.keeper.SetOrdersAwaitingFinalizer(ctx, oaf)
-	am.keeper.RemoveOrdersUnderWatch(ctx, ouw.Index)
 }
 
 func (am AppModule) waitAndVerifyEVMChain(ctx sdk.Context, client, client2 *ethclient.Client, request AccountWatchRequest) {
-	// awrr := &AccountWatchRequestResult{
-	// 	AccountWatchRequest: request,
-	// 	Result:              OUTCOME_SUCCESS,
-	// }
+	awrr := &AccountWatchRequestResult{
+		AccountWatchRequest: request,
+		Result:              OUTCOME_SUCCESS,
+	}
 
-	// am.dispatch(ctx, awrr)
+	am.dispatch(ctx, awrr)
 
-	// return
+	return
 
 	// create a ticker that ticks every 30 seconds
 	// ticker := time.NewTicker(time.Second * 30)
