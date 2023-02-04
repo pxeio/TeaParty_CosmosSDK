@@ -1,6 +1,7 @@
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
 import { PageRequest, PageResponse } from "../../cosmos/base/query/v1beta1/pagination";
+import { FinalizingOrders } from "./finalizing_orders";
 import { OrdersAwaitingFinalizer } from "./orders_awaiting_finalizer";
 import { OrdersUnderWatch } from "./orders_under_watch";
 import { Params } from "./params";
@@ -84,6 +85,24 @@ export interface QueryAllOrdersUnderWatchRequest {
 
 export interface QueryAllOrdersUnderWatchResponse {
   ordersUnderWatch: OrdersUnderWatch[];
+  pagination: PageResponse | undefined;
+}
+
+/** this line is used by starport scaffolding # 3 */
+export interface QueryGetFinalizingOrdersRequest {
+  index: string;
+}
+
+export interface QueryGetFinalizingOrdersResponse {
+  finalizingOrders: FinalizingOrders | undefined;
+}
+
+export interface QueryAllFinalizingOrdersRequest {
+  pagination: PageRequest | undefined;
+}
+
+export interface QueryAllFinalizingOrdersResponse {
+  finalizingOrders: FinalizingOrders[];
   pagination: PageResponse | undefined;
 }
 
@@ -1063,6 +1082,231 @@ export const QueryAllOrdersUnderWatchResponse = {
   },
 };
 
+function createBaseQueryGetFinalizingOrdersRequest(): QueryGetFinalizingOrdersRequest {
+  return { index: "" };
+}
+
+export const QueryGetFinalizingOrdersRequest = {
+  encode(message: QueryGetFinalizingOrdersRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.index !== "") {
+      writer.uint32(10).string(message.index);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGetFinalizingOrdersRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetFinalizingOrdersRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.index = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetFinalizingOrdersRequest {
+    return { index: isSet(object.index) ? String(object.index) : "" };
+  },
+
+  toJSON(message: QueryGetFinalizingOrdersRequest): unknown {
+    const obj: any = {};
+    message.index !== undefined && (obj.index = message.index);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryGetFinalizingOrdersRequest>, I>>(
+    object: I,
+  ): QueryGetFinalizingOrdersRequest {
+    const message = createBaseQueryGetFinalizingOrdersRequest();
+    message.index = object.index ?? "";
+    return message;
+  },
+};
+
+function createBaseQueryGetFinalizingOrdersResponse(): QueryGetFinalizingOrdersResponse {
+  return { finalizingOrders: undefined };
+}
+
+export const QueryGetFinalizingOrdersResponse = {
+  encode(message: QueryGetFinalizingOrdersResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.finalizingOrders !== undefined) {
+      FinalizingOrders.encode(message.finalizingOrders, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryGetFinalizingOrdersResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryGetFinalizingOrdersResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.finalizingOrders = FinalizingOrders.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryGetFinalizingOrdersResponse {
+    return {
+      finalizingOrders: isSet(object.finalizingOrders) ? FinalizingOrders.fromJSON(object.finalizingOrders) : undefined,
+    };
+  },
+
+  toJSON(message: QueryGetFinalizingOrdersResponse): unknown {
+    const obj: any = {};
+    message.finalizingOrders !== undefined && (obj.finalizingOrders = message.finalizingOrders
+      ? FinalizingOrders.toJSON(message.finalizingOrders)
+      : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryGetFinalizingOrdersResponse>, I>>(
+    object: I,
+  ): QueryGetFinalizingOrdersResponse {
+    const message = createBaseQueryGetFinalizingOrdersResponse();
+    message.finalizingOrders = (object.finalizingOrders !== undefined && object.finalizingOrders !== null)
+      ? FinalizingOrders.fromPartial(object.finalizingOrders)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseQueryAllFinalizingOrdersRequest(): QueryAllFinalizingOrdersRequest {
+  return { pagination: undefined };
+}
+
+export const QueryAllFinalizingOrdersRequest = {
+  encode(message: QueryAllFinalizingOrdersRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryAllFinalizingOrdersRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllFinalizingOrdersRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllFinalizingOrdersRequest {
+    return { pagination: isSet(object.pagination) ? PageRequest.fromJSON(object.pagination) : undefined };
+  },
+
+  toJSON(message: QueryAllFinalizingOrdersRequest): unknown {
+    const obj: any = {};
+    message.pagination !== undefined
+      && (obj.pagination = message.pagination ? PageRequest.toJSON(message.pagination) : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryAllFinalizingOrdersRequest>, I>>(
+    object: I,
+  ): QueryAllFinalizingOrdersRequest {
+    const message = createBaseQueryAllFinalizingOrdersRequest();
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PageRequest.fromPartial(object.pagination)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseQueryAllFinalizingOrdersResponse(): QueryAllFinalizingOrdersResponse {
+  return { finalizingOrders: [], pagination: undefined };
+}
+
+export const QueryAllFinalizingOrdersResponse = {
+  encode(message: QueryAllFinalizingOrdersResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    for (const v of message.finalizingOrders) {
+      FinalizingOrders.encode(v!, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryAllFinalizingOrdersResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryAllFinalizingOrdersResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.finalizingOrders.push(FinalizingOrders.decode(reader, reader.uint32()));
+          break;
+        case 2:
+          message.pagination = PageResponse.decode(reader, reader.uint32());
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryAllFinalizingOrdersResponse {
+    return {
+      finalizingOrders: Array.isArray(object?.finalizingOrders)
+        ? object.finalizingOrders.map((e: any) => FinalizingOrders.fromJSON(e))
+        : [],
+      pagination: isSet(object.pagination) ? PageResponse.fromJSON(object.pagination) : undefined,
+    };
+  },
+
+  toJSON(message: QueryAllFinalizingOrdersResponse): unknown {
+    const obj: any = {};
+    if (message.finalizingOrders) {
+      obj.finalizingOrders = message.finalizingOrders.map((e) => e ? FinalizingOrders.toJSON(e) : undefined);
+    } else {
+      obj.finalizingOrders = [];
+    }
+    message.pagination !== undefined
+      && (obj.pagination = message.pagination ? PageResponse.toJSON(message.pagination) : undefined);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryAllFinalizingOrdersResponse>, I>>(
+    object: I,
+  ): QueryAllFinalizingOrdersResponse {
+    const message = createBaseQueryAllFinalizingOrdersResponse();
+    message.finalizingOrders = object.finalizingOrders?.map((e) => FinalizingOrders.fromPartial(e)) || [];
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PageResponse.fromPartial(object.pagination)
+      : undefined;
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
@@ -1087,6 +1331,9 @@ export interface Query {
   OrdersUnderWatch(request: QueryGetOrdersUnderWatchRequest): Promise<QueryGetOrdersUnderWatchResponse>;
   /** Queries a list of OrdersUnderWatch items. */
   OrdersUnderWatchAll(request: QueryAllOrdersUnderWatchRequest): Promise<QueryAllOrdersUnderWatchResponse>;
+  /** Queries a list of FinalizingOrders items. */
+  FinalizingOrders(request: QueryGetFinalizingOrdersRequest): Promise<QueryGetFinalizingOrdersResponse>;
+  FinalizingOrdersAll(request: QueryAllFinalizingOrdersRequest): Promise<QueryAllFinalizingOrdersResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -1102,6 +1349,8 @@ export class QueryClientImpl implements Query {
     this.OrdersAwaitingFinalizerAll = this.OrdersAwaitingFinalizerAll.bind(this);
     this.OrdersUnderWatch = this.OrdersUnderWatch.bind(this);
     this.OrdersUnderWatchAll = this.OrdersUnderWatchAll.bind(this);
+    this.FinalizingOrders = this.FinalizingOrders.bind(this);
+    this.FinalizingOrdersAll = this.FinalizingOrdersAll.bind(this);
   }
   Params(request: QueryParamsRequest): Promise<QueryParamsResponse> {
     const data = QueryParamsRequest.encode(request).finish();
@@ -1159,6 +1408,18 @@ export class QueryClientImpl implements Query {
     const data = QueryAllOrdersUnderWatchRequest.encode(request).finish();
     const promise = this.rpc.request("teapartycrypto.partychain.party.Query", "OrdersUnderWatchAll", data);
     return promise.then((data) => QueryAllOrdersUnderWatchResponse.decode(new _m0.Reader(data)));
+  }
+
+  FinalizingOrders(request: QueryGetFinalizingOrdersRequest): Promise<QueryGetFinalizingOrdersResponse> {
+    const data = QueryGetFinalizingOrdersRequest.encode(request).finish();
+    const promise = this.rpc.request("teapartycrypto.partychain.party.Query", "FinalizingOrders", data);
+    return promise.then((data) => QueryGetFinalizingOrdersResponse.decode(new _m0.Reader(data)));
+  }
+
+  FinalizingOrdersAll(request: QueryAllFinalizingOrdersRequest): Promise<QueryAllFinalizingOrdersResponse> {
+    const data = QueryAllFinalizingOrdersRequest.encode(request).finish();
+    const promise = this.rpc.request("teapartycrypto.partychain.party.Query", "FinalizingOrdersAll", data);
+    return promise.then((data) => QueryAllFinalizingOrdersResponse.decode(new _m0.Reader(data)));
   }
 }
 

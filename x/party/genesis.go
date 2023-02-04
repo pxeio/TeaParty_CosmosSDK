@@ -24,6 +24,10 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, genState types.GenesisState) 
 	for _, elem := range genState.OrdersUnderWatchList {
 		k.SetOrdersUnderWatch(ctx, elem)
 	}
+	// Set all the finalizingOrders
+	for _, elem := range genState.FinalizingOrdersList {
+		k.SetFinalizingOrders(ctx, elem)
+	}
 	// this line is used by starport scaffolding # genesis/module/init
 	k.SetParams(ctx, genState.Params)
 }
@@ -37,6 +41,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	genesis.PendingOrdersList = k.GetAllPendingOrders(ctx)
 	genesis.OrdersAwaitingFinalizerList = k.GetAllOrdersAwaitingFinalizer(ctx)
 	genesis.OrdersUnderWatchList = k.GetAllOrdersUnderWatch(ctx)
+	genesis.FinalizingOrdersList = k.GetAllFinalizingOrders(ctx)
 	// this line is used by starport scaffolding # genesis/module/export
 
 	return genesis

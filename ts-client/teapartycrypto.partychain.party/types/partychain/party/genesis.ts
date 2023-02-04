@@ -1,5 +1,6 @@
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
+import { FinalizingOrders } from "./finalizing_orders";
 import { OrdersAwaitingFinalizer } from "./orders_awaiting_finalizer";
 import { OrdersUnderWatch } from "./orders_under_watch";
 import { Params } from "./params";
@@ -14,8 +15,9 @@ export interface GenesisState {
   tradeOrdersList: TradeOrders[];
   pendingOrdersList: PendingOrders[];
   ordersAwaitingFinalizerList: OrdersAwaitingFinalizer[];
-  /** this line is used by starport scaffolding # genesis/proto/state */
   ordersUnderWatchList: OrdersUnderWatch[];
+  /** this line is used by starport scaffolding # genesis/proto/state */
+  finalizingOrdersList: FinalizingOrders[];
 }
 
 function createBaseGenesisState(): GenesisState {
@@ -25,6 +27,7 @@ function createBaseGenesisState(): GenesisState {
     pendingOrdersList: [],
     ordersAwaitingFinalizerList: [],
     ordersUnderWatchList: [],
+    finalizingOrdersList: [],
   };
 }
 
@@ -44,6 +47,9 @@ export const GenesisState = {
     }
     for (const v of message.ordersUnderWatchList) {
       OrdersUnderWatch.encode(v!, writer.uint32(42).fork()).ldelim();
+    }
+    for (const v of message.finalizingOrdersList) {
+      FinalizingOrders.encode(v!, writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
@@ -70,6 +76,9 @@ export const GenesisState = {
         case 5:
           message.ordersUnderWatchList.push(OrdersUnderWatch.decode(reader, reader.uint32()));
           break;
+        case 6:
+          message.finalizingOrdersList.push(FinalizingOrders.decode(reader, reader.uint32()));
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -92,6 +101,9 @@ export const GenesisState = {
         : [],
       ordersUnderWatchList: Array.isArray(object?.ordersUnderWatchList)
         ? object.ordersUnderWatchList.map((e: any) => OrdersUnderWatch.fromJSON(e))
+        : [],
+      finalizingOrdersList: Array.isArray(object?.finalizingOrdersList)
+        ? object.finalizingOrdersList.map((e: any) => FinalizingOrders.fromJSON(e))
         : [],
     };
   },
@@ -121,6 +133,11 @@ export const GenesisState = {
     } else {
       obj.ordersUnderWatchList = [];
     }
+    if (message.finalizingOrdersList) {
+      obj.finalizingOrdersList = message.finalizingOrdersList.map((e) => e ? FinalizingOrders.toJSON(e) : undefined);
+    } else {
+      obj.finalizingOrdersList = [];
+    }
     return obj;
   },
 
@@ -134,6 +151,7 @@ export const GenesisState = {
     message.ordersAwaitingFinalizerList =
       object.ordersAwaitingFinalizerList?.map((e) => OrdersAwaitingFinalizer.fromPartial(e)) || [];
     message.ordersUnderWatchList = object.ordersUnderWatchList?.map((e) => OrdersUnderWatch.fromPartial(e)) || [];
+    message.finalizingOrdersList = object.finalizingOrdersList?.map((e) => FinalizingOrders.fromPartial(e)) || [];
     return message;
   },
 };

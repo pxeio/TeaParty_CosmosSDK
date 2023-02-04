@@ -1,0 +1,29 @@
+syntax = "proto3";
+package teapartycrypto.partychain.party;
+
+option go_package = "github.com/TeaPartyCrypto/partychain/x/party/types";
+
+message FinalizingOrders {
+  string index = 1; 
+  string buyerEscrowWalletPublicKey = 2; 
+  string buyerEscrowWalletPrivateKey = 3; 
+  string sellerEscrowWalletPublicKey = 4; 
+  string sellerEscrowWalletPrivateKey = 5; 
+  bool sellerPaymentComplete = 6; 
+  int32 sellerPaymentCompleteBlockHeight = 7; 
+  bool buyerPaymentComplete = 8; 
+  int32 buyerPaymentCompleteBlockHeight = 9; 
+  string amount = 10; 
+  string buyerShippingAddress = 11; 
+  string buyerRefundAddress = 12; 
+  string buyerNKNAddress = 13; 
+  string sellerRefundAddress = 14; 
+  string sellerShippingAddress = 15; 
+  string sellerNKNAddress = 16; 
+  string tradeAsset = 17; 
+  string currency = 18; 
+  string price = 19; 
+  int32 blockHeight = 20; 
+  
+}
+

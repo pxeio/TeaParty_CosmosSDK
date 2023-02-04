@@ -9,6 +9,35 @@
  * ---------------------------------------------------------------
  */
 
+export interface PartyFinalizingOrders {
+  index?: string;
+  buyerEscrowWalletPublicKey?: string;
+  buyerEscrowWalletPrivateKey?: string;
+  sellerEscrowWalletPublicKey?: string;
+  sellerEscrowWalletPrivateKey?: string;
+  sellerPaymentComplete?: boolean;
+
+  /** @format int32 */
+  sellerPaymentCompleteBlockHeight?: number;
+  buyerPaymentComplete?: boolean;
+
+  /** @format int32 */
+  buyerPaymentCompleteBlockHeight?: number;
+  amount?: string;
+  buyerShippingAddress?: string;
+  buyerRefundAddress?: string;
+  buyerNKNAddress?: string;
+  sellerRefundAddress?: string;
+  sellerShippingAddress?: string;
+  sellerNKNAddress?: string;
+  tradeAsset?: string;
+  currency?: string;
+  price?: string;
+
+  /** @format int32 */
+  blockHeight?: number;
+}
+
 export type PartyMsgAccountWatchFailureResponse = object;
 
 export type PartyMsgAccountWatchOutcomeResponse = object;
@@ -78,6 +107,21 @@ export interface PartyPendingOrders {
   blockHeight?: number;
 }
 
+export interface PartyQueryAllFinalizingOrdersResponse {
+  finalizingOrders?: PartyFinalizingOrders[];
+
+  /**
+   * PageResponse is to be embedded in gRPC response messages where the
+   * corresponding request message has used PageRequest.
+   *
+   *  message SomeResponse {
+   *          repeated Bar results = 1;
+   *          PageResponse page = 2;
+   *  }
+   */
+  pagination?: V1Beta1PageResponse;
+}
+
 export interface PartyQueryAllOrdersAwaitingFinalizerResponse {
   ordersAwaitingFinalizer?: PartyOrdersAwaitingFinalizer[];
 
@@ -136,6 +180,10 @@ export interface PartyQueryAllTradeOrdersResponse {
    *  }
    */
   pagination?: V1Beta1PageResponse;
+}
+
+export interface PartyQueryGetFinalizingOrdersResponse {
+  finalizingOrders?: PartyFinalizingOrders;
 }
 
 export interface PartyQueryGetOrdersAwaitingFinalizerResponse {
@@ -377,10 +425,51 @@ export class HttpClient<SecurityDataType = unknown> {
 }
 
 /**
- * @title partychain/party/genesis.proto
+ * @title partychain/party/finalizing_orders.proto
  * @version version not set
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryFinalizingOrdersAll
+   * @request GET:/TeaPartyCrypto/partychain/party/finalizing_orders
+   */
+  queryFinalizingOrdersAll = (
+    query?: {
+      "pagination.key"?: string;
+      "pagination.offset"?: string;
+      "pagination.limit"?: string;
+      "pagination.count_total"?: boolean;
+      "pagination.reverse"?: boolean;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<PartyQueryAllFinalizingOrdersResponse, RpcStatus>({
+      path: `/TeaPartyCrypto/partychain/party/finalizing_orders`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+
+  /**
+   * No description
+   *
+   * @tags Query
+   * @name QueryFinalizingOrders
+   * @summary Queries a list of FinalizingOrders items.
+   * @request GET:/TeaPartyCrypto/partychain/party/finalizing_orders/{index}
+   */
+  queryFinalizingOrders = (index: string, params: RequestParams = {}) =>
+    this.request<PartyQueryGetFinalizingOrdersResponse, RpcStatus>({
+      path: `/TeaPartyCrypto/partychain/party/finalizing_orders/${index}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+
   /**
    * No description
    *
