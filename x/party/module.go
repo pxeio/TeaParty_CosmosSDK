@@ -661,15 +661,6 @@ func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 
 	po := am.keeper.GetAllPendingOrders(ctx)
 	for _, order := range po {
-		for _, oiw := range am.ordersInWatch {
-			if oiw == order.Index {
-				fmt.Println("order already in watch. skipping : ", order.Index)
-				continue
-			}
-		}
-		fmt.Println("adding order to watch: ", order.Index)
-		am.ordersInWatch = append(am.ordersInWatch, order.Index)
-
 		// TODO:: check if order has expired
 		// if it has, then refund the escrowed funds
 		// and remove the order from the list of pending orders
@@ -678,7 +669,7 @@ func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 		// TODO:: This does not scale. Come up with a better solution
 		// add this to a queue and process it in a separate go routine
 
-		// am.keeper.RemovePendingOrders(ctx, order.SellerNKNAddress)
+		am.keeper.RemovePendingOrders(ctx, order.SellerNKNAddress)
 		if err := am.initMonitor(ctx, order); err != nil {
 			fmt.Println("error: ", err)
 		}
