@@ -12,6 +12,106 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+func (am AppModule) dispatch(ctx sdk.Context, awrr *AccountWatchRequestResult) {
+	ouw, ok := am.keeper.GetOrdersUnderWatch(ctx, awrr.AccountWatchRequest.TransactionID)
+	if !ok {
+		fmt.Println("no orders under watch")
+		return
+	}
+
+	fmt.Printf("looking for pending order for %+v", ouw)
+
+	pendingFinalizingOrder, ok := am.keeper.GetFinalizingOrders(ctx, ouw.Index)
+	if !ok {
+		fmt.Println("no order in finalizing orders")
+		return
+	}
+
+	switch awrr.Result {
+	case OUTCOME_SUCCESS:
+		fmt.Println("success")
+		// TODO:: remove this
+		ouw.PaymentComplete = true
+
+		// compare owu.Chain to the Curency of the pendingFinalizingOrder
+		// if they match we know that we have the Buyer's payment completion status
+		if awrr.AccountWatchRequest.Chain == pendingFinalizingOrder.Currency {
+			fmt.Println("BUYER PAYMENT COMPLETE")
+			pendingFinalizingOrder.BuyerPaymentComplete = true
+		}
+		if awrr.AccountWatchRequest.Chain == pendingFinalizingOrder.TradeAsset {
+			fmt.Println("SELLER PAYMENT COMPLETE")
+			pendingFinalizingOrder.SellerPaymentComplete = true
+		}
+	case OUTCOME_FAILURE:
+		// TODO:: remove this
+		ouw.PaymentComplete = false
+
+		if ouw.Chain == pendingFinalizingOrder.Currency {
+			pendingFinalizingOrder.BuyerPaymentComplete = false
+		}
+		if ouw.Chain == pendingFinalizingOrder.TradeAsset {
+			pendingFinalizingOrder.SellerPaymentComplete = false
+		}
+	case OUTCOME_TIMEOUT:
+		// TODO:: remove this
+		ouw.PaymentComplete = false
+
+		if ouw.Chain == pendingFinalizingOrder.Currency {
+			pendingFinalizingOrder.BuyerPaymentComplete = false
+		}
+		if ouw.Chain == pendingFinalizingOrder.TradeAsset {
+			pendingFinalizingOrder.SellerPaymentComplete = false
+		}
+	}
+
+	// check if the buyer and seller have both completed payment
+	if pendingFinalizingOrder.BuyerPaymentComplete && pendingFinalizingOrder.SellerPaymentComplete {
+		fmt.Println("buyer and seller have both completed payment")
+		fmt.Println("creating the OrdersAwaitingFinalizer for both the buyer and seller")
+		// Create the OrdersAwaitingFinalizer for both the buyer and seller
+
+		boaf := partyTypes.OrdersAwaitingFinalizer{
+			Index:            pendingFinalizingOrder.BuyerEscrowWalletPublicKey,
+			NknAddress:       pendingFinalizingOrder.BuyerNKNAddress,
+			WalletPrivateKey: pendingFinalizingOrder.SellerEscrowWalletPrivateKey,
+			WalletPublicKey:  pendingFinalizingOrder.SellerEscrowWalletPublicKey,
+			ShippingAddress:  pendingFinalizingOrder.BuyerShippingAddress,
+			RefundAddress:    pendingFinalizingOrder.BuyerRefundAddress,
+			Amount:           pendingFinalizingOrder.Amount,
+			Chain:            pendingFinalizingOrder.Currency,
+		}
+
+		soaf := partyTypes.OrdersAwaitingFinalizer{
+			Index:            pendingFinalizingOrder.SellerEscrowWalletPublicKey,
+			NknAddress:       pendingFinalizingOrder.SellerNKNAddress,
+			WalletPrivateKey: pendingFinalizingOrder.BuyerEscrowWalletPrivateKey,
+			WalletPublicKey:  pendingFinalizingOrder.BuyerEscrowWalletPublicKey,
+			ShippingAddress:  pendingFinalizingOrder.SellerShippingAddress,
+			RefundAddress:    pendingFinalizingOrder.SellerRefundAddress,
+			Amount:           pendingFinalizingOrder.Amount,
+			Chain:            pendingFinalizingOrder.TradeAsset,
+		}
+
+		fmt.Printf("buyer order awaiting finalizer: %+v ", boaf)
+		fmt.Println("------")
+		fmt.Printf("seller order awaiting finalizer: %+v ", soaf)
+
+		am.keeper.SetOrdersAwaitingFinalizer(ctx, boaf)
+		am.keeper.SetOrdersAwaitingFinalizer(ctx, soaf)
+		// am.keeper.RemovePendingOrders(ctx, pendingFinalizingOrder.Index)
+		am.keeper.RemoveOrdersUnderWatch(ctx, ouw.Index)
+		am.wg.Done()
+		return
+	} else {
+		// remove the order under watch
+		am.keeper.RemoveOrdersUnderWatch(ctx, ouw.Index)
+		// update the pending order
+		am.keeper.SetFinalizingOrders(ctx, pendingFinalizingOrder)
+	}
+	am.wg.Done()
+}
+
 func (am AppModule) sendFunds(order partyTypes.OrdersAwaitingFinalizer) error {
 	// convert the order.Amount to a big int
 	dA, err := decimal.NewFromString(order.Amount)
@@ -154,104 +254,4 @@ func (am AppModule) watchAccount(ctx sdk.Context, awr *AccountWatchRequest) erro
 		go am.waitAndVerifyEVMChain(ctx, polyClient1, polyClient2, *awr)
 	}
 	return nil
-}
-
-func (am AppModule) dispatch(ctx sdk.Context, awrr *AccountWatchRequestResult) {
-	ouw, ok := am.keeper.GetOrdersUnderWatch(ctx, awrr.AccountWatchRequest.TransactionID)
-	if !ok {
-		fmt.Println("no orders under watch")
-		return
-	}
-
-	fmt.Printf("looking for pending order for %+v", ouw)
-
-	pendingFinalizingOrder, ok := am.keeper.GetFinalizingOrders(ctx, ouw.Index)
-	if !ok {
-		fmt.Println("no order in finalizing orders")
-		return
-	}
-
-	switch awrr.Result {
-	case OUTCOME_SUCCESS:
-		fmt.Println("success")
-		// TODO:: remove this
-		ouw.PaymentComplete = true
-
-		// compare owu.Chain to the Curency of the pendingFinalizingOrder
-		// if they match we know that we have the Buyer's payment completion status
-		if awrr.AccountWatchRequest.Chain == pendingFinalizingOrder.Currency {
-			fmt.Println("BUYER PAYMENT COMPLETE")
-			pendingFinalizingOrder.BuyerPaymentComplete = true
-		}
-		if awrr.AccountWatchRequest.Chain == pendingFinalizingOrder.TradeAsset {
-			fmt.Println("SELLER PAYMENT COMPLETE")
-			pendingFinalizingOrder.SellerPaymentComplete = true
-		}
-	case OUTCOME_FAILURE:
-		// TODO:: remove this
-		ouw.PaymentComplete = false
-
-		if ouw.Chain == pendingFinalizingOrder.Currency {
-			pendingFinalizingOrder.BuyerPaymentComplete = false
-		}
-		if ouw.Chain == pendingFinalizingOrder.TradeAsset {
-			pendingFinalizingOrder.SellerPaymentComplete = false
-		}
-	case OUTCOME_TIMEOUT:
-		// TODO:: remove this
-		ouw.PaymentComplete = false
-
-		if ouw.Chain == pendingFinalizingOrder.Currency {
-			pendingFinalizingOrder.BuyerPaymentComplete = false
-		}
-		if ouw.Chain == pendingFinalizingOrder.TradeAsset {
-			pendingFinalizingOrder.SellerPaymentComplete = false
-		}
-	}
-
-	// check if the buyer and seller have both completed payment
-	if pendingFinalizingOrder.BuyerPaymentComplete && pendingFinalizingOrder.SellerPaymentComplete {
-		fmt.Println("buyer and seller have both completed payment")
-		fmt.Println("creating the OrdersAwaitingFinalizer for both the buyer and seller")
-		// Create the OrdersAwaitingFinalizer for both the buyer and seller
-
-		boaf := partyTypes.OrdersAwaitingFinalizer{
-			Index:            pendingFinalizingOrder.BuyerEscrowWalletPublicKey,
-			NknAddress:       pendingFinalizingOrder.BuyerNKNAddress,
-			WalletPrivateKey: pendingFinalizingOrder.SellerEscrowWalletPrivateKey,
-			WalletPublicKey:  pendingFinalizingOrder.SellerEscrowWalletPublicKey,
-			ShippingAddress:  pendingFinalizingOrder.BuyerShippingAddress,
-			RefundAddress:    pendingFinalizingOrder.BuyerRefundAddress,
-			Amount:           pendingFinalizingOrder.Amount,
-			Chain:            pendingFinalizingOrder.Currency,
-		}
-
-		soaf := partyTypes.OrdersAwaitingFinalizer{
-			Index:            pendingFinalizingOrder.SellerEscrowWalletPublicKey,
-			NknAddress:       pendingFinalizingOrder.SellerNKNAddress,
-			WalletPrivateKey: pendingFinalizingOrder.BuyerEscrowWalletPrivateKey,
-			WalletPublicKey:  pendingFinalizingOrder.BuyerEscrowWalletPublicKey,
-			ShippingAddress:  pendingFinalizingOrder.SellerShippingAddress,
-			RefundAddress:    pendingFinalizingOrder.SellerRefundAddress,
-			Amount:           pendingFinalizingOrder.Amount,
-			Chain:            pendingFinalizingOrder.TradeAsset,
-		}
-
-		fmt.Printf("buyer order awaiting finalizer: %+v ", boaf)
-		fmt.Println("------")
-		fmt.Printf("seller order awaiting finalizer: %+v ", soaf)
-
-		am.keeper.SetOrdersAwaitingFinalizer(ctx, boaf)
-		am.keeper.SetOrdersAwaitingFinalizer(ctx, soaf)
-		// am.keeper.RemovePendingOrders(ctx, pendingFinalizingOrder.Index)
-		am.keeper.RemoveOrdersUnderWatch(ctx, ouw.Index)
-		am.wg.Done()
-		return
-	} else {
-		// remove the order under watch
-		am.keeper.RemoveOrdersUnderWatch(ctx, ouw.Index)
-		// update the pending order
-		am.keeper.SetFinalizingOrders(ctx, pendingFinalizingOrder)
-	}
-	am.wg.Done()
 }
