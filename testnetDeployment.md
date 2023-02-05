@@ -3,40 +3,40 @@
 
 ./partychaind keys --keyring-backend test add alice  
 
-- address: party1dhtn5g7ggjksdt4s6wvtwqmqx7nqkyqxk0dv4a
+- address: party1lg0mvx4nm7j8q9e5cz3fajc737d9qxa38h7ltg
   name: alice
-  pubkey: '{"@type":"/cosmos.crypto.secp256k1.PubKey","key":"AldXlKDglK9uPwFlKlrZROVoGjrOKSW3xOubSOHh364R"}'
+  pubkey: '{"@type":"/cosmos.crypto.secp256k1.PubKey","key":"AwFgiYkfWoxqQxiAR/F5gORxiHBzbQkO2DFT7zJiKhPX"}'
   type: local
 
 
 **Important** write this mnemonic phrase in a safe place.
 It is the only way to recover your account if you ever forget your password.
 
-rain script track piano toddler effort fork rate wheel dismiss couple warrior oyster critic joke relief hard wage ivory actual focus struggle habit tennis
+grab jeans various page castle major busy problem nurse clean fit catch table trip relief awake rack moral face right goose oppose brain cruise
 
 ./partychaind keys --keyring-backend file add mac  
 K!1poiv^F6fs8XtOdxwqRpp6
-- address: party1td5u55hd86ewpxuv8705xtnnxr4sl2uyd47nwf
+- address: party1a4xtrqv2z0t0kz7x969j70v689pl9ww85ajyw2
   name: mac
-  pubkey: '{"@type":"/cosmos.crypto.secp256k1.PubKey","key":"A6TAAG4Fytl2SkScaGr6SvEd3p4v7323Wx8quKPGdvj5"}'
+  pubkey: '{"@type":"/cosmos.crypto.secp256k1.PubKey","key":"Ao3lcYlx705IVPLneqQAoOrpu2WuiVWqpR4/TuP9wZ8L"}'
   type: local
 
 
 **Important** write this mnemonic phrase in a safe place.
 It is the only way to recover your account if you ever forget your password.
 
-moment please inform aisle earn second fiscal old silly relief noise taste shove tongue same hobby chat small road luggage doctor lamp page sun
+twin erase fold budget slot crack path tissue limb carry quality assume stereo tribe position hill word blast follow exist logic dilemma buzz today
 
 
-./partychaind add-genesis-account party1dhtn5g7ggjksdt4s6wvtwqmqx7nqkyqxk0dv4a 5000000000000000000000stake 
-./partychaind add-genesis-account party1td5u55hd86ewpxuv8705xtnnxr4sl2uyd47nwf 5000000000000000000000stake 
+./partychaind add-genesis-account party1lg0mvx4nm7j8q9e5cz3fajc737d9qxa38h7ltg 5000000000000000000000stake 
+./partychaind add-genesis-account party1a4xtrqv2z0t0kz7x969j70v689pl9ww85ajyw2 5000000000000000000000stake 
 
-./partychaind gentx mac  100000000stake  --keyring-backend file
-
+./partychaind gentx mac  4000000000000000000000stake  --keyring-backend file
+K!1poiv^F6fs8XtOdxwqRpp6
 
 ./partychaind collect-gentxs
 
-
+./partychaind start --log_level error
 
 Updated the `config.toml` on a peer line 212 seed nodes to connect to 
 seeds = "1c82a67c512a7172e40cefab76f679907498cdeb@209.126.11.245:26656"
