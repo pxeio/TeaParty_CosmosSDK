@@ -253,12 +253,12 @@ func (am AppModule) finalizeOrder(ctx sdk.Context, order partyTypes.OrdersAwaiti
 
 		// find the matching order in the finalizing orders list by seller nkn address
 		// and remove it from the list of finalizing orders
-		fo := am.keeper.GetAllFinalizingOrders(ctx)
-		for _, o := range fo {
-			if o.SellerNKNAddress == order.NknAddress || o.BuyerNKNAddress == order.NknAddress {
-				am.keeper.RemoveFinalizingOrders(ctx, o.Index)
-			}
-		}
+		// fo := am.keeper.GetAllFinalizingOrders(ctx)
+		// for _, o := range fo {
+		// 	if o.SellerNKNAddress == order.NknAddress || o.BuyerNKNAddress == order.NknAddress {
+		// 		am.keeper.RemoveFinalizingOrders(ctx, o.Index)
+		// 	}
+		// }
 
 	}
 
@@ -419,7 +419,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 		}
 
 		sellersAccountWatchRequest = &AccountWatchRequest{
-			Account:       co.SellerNKNAddress,
+			Account:       co.SellerEscrowWallet.PublicAddress,
 			TimeOut:       co.Timeout,
 			Chain:         SOL,
 			Amount:        co.Amount,

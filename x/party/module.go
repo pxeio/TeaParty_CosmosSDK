@@ -158,66 +158,66 @@ func (AppModule) ConsensusVersion() uint64 { return 1 }
 
 // BeginBlock contains the logic that is automatically triggered at the beginning of each block
 func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
-	// fmt.Println("")
-	// fmt.Println("")
-	// fmt.Println("CURRENT STATE:")
-	// fmt.Println("")
-	// fmt.Println("")
-	// fmt.Println("trade orders in the store: ")
-	// // fmt.Println("trade orders in the store: ", am.keeper.GetAllTradeOrders(ctx))
-	// for _, order := range am.keeper.GetAllTradeOrders(ctx) {
-	// 	b, err := json.MarshalIndent(order, "", "  ")
-	// 	if err != nil {
-	// 		fmt.Println("error: ", err)
-	// 	}
-	// 	fmt.Println(string(b))
-	// }
-	// fmt.Println("")
-	// fmt.Println("")
-	// // fmt.Println("Pending Orders: ", am.keeper.GetAllPendingOrders(ctx))
-	// fmt.Println("Pending Orders: ")
-	// for _, order := range am.keeper.GetAllPendingOrders(ctx) {
-	// 	b, err := json.MarshalIndent(order, "", "  ")
-	// 	if err != nil {
-	// 		fmt.Println("error: ", err)
-	// 	}
-	// 	fmt.Println(string(b))
-	// }
-	// fmt.Println("")
-	// fmt.Println("")
-	// // fmt.Println("Orders Awaiting Finalizer: ", am.keeper.GetAllOrdersAwaitingFinalizer(ctx))
-	// fmt.Println("Orders Awaiting Finalizer: ")
-	// for _, order := range am.keeper.GetAllOrdersAwaitingFinalizer(ctx) {
-	// 	b, err := json.MarshalIndent(order, "", "  ")
-	// 	if err != nil {
-	// 		fmt.Println("error: ", err)
-	// 	}
-	// 	fmt.Println(string(b))
-	// }
-	// fmt.Println("")
-	// fmt.Println("")
-	// // fmt.Println("Orders Under Watch: ", am.keeper.GetAllOrdersUnderWatch(ctx))
-	// fmt.Println("Orders Under Watch: ")
-	// // pretty print the orders under watch
-	// for _, order := range am.keeper.GetAllOrdersUnderWatch(ctx) {
-	// 	b, err := json.MarshalIndent(order, "", "  ")
-	// 	if err != nil {
-	// 		fmt.Println("error: ", err)
-	// 	}
-	// 	fmt.Println(string(b))
-	// }
-	// fmt.Println("")
-	// fmt.Println("")
-	// fmt.Println("Complete orders in Finalizing Orders: ")
-	// for _, order := range am.keeper.GetAllFinalizingOrders(ctx) {
-	// 	b, err := json.MarshalIndent(order, "", "  ")
-	// 	if err != nil {
-	// 		fmt.Println("error: ", err)
-	// 	}
-	// 	fmt.Println(string(b))
-	// }
-	// fmt.Println("")
-	// fmt.Println("")
+	fmt.Println("---------------------")
+	fmt.Println("")
+	fmt.Println("CURRENT STATE:")
+	fmt.Println("")
+	fmt.Println("")
+	fmt.Println("trade orders in the store: ")
+	// fmt.Println("trade orders in the store: ", am.keeper.GetAllTradeOrders(ctx))
+	for _, order := range am.keeper.GetAllTradeOrders(ctx) {
+		b, err := json.MarshalIndent(order, "", "  ")
+		if err != nil {
+			fmt.Println("error: ", err)
+		}
+		fmt.Println(string(b))
+	}
+	fmt.Println("")
+	fmt.Println("")
+	// fmt.Println("Pending Orders: ", am.keeper.GetAllPendingOrders(ctx))
+	fmt.Println("Pending Orders: ")
+	for _, order := range am.keeper.GetAllPendingOrders(ctx) {
+		b, err := json.MarshalIndent(order, "", "  ")
+		if err != nil {
+			fmt.Println("error: ", err)
+		}
+		fmt.Println(string(b))
+	}
+	fmt.Println("")
+	fmt.Println("")
+	// fmt.Println("Orders Awaiting Finalizer: ", am.keeper.GetAllOrdersAwaitingFinalizer(ctx))
+	fmt.Println("Orders Awaiting Finalizer: ")
+	for _, order := range am.keeper.GetAllOrdersAwaitingFinalizer(ctx) {
+		b, err := json.MarshalIndent(order, "", "  ")
+		if err != nil {
+			fmt.Println("error: ", err)
+		}
+		fmt.Println(string(b))
+	}
+	fmt.Println("")
+	fmt.Println("")
+	// fmt.Println("Orders Under Watch: ", am.keeper.GetAllOrdersUnderWatch(ctx))
+	fmt.Println("Orders Under Watch: ")
+	// pretty print the orders under watch
+	for _, order := range am.keeper.GetAllOrdersUnderWatch(ctx) {
+		b, err := json.MarshalIndent(order, "", "  ")
+		if err != nil {
+			fmt.Println("error: ", err)
+		}
+		fmt.Println(string(b))
+	}
+	fmt.Println("")
+	fmt.Println("")
+	fmt.Println("Complete orders in Finalizing Orders: ")
+	for _, order := range am.keeper.GetAllFinalizingOrders(ctx) {
+		b, err := json.MarshalIndent(order, "", "  ")
+		if err != nil {
+			fmt.Println("error: ", err)
+		}
+		fmt.Println(string(b))
+	}
+	fmt.Println("")
+	fmt.Println("---------------------")
 
 	po := am.keeper.GetAllPendingOrders(ctx)
 	for _, order := range po {
