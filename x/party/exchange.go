@@ -2,11 +2,14 @@ package party
 
 import (
 	"context"
+	"encoding/hex"
+	"errors"
 	"fmt"
 	"math/big"
 
 	partyTypes "github.com/TeaPartyCrypto/partychain/x/party/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	solRPC "github.com/gagliardetto/solana-go/rpc"
 	"github.com/shopspring/decimal"
@@ -19,8 +22,7 @@ func (am AppModule) dispatch(ctx sdk.Context, awrr *AccountWatchRequestResult) {
 		return
 	}
 
-	fmt.Printf("looking for pending order for %+v", ouw)
-
+	fmt.Printf("looking for finalizing order %+v", ouw)
 	pendingFinalizingOrder, ok := am.keeper.GetFinalizingOrders(ctx, ouw.Index)
 	if !ok {
 		fmt.Println("no order in finalizing orders")
@@ -53,6 +55,40 @@ func (am AppModule) dispatch(ctx sdk.Context, awrr *AccountWatchRequestResult) {
 		if ouw.Chain == pendingFinalizingOrder.TradeAsset {
 			pendingFinalizingOrder.SellerPaymentComplete = false
 		}
+		fmt.Println("creating a refund transaction")
+		// create the finalizer order
+		sellerFinalizerForRefund := partyTypes.OrdersAwaitingFinalizer{
+			Index:            pendingFinalizingOrder.SellerEscrowWalletPublicKey,
+			NknAddress:       pendingFinalizingOrder.SellerNKNAddress,
+			WalletPrivateKey: pendingFinalizingOrder.SellerEscrowWalletPrivateKey,
+			WalletPublicKey:  pendingFinalizingOrder.SellerEscrowWalletPublicKey,
+			ShippingAddress:  pendingFinalizingOrder.SellerShippingAddress,
+			RefundAddress:    pendingFinalizingOrder.SellerRefundAddress,
+			Amount:           pendingFinalizingOrder.Amount,
+			Chain:            pendingFinalizingOrder.Currency,
+		}
+
+		buyerFinalizerForRefund := partyTypes.OrdersAwaitingFinalizer{
+			Index:            pendingFinalizingOrder.BuyerEscrowWalletPublicKey,
+			NknAddress:       pendingFinalizingOrder.BuyerNKNAddress,
+			WalletPrivateKey: pendingFinalizingOrder.BuyerEscrowWalletPrivateKey,
+			WalletPublicKey:  pendingFinalizingOrder.BuyerEscrowWalletPublicKey,
+			ShippingAddress:  pendingFinalizingOrder.BuyerShippingAddress,
+			RefundAddress:    pendingFinalizingOrder.BuyerRefundAddress,
+			Amount:           pendingFinalizingOrder.Price,
+			Chain:            pendingFinalizingOrder.TradeAsset,
+		}
+
+		fmt.Printf("buyer order awaiting finalizer: %+v ", buyerFinalizerForRefund)
+		fmt.Println("------")
+		fmt.Printf("seller order awaiting finalizer: %+v ", sellerFinalizerForRefund)
+
+		am.keeper.SetOrdersAwaitingFinalizer(ctx, buyerFinalizerForRefund)
+		am.keeper.SetOrdersAwaitingFinalizer(ctx, sellerFinalizerForRefund)
+		// am.keeper.RemovePendingOrders(ctx, pendingFinalizingOrder.Index)
+		am.keeper.RemoveOrdersUnderWatch(ctx, ouw.Index)
+		am.wg.Done()
+		return
 	case OUTCOME_TIMEOUT:
 		// TODO:: remove this
 		ouw.PaymentComplete = false
@@ -63,6 +99,40 @@ func (am AppModule) dispatch(ctx sdk.Context, awrr *AccountWatchRequestResult) {
 		if ouw.Chain == pendingFinalizingOrder.TradeAsset {
 			pendingFinalizingOrder.SellerPaymentComplete = false
 		}
+		fmt.Println("creating a refund transaction")
+		// create the finalizer order
+		sellerFinalizerForRefund := partyTypes.OrdersAwaitingFinalizer{
+			Index:            pendingFinalizingOrder.SellerEscrowWalletPublicKey,
+			NknAddress:       pendingFinalizingOrder.SellerNKNAddress,
+			WalletPrivateKey: pendingFinalizingOrder.SellerEscrowWalletPrivateKey,
+			WalletPublicKey:  pendingFinalizingOrder.SellerEscrowWalletPublicKey,
+			ShippingAddress:  pendingFinalizingOrder.SellerShippingAddress,
+			RefundAddress:    pendingFinalizingOrder.SellerRefundAddress,
+			Amount:           pendingFinalizingOrder.Amount,
+			Chain:            pendingFinalizingOrder.Currency,
+		}
+
+		buyerFinalizerForRefund := partyTypes.OrdersAwaitingFinalizer{
+			Index:            pendingFinalizingOrder.BuyerEscrowWalletPublicKey,
+			NknAddress:       pendingFinalizingOrder.BuyerNKNAddress,
+			WalletPrivateKey: pendingFinalizingOrder.BuyerEscrowWalletPrivateKey,
+			WalletPublicKey:  pendingFinalizingOrder.BuyerEscrowWalletPublicKey,
+			ShippingAddress:  pendingFinalizingOrder.BuyerShippingAddress,
+			RefundAddress:    pendingFinalizingOrder.BuyerRefundAddress,
+			Amount:           pendingFinalizingOrder.Price,
+			Chain:            pendingFinalizingOrder.TradeAsset,
+		}
+
+		fmt.Printf("buyer order awaiting finalizer: %+v ", buyerFinalizerForRefund)
+		fmt.Println("------")
+		fmt.Printf("seller order awaiting finalizer: %+v ", sellerFinalizerForRefund)
+
+		am.keeper.SetOrdersAwaitingFinalizer(ctx, buyerFinalizerForRefund)
+		am.keeper.SetOrdersAwaitingFinalizer(ctx, sellerFinalizerForRefund)
+		// am.keeper.RemovePendingOrders(ctx, pendingFinalizingOrder.Index)
+		am.keeper.RemoveOrdersUnderWatch(ctx, ouw.Index)
+		am.wg.Done()
+		return
 	}
 
 	// check if the buyer and seller have both completed payment
@@ -78,7 +148,7 @@ func (am AppModule) dispatch(ctx sdk.Context, awrr *AccountWatchRequestResult) {
 			WalletPublicKey:  pendingFinalizingOrder.SellerEscrowWalletPublicKey,
 			ShippingAddress:  pendingFinalizingOrder.BuyerShippingAddress,
 			RefundAddress:    pendingFinalizingOrder.BuyerRefundAddress,
-			Amount:           pendingFinalizingOrder.Amount,
+			Amount:           pendingFinalizingOrder.Price,
 			Chain:            pendingFinalizingOrder.Currency,
 		}
 
@@ -89,7 +159,7 @@ func (am AppModule) dispatch(ctx sdk.Context, awrr *AccountWatchRequestResult) {
 			WalletPublicKey:  pendingFinalizingOrder.BuyerEscrowWalletPublicKey,
 			ShippingAddress:  pendingFinalizingOrder.SellerShippingAddress,
 			RefundAddress:    pendingFinalizingOrder.SellerRefundAddress,
-			Amount:           pendingFinalizingOrder.Amount,
+			Amount:           pendingFinalizingOrder.Price,
 			Chain:            pendingFinalizingOrder.TradeAsset,
 		}
 
@@ -253,5 +323,345 @@ func (am AppModule) watchAccount(ctx sdk.Context, awr *AccountWatchRequest) erro
 		}
 		go am.waitAndVerifyEVMChain(ctx, polyClient1, polyClient2, *awr)
 	}
+	return nil
+}
+
+func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders) error {
+	ta := order.TradeAsset
+	const productionTimeLimit = 7200 // 2 hours
+	const devTimelimit = 300         // 300 second
+	var timeLimit int64
+	// timeLimit = devTimelimit
+	// if e.dev {
+	// 	timeLimit = devTimelimit
+	// } else {
+	timeLimit = productionTimeLimit
+	// }
+
+	biPrice := new(big.Int)
+	d, _ := decimal.NewFromString(order.Price)
+	// if err != nil {
+	// 	e.logger.Error("Error converting price to decimal")
+	// 	return
+	// }
+	biPrice = d.BigInt()
+
+	biAmount := new(big.Int)
+	dA, _ := decimal.NewFromString(order.Amount)
+	// if err != nil {
+	// 	e.logger.Error("Error converting amount to decimal")
+	// 	return
+	// }
+
+	biAmount = dA.BigInt()
+	taAmount := biAmount
+
+	// if order.TradeAsset == "ANY" {
+	// 	// fetch the market price of the trade asset
+	// 	marketPrice, err := FetchMarketPriceInUSD(ta)
+	// 	if err != nil {
+	// 		e.logger.Error("error fetching market price: " + err.Error())
+	// 		return
+	// 	}
+
+	// 	e.logger.Infof("market price of %s is: %s", ta, marketPrice)
+
+	// 	// calcuate the amount to send to the buyer
+	// 	pgto := big.NewFloat(0).SetInt(biPrice)
+	// 	bito := big.NewFloat(0).SetInt(marketPrice)
+
+	// 	// convert to big.int
+
+	// 	fl, _ := pgto.Quo(pgto, bito).Float64()
+
+	// 	// taAmount = FloatToBigInt(fl)
+	// 	// TODO: TEST THIS!!! this is a big change from how it was before
+	// 	taAmount = big.NewInt(int64(fl * 100000000))
+	// 	// taAmount = big.NewInt(int64(fl * 100000000))
+	// 	e.logger.Infof("calculated amount to send to buyer: %s", fl)
+	// }
+
+	co := &CompletedOrder{
+		OrderID:               order.Index,
+		BuyerShippingAddress:  order.BuyerShippingAddress,
+		SellerShippingAddress: order.SellerShippingAddress,
+		TradeAsset:            ta,
+		Price:                 biPrice,
+		Currency:              order.Currency,
+		Amount:                taAmount,
+		Timeout:               timeLimit,
+		SellerNKNAddress:      order.SellerNKNAddress,
+		BuyerNKNAddress:       order.BuyerNKNAddress,
+		BuyerEscrowWallet: EscrowWallet{
+			PublicAddress: order.BuyerEscrowWalletPublicKey,
+			PrivateKey:    order.BuyerEscrowWalletPrivateKey,
+			Chain:         order.TradeAsset,
+		},
+	}
+
+	buyersAccountWatchRequest := &AccountWatchRequest{}
+	sellersAccountWatchRequest := &AccountWatchRequest{}
+
+	switch order.Currency {
+	case SOL:
+		// generate a new solana account for the buyer
+		acc := createSolanaAccount()
+
+		co.SellerEscrowWallet = EscrowWallet{
+			PublicAddress: acc.PublicKey,
+			PrivateKey:    acc.PrivateKey,
+			Chain:         SOL,
+		}
+
+		if err := notifySellerOfBuyer(*co); err != nil {
+			// TODO:: Cancle the order
+			return err
+		}
+
+		sellersAccountWatchRequest = &AccountWatchRequest{
+			Account:       co.SellerNKNAddress,
+			TimeOut:       co.Timeout,
+			Chain:         SOL,
+			Amount:        co.Amount,
+			TransactionID: co.OrderID,
+			Seller:        true,
+		}
+
+	case CEL:
+		acc := generateEVMAccount()
+		co.SellerEscrowWallet = EscrowWallet{
+			ECDSA:         acc,
+			PublicAddress: crypto.PubkeyToAddress(acc.PublicKey).String(),
+			PrivateKey:    hex.EncodeToString(acc.D.Bytes()),
+			Chain:         CEL,
+		}
+
+		if err := notifySellerOfBuyer(*co); err != nil {
+			// TODO:: Cancle the order
+			return err
+		}
+
+		sellersAccountWatchRequest = &AccountWatchRequest{
+			Account:       co.SellerEscrowWallet.PublicAddress,
+			TimeOut:       co.Timeout,
+			Chain:         CEL,
+			Amount:        co.Amount,
+			TransactionID: co.OrderID,
+			Seller:        true,
+		}
+
+	case ETH:
+		acc := generateEVMAccount()
+		co.SellerEscrowWallet = EscrowWallet{
+			ECDSA:         acc,
+			PublicAddress: crypto.PubkeyToAddress(acc.PublicKey).String(),
+			PrivateKey:    hex.EncodeToString(acc.D.Bytes()),
+			Chain:         ETH,
+		}
+
+		if err := notifySellerOfBuyer(*co); err != nil {
+			// TODO:: Cancle the order
+			return err
+		}
+
+		sellersAccountWatchRequest = &AccountWatchRequest{
+			Account:       co.SellerEscrowWallet.PublicAddress,
+			TimeOut:       co.Timeout,
+			Chain:         ETH,
+			Amount:        co.Amount,
+			TransactionID: co.OrderID,
+			Seller:        true,
+		}
+
+	case POL:
+		acc := generateEVMAccount()
+		co.SellerEscrowWallet = EscrowWallet{
+			ECDSA:         acc,
+			PublicAddress: crypto.PubkeyToAddress(acc.PublicKey).String(),
+			PrivateKey:    hex.EncodeToString(acc.D.Bytes()),
+			Chain:         POL,
+		}
+
+		if err := notifySellerOfBuyer(*co); err != nil {
+			// TODO:: Cancle the order
+			return err
+		}
+
+		sellersAccountWatchRequest = &AccountWatchRequest{
+			Account:       co.SellerEscrowWallet.PublicAddress,
+			TimeOut:       co.Timeout,
+			Chain:         POL,
+			Amount:        co.Amount,
+			TransactionID: co.OrderID,
+			Seller:        true,
+		}
+
+	case MO:
+		acc := generateEVMAccount()
+		co.SellerEscrowWallet = EscrowWallet{
+			ECDSA:         acc,
+			PublicAddress: crypto.PubkeyToAddress(acc.PublicKey).String(),
+			PrivateKey:    hex.EncodeToString(acc.D.Bytes()),
+			Chain:         MO,
+		}
+
+		if err := notifySellerOfBuyer(*co); err != nil {
+			// TODO:: Cancle the order
+			return err
+		}
+
+		sellersAccountWatchRequest = &AccountWatchRequest{
+			Account:       co.SellerEscrowWallet.PublicAddress,
+			TimeOut:       co.Timeout,
+			Chain:         MO,
+			Amount:        co.Amount,
+			TransactionID: co.OrderID,
+			Seller:        true,
+		}
+	default:
+		return errors.New("invalid currency")
+	}
+
+	switch ta {
+	case SOL:
+		// acc := createSolanaAccount()
+		// co.BuyerEscrowWallet = EscrowWallet{
+		// 	PublicAddress: acc.PublicKey,
+		// 	PrivateKey:    acc.PrivateKey,
+		// 	Chain:         SOL,
+		// }
+
+		// if err := sendBuyerPayInfo(*co); err != nil {
+		// 	// TODO:: Cancle the order
+		// 	return err
+		// }
+
+		buyersAccountWatchRequest = &AccountWatchRequest{
+			Account:       co.BuyerEscrowWallet.PublicAddress,
+			TimeOut:       co.Timeout,
+			Chain:         SOL,
+			Amount:        co.Price,
+			Seller:        false,
+			TransactionID: co.OrderID,
+		}
+
+	case MO:
+		// acc := generateEVMAccount()
+		// co.BuyerEscrowWallet = EscrowWallet{
+		// 	ECDSA:         acc,
+		// 	PublicAddress: crypto.PubkeyToAddress(acc.PublicKey).String(),
+		// 	PrivateKey:    hex.EncodeToString(acc.D.Bytes()),
+		// 	Chain:         MO,
+		// }
+
+		if err := sendBuyerPayInfo(*co); err != nil {
+			// TODO:: Cancle the order
+			return err
+		}
+		buyersAccountWatchRequest = &AccountWatchRequest{
+			Account:       co.BuyerEscrowWallet.PublicAddress,
+			TimeOut:       co.Timeout,
+			Chain:         MO,
+			Amount:        co.Price,
+			Seller:        false,
+			TransactionID: co.OrderID,
+		}
+
+	case ETH:
+		// acc := generateEVMAccount()
+		// co.BuyerEscrowWallet = EscrowWallet{
+		// 	ECDSA:         acc,
+		// 	PublicAddress: crypto.PubkeyToAddress(acc.PublicKey).String(),
+		// 	PrivateKey:    hex.EncodeToString(acc.D.Bytes()),
+		// 	Chain:         ETH,
+		// }
+
+		if err := sendBuyerPayInfo(*co); err != nil {
+			// TODO:: Cancle the order
+			return err
+		}
+
+		buyersAccountWatchRequest = &AccountWatchRequest{
+			Account:       co.BuyerEscrowWallet.PublicAddress,
+			TimeOut:       co.Timeout,
+			Chain:         ETH,
+			Amount:        co.Price,
+			Seller:        false,
+			TransactionID: co.OrderID,
+		}
+	case CEL:
+		// acc := generateEVMAccount()
+		// co.BuyerEscrowWallet = EscrowWallet{
+		// 	ECDSA:         acc,
+		// 	PublicAddress: crypto.PubkeyToAddress(acc.PublicKey).String(),
+		// 	PrivateKey:    hex.EncodeToString(acc.D.Bytes()),
+		// 	Chain:         CEL,
+		// }
+
+		if err := sendBuyerPayInfo(*co); err != nil {
+			// TODO:: Cancle the order
+			return err
+		}
+
+		buyersAccountWatchRequest = &AccountWatchRequest{
+			Account:       co.BuyerEscrowWallet.PublicAddress,
+			TimeOut:       co.Timeout,
+			Chain:         CEL,
+			Amount:        co.Price,
+			Seller:        false,
+			TransactionID: co.OrderID,
+		}
+
+	case POL:
+		// acc := generateEVMAccount()
+		// co.BuyerEscrowWallet = EscrowWallet{
+		// 	ECDSA:         acc,
+		// 	PublicAddress: crypto.PubkeyToAddress(acc.PublicKey).String(),
+		// 	PrivateKey:    hex.EncodeToString(acc.D.Bytes()),
+		// 	Chain:         POL,
+		// }
+
+		if err := sendBuyerPayInfo(*co); err != nil {
+			// TODO:: Cancle the order
+			return err
+		}
+
+		// emit a new event to let Warren know that we need to start watching a new account
+		buyersAccountWatchRequest = &AccountWatchRequest{
+			Account:       co.BuyerEscrowWallet.PublicAddress,
+			TimeOut:       co.Timeout,
+			Chain:         POL,
+			Amount:        co.Price,
+			Seller:        false,
+			TransactionID: co.OrderID,
+		}
+	default:
+		return errors.New("invalid currency")
+	}
+
+	am.keeper.SetOrdersUnderWatch(ctx, partyTypes.OrdersUnderWatch{
+		Index:            co.BuyerNKNAddress,
+		NknAddress:       co.BuyerNKNAddress,
+		WalletPrivateKey: co.BuyerEscrowWallet.PrivateKey,
+		WalletPublicKey:  co.BuyerEscrowWallet.PublicAddress,
+		ShippingAddress:  co.BuyerShippingAddress,
+		Amount:           order.Price,
+		Chain:            buyersAccountWatchRequest.Chain,
+		PaymentComplete:  false,
+	})
+
+	am.keeper.SetOrdersUnderWatch(ctx, partyTypes.OrdersUnderWatch{
+		Index:            co.SellerNKNAddress,
+		NknAddress:       co.SellerNKNAddress,
+		WalletPrivateKey: co.SellerEscrowWallet.PrivateKey,
+		WalletPublicKey:  co.SellerEscrowWallet.PublicAddress,
+		ShippingAddress:  co.SellerShippingAddress,
+		Amount:           order.Amount,
+		Chain:            sellersAccountWatchRequest.Chain,
+		PaymentComplete:  false,
+	})
+
+	go am.watchAccount(ctx, buyersAccountWatchRequest)
+	go am.watchAccount(ctx, sellersAccountWatchRequest)
 	return nil
 }

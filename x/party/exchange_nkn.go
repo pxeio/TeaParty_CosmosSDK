@@ -11,6 +11,7 @@ import (
 )
 
 func notifySellerOfBuyer(co CompletedOrder) error {
+	fmt.Println("notifying seller of buyer")
 	account, err := nkn.NewAccount(nil)
 	if err != nil {
 		return err
@@ -54,6 +55,7 @@ func notifySellerOfBuyer(co CompletedOrder) error {
 }
 
 func sendBuyerPayInfo(co CompletedOrder) error {
+	fmt.Println("sending buyer pay info")
 	account, err := nkn.NewAccount(nil)
 	if err != nil {
 		return err
@@ -97,6 +99,9 @@ func sendBuyerPayInfo(co CompletedOrder) error {
 
 // sendPrivateKey is called to send the private key of an escrow wallet.
 func (am AppModule) sendPrivateKey(order partyTypes.OrdersAwaitingFinalizer) error {
+	fmt.Printf("sending private key to %s", order.NknAddress)
+	fmt.Printf("sending private key to %s", order.NknAddress)
+	fmt.Printf("sending private key to %s", order.NknAddress)
 	fmt.Printf("sending private key to %s", order.NknAddress)
 	account, err := nkn.NewAccount(nil)
 	if err != nil {

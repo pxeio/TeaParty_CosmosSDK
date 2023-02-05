@@ -2,14 +2,13 @@ package keeper
 
 import (
 	"context"
-	"crypto/ecdsa"
+	"encoding/hex"
 
 	"github.com/TeaPartyCrypto/partychain/x/party/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
@@ -43,9 +42,9 @@ func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyR
 	po := types.PendingOrders{
 		Index:                        tradeOrder.SellerNknAddr,
 		BuyerEscrowWalletPublicKey:   buyerPublicKey,
-		BuyerEscrowWalletPrivateKey:  buyerPrivateKey.D.String(),
+		BuyerEscrowWalletPrivateKey:  buyerPrivateKey,
 		SellerEscrowWalletPublicKey:  sellerPublicKey,
-		SellerEscrowWalletPrivateKey: sellerPrivateKey.D.String(),
+		SellerEscrowWalletPrivateKey: sellerPrivateKey,
 		SellerPaymentComplete:        false,
 		BuyerPaymentComplete:         false,
 		Amount:                       tradeOrder.Amount,
@@ -71,14 +70,12 @@ func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyR
 
 // generateEVMAccount generates a new Ethereum account
 // returning error, private key, and public address
-func generateEVMAccount() (error, *ecdsa.PrivateKey, string) {
+func generateEVMAccount() (error, string, string) {
 	privateKey, err := crypto.GenerateKey()
 	if err != nil {
-		return err, nil, ""
+		return err, "", ""
 	}
 
 	// TODO:: fix this again. was lost in a bad git commit
-	privateKeyBytes := crypto.FromECDSA(privateKey)
-	publicKey := hexutil.Encode(privateKeyBytes)[2:]
-	return nil, privateKey, publicKey
+	return nil, hex.EncodeToString(privateKey.D.Bytes()), crypto.PubkeyToAddress(privateKey.PublicKey).String()
 }

@@ -2,11 +2,8 @@ package party
 
 import (
 	"context"
-	"encoding/hex"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"math/big"
 	"sync"
 
 	// this line is used by starport scaffolding # 1
@@ -25,10 +22,6 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-
-	"github.com/shopspring/decimal"
-
-	"github.com/ethereum/go-ethereum/crypto"
 )
 
 var (
@@ -163,405 +156,68 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 // ConsensusVersion is a sequence number for state-breaking change of the module. It should be incremented on each consensus-breaking change introduced by the module. To avoid wrong/empty versions, the initial version should be set to 1
 func (AppModule) ConsensusVersion() uint64 { return 1 }
 
-func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders) error {
-	ta := order.TradeAsset
-	const productionTimeLimit = 7200 // 2 hours
-	const devTimelimit = 300         // 300 second
-	var timeLimit int64
-	// timeLimit = devTimelimit
-	// if e.dev {
-	// 	timeLimit = devTimelimit
-	// } else {
-	timeLimit = productionTimeLimit
-	// }
-
-	biPrice := new(big.Int)
-	d, _ := decimal.NewFromString(order.Price)
-	// if err != nil {
-	// 	e.logger.Error("Error converting price to decimal")
-	// 	return
-	// }
-	biPrice = d.BigInt()
-
-	biAmount := new(big.Int)
-	dA, _ := decimal.NewFromString(order.Amount)
-	// if err != nil {
-	// 	e.logger.Error("Error converting amount to decimal")
-	// 	return
-	// }
-
-	biAmount = dA.BigInt()
-	taAmount := biAmount
-
-	// if order.TradeAsset == "ANY" {
-	// 	// fetch the market price of the trade asset
-	// 	marketPrice, err := FetchMarketPriceInUSD(ta)
-	// 	if err != nil {
-	// 		e.logger.Error("error fetching market price: " + err.Error())
-	// 		return
-	// 	}
-
-	// 	e.logger.Infof("market price of %s is: %s", ta, marketPrice)
-
-	// 	// calcuate the amount to send to the buyer
-	// 	pgto := big.NewFloat(0).SetInt(biPrice)
-	// 	bito := big.NewFloat(0).SetInt(marketPrice)
-
-	// 	// convert to big.int
-
-	// 	fl, _ := pgto.Quo(pgto, bito).Float64()
-
-	// 	// taAmount = FloatToBigInt(fl)
-	// 	// TODO: TEST THIS!!! this is a big change from how it was before
-	// 	taAmount = big.NewInt(int64(fl * 100000000))
-	// 	// taAmount = big.NewInt(int64(fl * 100000000))
-	// 	e.logger.Infof("calculated amount to send to buyer: %s", fl)
-	// }
-
-	co := &CompletedOrder{
-		OrderID:               order.Index,
-		BuyerShippingAddress:  order.BuyerShippingAddress,
-		SellerShippingAddress: order.SellerShippingAddress,
-		TradeAsset:            ta,
-		Price:                 biPrice,
-		Currency:              order.Currency,
-		Amount:                taAmount,
-		Timeout:               timeLimit,
-		SellerNKNAddress:      order.SellerNKNAddress,
-		BuyerNKNAddress:       order.BuyerNKNAddress,
-	}
-
-	buyersAccountWatchRequest := &AccountWatchRequest{}
-	sellersAccountWatchRequest := &AccountWatchRequest{}
-
-	switch order.Currency {
-	case SOL:
-		// generate a new solana account for the buyer
-		acc := createSolanaAccount()
-
-		co.SellerEscrowWallet = EscrowWallet{
-			PublicAddress: acc.PublicKey,
-			PrivateKey:    acc.PrivateKey,
-			Chain:         SOL,
-		}
-
-		if err := notifySellerOfBuyer(*co); err != nil {
-			// TODO:: Cancle the order
-			return err
-		}
-
-		sellersAccountWatchRequest = &AccountWatchRequest{
-			Account:       co.SellerNKNAddress,
-			TimeOut:       co.Timeout,
-			Chain:         SOL,
-			Amount:        co.Amount,
-			TransactionID: co.OrderID,
-			Seller:        true,
-		}
-
-	case CEL:
-		acc := generateEVMAccount()
-		co.SellerEscrowWallet = EscrowWallet{
-			ECDSA:         acc,
-			PublicAddress: crypto.PubkeyToAddress(acc.PublicKey).String(),
-			PrivateKey:    hex.EncodeToString(acc.D.Bytes()),
-			Chain:         CEL,
-		}
-
-		if err := notifySellerOfBuyer(*co); err != nil {
-			// TODO:: Cancle the order
-			return err
-		}
-
-		sellersAccountWatchRequest = &AccountWatchRequest{
-			Account:       co.SellerNKNAddress,
-			TimeOut:       co.Timeout,
-			Chain:         CEL,
-			Amount:        co.Amount,
-			TransactionID: co.OrderID,
-			Seller:        true,
-		}
-
-	case ETH:
-		acc := generateEVMAccount()
-		co.SellerEscrowWallet = EscrowWallet{
-			ECDSA:         acc,
-			PublicAddress: crypto.PubkeyToAddress(acc.PublicKey).String(),
-			PrivateKey:    hex.EncodeToString(acc.D.Bytes()),
-			Chain:         ETH,
-		}
-
-		if err := notifySellerOfBuyer(*co); err != nil {
-			// TODO:: Cancle the order
-			return err
-		}
-
-		sellersAccountWatchRequest = &AccountWatchRequest{
-			Account:       co.SellerNKNAddress,
-			TimeOut:       co.Timeout,
-			Chain:         ETH,
-			Amount:        co.Amount,
-			TransactionID: co.OrderID,
-			Seller:        true,
-		}
-
-	case POL:
-		acc := generateEVMAccount()
-		co.SellerEscrowWallet = EscrowWallet{
-			ECDSA:         acc,
-			PublicAddress: crypto.PubkeyToAddress(acc.PublicKey).String(),
-			PrivateKey:    hex.EncodeToString(acc.D.Bytes()),
-			Chain:         POL,
-		}
-
-		if err := notifySellerOfBuyer(*co); err != nil {
-			// TODO:: Cancle the order
-			return err
-		}
-
-		sellersAccountWatchRequest = &AccountWatchRequest{
-			Account:       co.SellerNKNAddress,
-			TimeOut:       co.Timeout,
-			Chain:         POL,
-			Amount:        co.Amount,
-			TransactionID: co.OrderID,
-			Seller:        true,
-		}
-
-	case MO:
-		acc := generateEVMAccount()
-		co.SellerEscrowWallet = EscrowWallet{
-			ECDSA:         acc,
-			PublicAddress: crypto.PubkeyToAddress(acc.PublicKey).String(),
-			PrivateKey:    hex.EncodeToString(acc.D.Bytes()),
-			Chain:         MO,
-		}
-
-		if err := notifySellerOfBuyer(*co); err != nil {
-			// TODO:: Cancle the order
-			return err
-		}
-
-		sellersAccountWatchRequest = &AccountWatchRequest{
-			Account:       co.SellerNKNAddress,
-			TimeOut:       co.Timeout,
-			Chain:         MO,
-			Amount:        co.Amount,
-			TransactionID: co.OrderID,
-			Seller:        true,
-		}
-	default:
-		return errors.New("invalid currency")
-	}
-
-	switch ta {
-	case SOL:
-		acc := createSolanaAccount()
-		co.BuyerEscrowWallet = EscrowWallet{
-			PublicAddress: acc.PublicKey,
-			PrivateKey:    acc.PrivateKey,
-			Chain:         SOL,
-		}
-
-		if err := sendBuyerPayInfo(*co); err != nil {
-			// TODO:: Cancle the order
-			return err
-		}
-
-		buyersAccountWatchRequest = &AccountWatchRequest{
-			Account:       co.BuyerNKNAddress,
-			TimeOut:       co.Timeout,
-			Chain:         SOL,
-			Amount:        co.Price,
-			Seller:        false,
-			TransactionID: co.OrderID,
-		}
-
-	case MO:
-		acc := generateEVMAccount()
-		co.BuyerEscrowWallet = EscrowWallet{
-			ECDSA:         acc,
-			PublicAddress: crypto.PubkeyToAddress(acc.PublicKey).String(),
-			PrivateKey:    hex.EncodeToString(acc.D.Bytes()),
-			Chain:         MO,
-		}
-
-		if err := sendBuyerPayInfo(*co); err != nil {
-			// TODO:: Cancle the order
-			return err
-		}
-		buyersAccountWatchRequest = &AccountWatchRequest{
-			Account:       co.BuyerNKNAddress,
-			TimeOut:       co.Timeout,
-			Chain:         MO,
-			Amount:        co.Price,
-			Seller:        false,
-			TransactionID: co.OrderID,
-		}
-
-	case ETH:
-		acc := generateEVMAccount()
-		co.BuyerEscrowWallet = EscrowWallet{
-			ECDSA:         acc,
-			PublicAddress: crypto.PubkeyToAddress(acc.PublicKey).String(),
-			PrivateKey:    hex.EncodeToString(acc.D.Bytes()),
-			Chain:         ETH,
-		}
-
-		if err := sendBuyerPayInfo(*co); err != nil {
-			// TODO:: Cancle the order
-			return err
-		}
-
-		buyersAccountWatchRequest = &AccountWatchRequest{
-			Account:       co.BuyerNKNAddress,
-			TimeOut:       co.Timeout,
-			Chain:         ETH,
-			Amount:        co.Price,
-			Seller:        false,
-			TransactionID: co.OrderID,
-		}
-	case CEL:
-		acc := generateEVMAccount()
-		co.BuyerEscrowWallet = EscrowWallet{
-			ECDSA:         acc,
-			PublicAddress: crypto.PubkeyToAddress(acc.PublicKey).String(),
-			PrivateKey:    hex.EncodeToString(acc.D.Bytes()),
-			Chain:         CEL,
-		}
-
-		if err := sendBuyerPayInfo(*co); err != nil {
-			// TODO:: Cancle the order
-			return err
-		}
-
-		buyersAccountWatchRequest = &AccountWatchRequest{
-			Account:       co.BuyerNKNAddress,
-			TimeOut:       co.Timeout,
-			Chain:         CEL,
-			Amount:        co.Price,
-			Seller:        false,
-			TransactionID: co.OrderID,
-		}
-
-	case POL:
-		acc := generateEVMAccount()
-		co.BuyerEscrowWallet = EscrowWallet{
-			ECDSA:         acc,
-			PublicAddress: crypto.PubkeyToAddress(acc.PublicKey).String(),
-			PrivateKey:    hex.EncodeToString(acc.D.Bytes()),
-			Chain:         POL,
-		}
-
-		if err := sendBuyerPayInfo(*co); err != nil {
-			// TODO:: Cancle the order
-			return err
-		}
-
-		// emit a new event to let Warren know that we need to start watching a new account
-		buyersAccountWatchRequest = &AccountWatchRequest{
-			Account:       co.BuyerNKNAddress,
-			TimeOut:       co.Timeout,
-			Chain:         POL,
-			Amount:        co.Price,
-			Seller:        false,
-			TransactionID: co.OrderID,
-		}
-	default:
-		return errors.New("invalid currency")
-	}
-
-	bouw := partyTypes.OrdersUnderWatch{
-		Index:            co.BuyerNKNAddress,
-		NknAddress:       co.BuyerNKNAddress,
-		WalletPrivateKey: co.BuyerEscrowWallet.PrivateKey,
-		WalletPublicKey:  co.BuyerEscrowWallet.PublicAddress,
-		ShippingAddress:  co.BuyerShippingAddress,
-		Amount:           order.Price,
-		Chain:            buyersAccountWatchRequest.Chain,
-		PaymentComplete:  false,
-	}
-	am.keeper.SetOrdersUnderWatch(ctx, bouw)
-
-	souw := partyTypes.OrdersUnderWatch{
-		Index:            co.SellerNKNAddress,
-		NknAddress:       co.SellerNKNAddress,
-		WalletPrivateKey: co.SellerEscrowWallet.PrivateKey,
-		WalletPublicKey:  co.SellerEscrowWallet.PublicAddress,
-		ShippingAddress:  co.SellerShippingAddress,
-		Amount:           order.Amount,
-		Chain:            sellersAccountWatchRequest.Chain,
-		PaymentComplete:  false,
-	}
-
-	am.keeper.SetOrdersUnderWatch(ctx, souw)
-	go am.watchAccount(ctx, buyersAccountWatchRequest)
-	go am.watchAccount(ctx, sellersAccountWatchRequest)
-	return nil
-}
-
 // BeginBlock contains the logic that is automatically triggered at the beginning of each block
 func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
-	fmt.Println("")
-	fmt.Println("")
-	fmt.Println("CURRENT STATE:")
-	fmt.Println("")
-	fmt.Println("")
-	fmt.Println("trade orders in the store: ")
-	// fmt.Println("trade orders in the store: ", am.keeper.GetAllTradeOrders(ctx))
-	for _, order := range am.keeper.GetAllTradeOrders(ctx) {
-		b, err := json.MarshalIndent(order, "", "  ")
-		if err != nil {
-			fmt.Println("error: ", err)
-		}
-		fmt.Println(string(b))
-	}
-	fmt.Println("")
-	fmt.Println("")
-	// fmt.Println("Pending Orders: ", am.keeper.GetAllPendingOrders(ctx))
-	fmt.Println("Pending Orders: ")
-	for _, order := range am.keeper.GetAllPendingOrders(ctx) {
-		b, err := json.MarshalIndent(order, "", "  ")
-		if err != nil {
-			fmt.Println("error: ", err)
-		}
-		fmt.Println(string(b))
-	}
-	fmt.Println("")
-	fmt.Println("")
-	// fmt.Println("Orders Awaiting Finalizer: ", am.keeper.GetAllOrdersAwaitingFinalizer(ctx))
-	fmt.Println("Orders Awaiting Finalizer: ")
-	for _, order := range am.keeper.GetAllOrdersAwaitingFinalizer(ctx) {
-		b, err := json.MarshalIndent(order, "", "  ")
-		if err != nil {
-			fmt.Println("error: ", err)
-		}
-		fmt.Println(string(b))
-	}
-	fmt.Println("")
-	fmt.Println("")
-	// fmt.Println("Orders Under Watch: ", am.keeper.GetAllOrdersUnderWatch(ctx))
-	fmt.Println("Orders Under Watch: ")
-	// pretty print the orders under watch
-	for _, order := range am.keeper.GetAllOrdersUnderWatch(ctx) {
-		b, err := json.MarshalIndent(order, "", "  ")
-		if err != nil {
-			fmt.Println("error: ", err)
-		}
-		fmt.Println(string(b))
-	}
-	fmt.Println("")
-	fmt.Println("")
-	fmt.Println("Complete orders in Finalizing Orders: ")
-	for _, order := range am.keeper.GetAllFinalizingOrders(ctx) {
-		b, err := json.MarshalIndent(order, "", "  ")
-		if err != nil {
-			fmt.Println("error: ", err)
-		}
-		fmt.Println(string(b))
-	}
-	fmt.Println("")
-	fmt.Println("")
+	// fmt.Println("")
+	// fmt.Println("")
+	// fmt.Println("CURRENT STATE:")
+	// fmt.Println("")
+	// fmt.Println("")
+	// fmt.Println("trade orders in the store: ")
+	// // fmt.Println("trade orders in the store: ", am.keeper.GetAllTradeOrders(ctx))
+	// for _, order := range am.keeper.GetAllTradeOrders(ctx) {
+	// 	b, err := json.MarshalIndent(order, "", "  ")
+	// 	if err != nil {
+	// 		fmt.Println("error: ", err)
+	// 	}
+	// 	fmt.Println(string(b))
+	// }
+	// fmt.Println("")
+	// fmt.Println("")
+	// // fmt.Println("Pending Orders: ", am.keeper.GetAllPendingOrders(ctx))
+	// fmt.Println("Pending Orders: ")
+	// for _, order := range am.keeper.GetAllPendingOrders(ctx) {
+	// 	b, err := json.MarshalIndent(order, "", "  ")
+	// 	if err != nil {
+	// 		fmt.Println("error: ", err)
+	// 	}
+	// 	fmt.Println(string(b))
+	// }
+	// fmt.Println("")
+	// fmt.Println("")
+	// // fmt.Println("Orders Awaiting Finalizer: ", am.keeper.GetAllOrdersAwaitingFinalizer(ctx))
+	// fmt.Println("Orders Awaiting Finalizer: ")
+	// for _, order := range am.keeper.GetAllOrdersAwaitingFinalizer(ctx) {
+	// 	b, err := json.MarshalIndent(order, "", "  ")
+	// 	if err != nil {
+	// 		fmt.Println("error: ", err)
+	// 	}
+	// 	fmt.Println(string(b))
+	// }
+	// fmt.Println("")
+	// fmt.Println("")
+	// // fmt.Println("Orders Under Watch: ", am.keeper.GetAllOrdersUnderWatch(ctx))
+	// fmt.Println("Orders Under Watch: ")
+	// // pretty print the orders under watch
+	// for _, order := range am.keeper.GetAllOrdersUnderWatch(ctx) {
+	// 	b, err := json.MarshalIndent(order, "", "  ")
+	// 	if err != nil {
+	// 		fmt.Println("error: ", err)
+	// 	}
+	// 	fmt.Println(string(b))
+	// }
+	// fmt.Println("")
+	// fmt.Println("")
+	// fmt.Println("Complete orders in Finalizing Orders: ")
+	// for _, order := range am.keeper.GetAllFinalizingOrders(ctx) {
+	// 	b, err := json.MarshalIndent(order, "", "  ")
+	// 	if err != nil {
+	// 		fmt.Println("error: ", err)
+	// 	}
+	// 	fmt.Println(string(b))
+	// }
+	// fmt.Println("")
+	// fmt.Println("")
 
 	po := am.keeper.GetAllPendingOrders(ctx)
 	for _, order := range po {
