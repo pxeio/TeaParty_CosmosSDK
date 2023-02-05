@@ -269,7 +269,7 @@ func (am AppModule) finalizeOrder(ctx sdk.Context, order partyTypes.OrdersAwaiti
 	// 	e.logger.Error("error notifying the party chain that the transaction was successful: " + err.Error())
 	// }
 
-	am.keeper.RemoveOrdersAwaitingFinalizer(ctx, order.Index)
+	// am.keeper.RemoveOrdersAwaitingFinalizer(ctx, order.Index)
 	return nil
 }
 

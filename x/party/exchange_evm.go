@@ -6,6 +6,7 @@ import (
 	"crypto/elliptic"
 	"fmt"
 	"math/big"
+	"math/rand"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -26,6 +27,8 @@ func (am AppModule) waitAndVerifyEVMChain(ctx sdk.Context, client, client2 *ethc
 		Result:              OUTCOME_SUCCESS,
 	}
 	am.wg.Add(1)
+	// sleep for a random ammount of time between 5 and 10 seconds
+	time.Sleep(time.Duration(rand.Intn(5)+5) * time.Second)
 	am.dispatch(ctx, awrr)
 	am.wg.Wait()
 	return

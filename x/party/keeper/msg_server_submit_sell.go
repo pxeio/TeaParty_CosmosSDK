@@ -5,8 +5,6 @@ import (
 
 	"github.com/TeaPartyCrypto/partychain/x/party/types"
 
-	"github.com/google/uuid"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -24,7 +22,7 @@ func (k msgServer) SubmitSell(goCtx context.Context, msg *types.MsgSubmitSell) (
 
 	// create a new sell order
 	order = types.TradeOrders{
-		Index:              uuid.New().String(),
+		Index:              msg.SellerNknAddr,
 		TradeAsset:         msg.TradeAsset,
 		Price:              msg.Price,
 		Currency:           msg.Currency,
