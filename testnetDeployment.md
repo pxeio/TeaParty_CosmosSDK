@@ -1,47 +1,51 @@
 
 ./partychaind init party 
 
-./partychaind keys --keyring-backend file add mac  
+./partychaind keys --keyring-backend test add alice  
 
-- address: party14jxp6ffh7sr9mh5frekq93gkqy7tqknxqf2yhr
-  name: mac
-  pubkey: '{"@type":"/cosmos.crypto.secp256k1.PubKey","key":"A1cpf1FuBy/6+3MxENXZzKVJo3ICjVrpa+HaikjCOALN"}'
+- address: party1lg0mvx4nm7j8q9e5cz3fajc737d9qxa38h7ltg
+  name: alice
+  pubkey: '{"@type":"/cosmos.crypto.secp256k1.PubKey","key":"AwFgiYkfWoxqQxiAR/F5gORxiHBzbQkO2DFT7zJiKhPX"}'
   type: local
 
 
 **Important** write this mnemonic phrase in a safe place.
 It is the only way to recover your account if you ever forget your password.
 
-sunset sing canal frozen friend stone neither party own decorate spider network suit boost number opera dune word loud win similar knee flush special
+grab jeans various page castle major busy problem nurse clean fit catch table trip relief awake rack moral face right goose oppose brain cruise
+
+./partychaind keys --keyring-backend file add mac  
+K!1poiv^F6fs8XtOdxwqRpp6
+- address: party1a4xtrqv2z0t0kz7x969j70v689pl9ww85ajyw2
+  name: mac
+  pubkey: '{"@type":"/cosmos.crypto.secp256k1.PubKey","key":"Ao3lcYlx705IVPLneqQAoOrpu2WuiVWqpR4/TuP9wZ8L"}'
+  type: local
 
 
-./partychaind add-genesis-account party14jxp6ffh7sr9mh5frekq93gkqy7tqknxqf2yhr 5000000000000000000000stake 
-./partychaind add-genesis-account party1wn9w5w3lx0q3r55xt80zkclzv3lzxlrf05d3qa 5000000000000000000000stake 
+**Important** write this mnemonic phrase in a safe place.
+It is the only way to recover your account if you ever forget your password.
 
-./partychaind gentx mac  100000000stake  --keyring-backend file
+twin erase fold budget slot crack path tissue limb carry quality assume stereo tribe position hill word blast follow exist logic dilemma buzz today
+
+
+./partychaind add-genesis-account party1lg0mvx4nm7j8q9e5cz3fajc737d9qxa38h7ltg 5000000000000000000000stake 
+./partychaind add-genesis-account party1a4xtrqv2z0t0kz7x969j70v689pl9ww85ajyw2 5000000000000000000000stake 
+
+./partychaind gentx mac  4000000000000000000000stake  --keyring-backend file
 K!1poiv^F6fs8XtOdxwqRpp6
 
 ./partychaind collect-gentxs
 
-
-// on another computer i ran 
-- address: party1wn9w5w3lx0q3r55xt80zkclzv3lzxlrf05d3qa
-  name: alice
-  pubkey: '{"@type":"/cosmos.crypto.secp256k1.PubKey","key":"A937d10es42OTxzDE79cxbRIURx4nQo4K5AnhZ+yS0JV"}'
-  type: local
-
-
-**Important** write this mnemonic phrase in a safe place.
-It is the only way to recover your account if you ever forget your password.
-
-nation rare split giggle parade grow above clutch various venue muffin drop exotic scare image favorite speak dolphin good eight tuition glimpse clown alone
-
+./partychaind start --log_level error
 
 Updated the `config.toml` on a peer line 212 seed nodes to connect to 
 seeds = "1c82a67c512a7172e40cefab76f679907498cdeb@209.126.11.245:26656"
 
+
+// generated genesis 
+
 {
-  "genesis_time": "2023-02-03T15:39:17.252786356Z",
+  "genesis_time": "2023-02-04T16:54:01.795525793Z",
   "chain_id": "partychain",
   "initial_height": "1",
   "consensus_params": {
@@ -75,21 +79,14 @@ seeds = "1c82a67c512a7172e40cefab76f679907498cdeb@209.126.11.245:26656"
       "accounts": [
         {
           "@type": "/cosmos.auth.v1beta1.BaseAccount",
-          "address": "party14jxp6ffh7sr9mh5frekq93gkqy7tqknxqf2yhr",
+          "address": "party1dhtn5g7ggjksdt4s6wvtwqmqx7nqkyqxk0dv4a",
           "pub_key": null,
           "account_number": "0",
           "sequence": "0"
         },
         {
           "@type": "/cosmos.auth.v1beta1.BaseAccount",
-          "address": "party1wn9w5w3lx0q3r55xt80zkclzv3lzxlrf05d3qa",
-          "pub_key": null,
-          "account_number": "0",
-          "sequence": "0"
-        },
-        {
-          "@type": "/cosmos.auth.v1beta1.BaseAccount",
-          "address": "party1hedrjppvwuzvpxj2w5rp6xg3gqc0mx7klk8dwl",
+          "address": "party1td5u55hd86ewpxuv8705xtnnxr4sl2uyd47nwf",
           "pub_key": null,
           "account_number": "0",
           "sequence": "0"
@@ -106,7 +103,7 @@ seeds = "1c82a67c512a7172e40cefab76f679907498cdeb@209.126.11.245:26656"
       },
       "balances": [
         {
-          "address": "party1wn9w5w3lx0q3r55xt80zkclzv3lzxlrf05d3qa",
+          "address": "party1td5u55hd86ewpxuv8705xtnnxr4sl2uyd47nwf",
           "coins": [
             {
               "denom": "stake",
@@ -115,16 +112,7 @@ seeds = "1c82a67c512a7172e40cefab76f679907498cdeb@209.126.11.245:26656"
           ]
         },
         {
-          "address": "party14jxp6ffh7sr9mh5frekq93gkqy7tqknxqf2yhr",
-          "coins": [
-            {
-              "denom": "stake",
-              "amount": "5000000000000000000000"
-            }
-          ]
-        },
-        {
-          "address": "party1hedrjppvwuzvpxj2w5rp6xg3gqc0mx7klk8dwl",
+          "address": "party1dhtn5g7ggjksdt4s6wvtwqmqx7nqkyqxk0dv4a",
           "coins": [
             {
               "denom": "stake",
@@ -191,11 +179,11 @@ seeds = "1c82a67c512a7172e40cefab76f679907498cdeb@209.126.11.245:26656"
                   "max_change_rate": "0.010000000000000000"
                 },
                 "min_self_delegation": "1",
-                "delegator_address": "party14jxp6ffh7sr9mh5frekq93gkqy7tqknxqf2yhr",
-                "validator_address": "partyvaloper14jxp6ffh7sr9mh5frekq93gkqy7tqknx0craq6",
+                "delegator_address": "party1td5u55hd86ewpxuv8705xtnnxr4sl2uyd47nwf",
+                "validator_address": "partyvaloper1td5u55hd86ewpxuv8705xtnnxr4sl2uyzyh2es",
                 "pubkey": {
                   "@type": "/cosmos.crypto.ed25519.PubKey",
-                  "key": "qP+7QxcIUyJU8NtwJ4ZwOHgfLVVbUJ9OpxxSIWlEh5o="
+                  "key": "Kt5xhkpcpsFP7PvTYBe1mNIa6lFuzRa4U5wqHNasRMQ="
                 },
                 "value": {
                   "denom": "stake",
@@ -203,7 +191,7 @@ seeds = "1c82a67c512a7172e40cefab76f679907498cdeb@209.126.11.245:26656"
                 }
               }
             ],
-            "memo": "1c82a67c512a7172e40cefab76f679907498cdeb@209.126.11.245:26656",
+            "memo": "879ef7299f062b2b9e9d507c94b38d98c92eaeec@144.126.148.104:26656",
             "timeout_height": "0",
             "extension_options": [],
             "non_critical_extension_options": []
@@ -213,7 +201,7 @@ seeds = "1c82a67c512a7172e40cefab76f679907498cdeb@209.126.11.245:26656"
               {
                 "public_key": {
                   "@type": "/cosmos.crypto.secp256k1.PubKey",
-                  "key": "A1cpf1FuBy/6+3MxENXZzKVJo3ICjVrpa+HaikjCOALN"
+                  "key": "A6TAAG4Fytl2SkScaGr6SvEd3p4v7323Wx8quKPGdvj5"
                 },
                 "mode_info": {
                   "single": {
@@ -232,7 +220,7 @@ seeds = "1c82a67c512a7172e40cefab76f679907498cdeb@209.126.11.245:26656"
             "tip": null
           },
           "signatures": [
-            "+LpzA2mThKXRo0mzVTRewHbTaGmqqRu+NhMzY7jvYMJlb/ZvxQRdeAjQ7LkOG8r4LOS/Uq7uzt374W3Fj47B5g=="
+            "KjjduOrfy1jLtrLvsxiGcmtrSeOf6aBrIdc1xlltRqJeFeAV6TamRd/AZW2eN6Ye4ePKM/INcV4dPoRkbbFI4w=="
           ]
         }
       ]
@@ -342,7 +330,8 @@ seeds = "1c82a67c512a7172e40cefab76f679907498cdeb@209.126.11.245:26656"
       "tradeOrdersList": [],
       "pendingOrdersList": [],
       "ordersAwaitingFinalizerList": [],
-      "ordersUnderWatchList": []
+      "ordersUnderWatchList": [],
+      "finalizingOrdersList": []
     },
     "slashing": {
       "params": {

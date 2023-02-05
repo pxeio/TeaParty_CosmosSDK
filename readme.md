@@ -14,6 +14,8 @@ ignite scaffold map trade-orders tradeAsset price currency amount sellerShipping
 
 ignite scaffold map pending-orders buyerEscrowWalletPublicKey buyerEscrowWalletPrivateKey sellerEscrowWalletPublicKey sellerEscrowWalletPrivateKey sellerPaymentComplete:bool sellerPaymentCompleteBlockHeight:int buyerPaymentComplete:bool buyerPaymentCompleteBlockHeight:int amount buyerShippingAddress buyerRefundAddress buyerNKNAddress sellerRefundAddress sellerShippingAddress sellerNKNAddress tradeAsset currency price blockHeight:int --no-message  --module party -y
 
+ignite scaffold map finalizing-orders buyerEscrowWalletPublicKey buyerEscrowWalletPrivateKey sellerEscrowWalletPublicKey sellerEscrowWalletPrivateKey sellerPaymentComplete:bool sellerPaymentCompleteBlockHeight:int buyerPaymentComplete:bool buyerPaymentCompleteBlockHeight:int amount buyerShippingAddress buyerRefundAddress buyerNKNAddress sellerRefundAddress sellerShippingAddress sellerNKNAddress tradeAsset currency price blockHeight:int --no-message  --module party -y
+
 
 ignite scaffold map orders-awaiting-finalizer nknAddress walletPrivateKey walletPublicKey shippingAddress  refundAddress amount chain --module party  --no-message -y  
 
@@ -372,19 +374,20 @@ pretty cricket rifle adapt number home chief kick ready tilt silly end promote t
 
 
 ./partychaind keys add alice  --keyring-backend test
- address: party1apt3daudlmpss078kcwev9yf5pvge9gs3ww8hu
+- address: party1tvddzkq3yvq6q0kmg0hlaszlwwtn74hr5ehu36
   name: alice
-  pubkey: '{"@type":"/cosmos.crypto.secp256k1.PubKey","key":"Au9X4GHm0ZY+ip8Xa8k7JAHgjuYPXvaNqXArlscWHcIA"}'
+  pubkey: '{"@type":"/cosmos.crypto.secp256k1.PubKey","key":"Ah51X9Zxduik5agilBFOcgs6h7M66jIfTUukZkyU7MZU"}'
   type: local
 
 
 **Important** write this mnemonic phrase in a safe place.
 It is the only way to recover your account if you ever forget your password.
 
-spot point rely dwarf topic choose escape million toddler shrimp hero upset canal walnut stomach uncover fetch onion switch regular fit size girl glare
+note rescue often vocal wedding quality velvet rude trouble trophy humble salute display help tuition scorpion bid level swap upper art lift option sort
 
-./partychaind add-genesis-account party1apt3daudlmpss078kcwev9yf5pvge9gs3ww8hu 5000000000000000000000stake 
-./partychaind add-genesis-account party190z2fe0g96cx63ewqfashuszdcpupaleg7l5lm 5000000000000000000000stake 
+
+./partychaind add-genesis-account party1tvddzkq3yvq6q0kmg0hlaszlwwtn74hr5ehu36 5000000000000000000000stake 
+./partychaind add-genesis-account party190z2fe0g96cx63ewqfashuszdcpupaleg7l5lm 5000000000000000000000stake
 
 
 
@@ -414,7 +417,7 @@ K!1poiv^F6fs8XtOdxwqRpp6
 
 docker run --rm -it \
     -v $(pwd)/docker/bob/:/root/.partychaind/ \
-    partychaind \
+    tmjeff/partychaind  \
     init party-1
 
 
@@ -422,7 +425,7 @@ mkdir -p docker/bob/keys
 echo -n password > docker/bob/keys/passphrase.txt
 docker run --rm -it \
     -v $(pwd)/docker/bob:/root/.partychaind \
-    partychaind \
+    tmjeff/partychaind  \
     keys \
     --keyring-backend file --keyring-dir /root/.partychaind/keys \
     add bob --home /root/.partychaind/
@@ -440,7 +443,7 @@ estate mobile afford toilet love useless few clock exhaust apple taste organ shr
 
 docker run --rm -it \f
     -v $(pwd)/docker/bob/:/root/.partychaind/ \
-    partychaind \
+    tmjeff/partychaind  \
     gentx cosmos18n4nyucwu436nx4czhg43kdzyh64lfv4wj6cqa 500000000000000tea  --account-number 0 --sequence 0  --chain-id party --pubkey '{"@type":"/cosmos.crypto.secp256k1.PubKey","key":"A7JbUfXrrO1f+F8LokSv4i4nK4f1Uv+jvOy/bSNq15q7"}'   --gas 1000000 --gas-prices 0.1ngram  --keyring-backend file --home /root/.partychaind/
 
 
@@ -527,3 +530,12 @@ func main() {
 replace github.com/TeaPartyCrypto/partychain => ../partychain
 
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
+
+
+rm -rf ~/.partychain
+./partychaind init party 
+./partychaind keys add alice  --keyring-backend test 
+./partychaind add-genesis-account alice 5000000000000000000000stake 
+./partychaind gentx alice  100000000stake   --keyring-backend test
+./partychaind collect-gentxs
+go run .  start --log_level error

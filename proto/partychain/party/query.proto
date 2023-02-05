@@ -1,4 +1,5 @@
 syntax = "proto3";
+
 package teapartycrypto.partychain.party;
 
 import "gogoproto/gogo.proto";
@@ -9,138 +10,175 @@ import "partychain/party/trade_orders.proto";
 import "partychain/party/pending_orders.proto";
 import "partychain/party/orders_awaiting_finalizer.proto";
 import "partychain/party/orders_under_watch.proto";
+import "partychain/party/finalizing_orders.proto";
+
 // this line is used by starport scaffolding # 1
 
 option go_package = "github.com/TeaPartyCrypto/partychain/x/party/types";
 
 // Query defines the gRPC querier service.
 service Query {
+  
   // Parameters queries the parameters of the module.
-  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
+  rpc Params (QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/TeaPartyCrypto/partychain/party/params";
+  
   }
+  
   // Queries a TradeOrders by index.
-	rpc TradeOrders(QueryGetTradeOrdersRequest) returns (QueryGetTradeOrdersResponse) {
-		option (google.api.http).get = "/TeaPartyCrypto/partychain/party/trade_orders/{index}";
-	}
+  rpc TradeOrders (QueryGetTradeOrdersRequest) returns (QueryGetTradeOrdersResponse) {
+    option (google.api.http).get = "/TeaPartyCrypto/partychain/party/trade_orders/{index}";
+  
+  }
+  
+  // Queries a list of TradeOrders items.
+  rpc TradeOrdersAll (QueryAllTradeOrdersRequest) returns (QueryAllTradeOrdersResponse) {
+    option (google.api.http).get = "/TeaPartyCrypto/partychain/party/trade_orders";
+  
+  }
+  
+  // Queries a PendingOrders by index.
+  rpc PendingOrders (QueryGetPendingOrdersRequest) returns (QueryGetPendingOrdersResponse) {
+    option (google.api.http).get = "/TeaPartyCrypto/partychain/party/pending_orders/{index}";
+  
+  }
+  
+  // Queries a list of PendingOrders items.
+  rpc PendingOrdersAll (QueryAllPendingOrdersRequest) returns (QueryAllPendingOrdersResponse) {
+    option (google.api.http).get = "/TeaPartyCrypto/partychain/party/pending_orders";
+  
+  }
+  
+  // Queries a OrdersAwaitingFinalizer by index.
+  rpc OrdersAwaitingFinalizer (QueryGetOrdersAwaitingFinalizerRequest) returns (QueryGetOrdersAwaitingFinalizerResponse) {
+    option (google.api.http).get = "/TeaPartyCrypto/partychain/party/orders_awaiting_finalizer/{index}";
+  
+  }
+  
+  // Queries a list of OrdersAwaitingFinalizer items.
+  rpc OrdersAwaitingFinalizerAll (QueryAllOrdersAwaitingFinalizerRequest) returns (QueryAllOrdersAwaitingFinalizerResponse) {
+    option (google.api.http).get = "/TeaPartyCrypto/partychain/party/orders_awaiting_finalizer";
+  
+  }
+  
+  // Queries a OrdersUnderWatch by index.
+  rpc OrdersUnderWatch (QueryGetOrdersUnderWatchRequest) returns (QueryGetOrdersUnderWatchResponse) {
+    option (google.api.http).get = "/TeaPartyCrypto/partychain/party/orders_under_watch/{index}";
+  
+  }
+  
+  // Queries a list of OrdersUnderWatch items.
+  rpc OrdersUnderWatchAll (QueryAllOrdersUnderWatchRequest) returns (QueryAllOrdersUnderWatchResponse) {
+    option (google.api.http).get = "/TeaPartyCrypto/partychain/party/orders_under_watch";
+  
+  }
 
-	// Queries a list of TradeOrders items.
-	rpc TradeOrdersAll(QueryAllTradeOrdersRequest) returns (QueryAllTradeOrdersResponse) {
-		option (google.api.http).get = "/TeaPartyCrypto/partychain/party/trade_orders";
-	}
-
-// Queries a PendingOrders by index.
-	rpc PendingOrders(QueryGetPendingOrdersRequest) returns (QueryGetPendingOrdersResponse) {
-		option (google.api.http).get = "/TeaPartyCrypto/partychain/party/pending_orders/{index}";
-	}
-
-	// Queries a list of PendingOrders items.
-	rpc PendingOrdersAll(QueryAllPendingOrdersRequest) returns (QueryAllPendingOrdersResponse) {
-		option (google.api.http).get = "/TeaPartyCrypto/partychain/party/pending_orders";
-	}
-
-// Queries a OrdersAwaitingFinalizer by index.
-	rpc OrdersAwaitingFinalizer(QueryGetOrdersAwaitingFinalizerRequest) returns (QueryGetOrdersAwaitingFinalizerResponse) {
-		option (google.api.http).get = "/TeaPartyCrypto/partychain/party/orders_awaiting_finalizer/{index}";
-	}
-
-	// Queries a list of OrdersAwaitingFinalizer items.
-	rpc OrdersAwaitingFinalizerAll(QueryAllOrdersAwaitingFinalizerRequest) returns (QueryAllOrdersAwaitingFinalizerResponse) {
-		option (google.api.http).get = "/TeaPartyCrypto/partychain/party/orders_awaiting_finalizer";
-	}
-
-// Queries a OrdersUnderWatch by index.
-	rpc OrdersUnderWatch(QueryGetOrdersUnderWatchRequest) returns (QueryGetOrdersUnderWatchResponse) {
-		option (google.api.http).get = "/TeaPartyCrypto/partychain/party/orders_under_watch/{index}";
-	}
-
-	// Queries a list of OrdersUnderWatch items.
-	rpc OrdersUnderWatchAll(QueryAllOrdersUnderWatchRequest) returns (QueryAllOrdersUnderWatchResponse) {
-		option (google.api.http).get = "/TeaPartyCrypto/partychain/party/orders_under_watch";
-	}
-
-// this line is used by starport scaffolding # 2
+  // this line is used by starport scaffolding # 2
+  
+  // Queries a list of FinalizingOrders items.
+  rpc FinalizingOrders    (QueryGetFinalizingOrdersRequest) returns (QueryGetFinalizingOrdersResponse) {
+    option (google.api.http).get = "/TeaPartyCrypto/partychain/party/finalizing_orders/{index}";
+  
+  }
+  rpc FinalizingOrdersAll (QueryAllFinalizingOrdersRequest) returns (QueryAllFinalizingOrdersResponse) {
+    option (google.api.http).get = "/TeaPartyCrypto/partychain/party/finalizing_orders";
+  
+  }
 }
-
 // QueryParamsRequest is request type for the Query/Params RPC method.
 message QueryParamsRequest {}
 
 // QueryParamsResponse is response type for the Query/Params RPC method.
 message QueryParamsResponse {
+  
   // params holds all the parameters of this module.
   Params params = 1 [(gogoproto.nullable) = false];
 }
 
 message QueryGetTradeOrdersRequest {
-	  string index = 1;
-
+  string index = 1;
 }
 
 message QueryGetTradeOrdersResponse {
-	TradeOrders tradeOrders = 1 [(gogoproto.nullable) = false];
+  TradeOrders tradeOrders = 1 [(gogoproto.nullable) = false];
 }
 
 message QueryAllTradeOrdersRequest {
-	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
 message QueryAllTradeOrdersResponse {
-	repeated TradeOrders tradeOrders = 1 [(gogoproto.nullable) = false];
-	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+  repeated TradeOrders                            tradeOrders = 1 [(gogoproto.nullable) = false];
+           cosmos.base.query.v1beta1.PageResponse pagination  = 2;
 }
 
 message QueryGetPendingOrdersRequest {
-	  string index = 1;
-
+  string index = 1;
 }
 
 message QueryGetPendingOrdersResponse {
-	PendingOrders pendingOrders = 1 [(gogoproto.nullable) = false];
+  PendingOrders pendingOrders = 1 [(gogoproto.nullable) = false];
 }
 
 message QueryAllPendingOrdersRequest {
-	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
 message QueryAllPendingOrdersResponse {
-	repeated PendingOrders pendingOrders = 1 [(gogoproto.nullable) = false];
-	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+  repeated PendingOrders                          pendingOrders = 1 [(gogoproto.nullable) = false];
+           cosmos.base.query.v1beta1.PageResponse pagination    = 2;
 }
 
 message QueryGetOrdersAwaitingFinalizerRequest {
-	  string index = 1;
-
+  string index = 1;
 }
 
 message QueryGetOrdersAwaitingFinalizerResponse {
-	OrdersAwaitingFinalizer ordersAwaitingFinalizer = 1 [(gogoproto.nullable) = false];
+  OrdersAwaitingFinalizer ordersAwaitingFinalizer = 1 [(gogoproto.nullable) = false];
 }
 
 message QueryAllOrdersAwaitingFinalizerRequest {
-	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
 message QueryAllOrdersAwaitingFinalizerResponse {
-	repeated OrdersAwaitingFinalizer ordersAwaitingFinalizer = 1 [(gogoproto.nullable) = false];
-	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+  repeated OrdersAwaitingFinalizer                ordersAwaitingFinalizer = 1 [(gogoproto.nullable) = false];
+           cosmos.base.query.v1beta1.PageResponse pagination              = 2;
 }
 
 message QueryGetOrdersUnderWatchRequest {
-	  string index = 1;
-
+  string index = 1;
 }
 
 message QueryGetOrdersUnderWatchResponse {
-	OrdersUnderWatch ordersUnderWatch = 1 [(gogoproto.nullable) = false];
+  OrdersUnderWatch ordersUnderWatch = 1 [(gogoproto.nullable) = false];
 }
 
 message QueryAllOrdersUnderWatchRequest {
-	cosmos.base.query.v1beta1.PageRequest pagination = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
 message QueryAllOrdersUnderWatchResponse {
-	repeated OrdersUnderWatch ordersUnderWatch = 1 [(gogoproto.nullable) = false];
-	cosmos.base.query.v1beta1.PageResponse pagination = 2;
+  repeated OrdersUnderWatch                       ordersUnderWatch = 1 [(gogoproto.nullable) = false];
+           cosmos.base.query.v1beta1.PageResponse pagination       = 2;
 }
 
+
 // this line is used by starport scaffolding # 3
+message QueryGetFinalizingOrdersRequest {
+  string index = 1;
+}
+
+message QueryGetFinalizingOrdersResponse {
+  FinalizingOrders finalizingOrders = 1 [(gogoproto.nullable) = false];
+}
+
+message QueryAllFinalizingOrdersRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllFinalizingOrdersResponse {
+  repeated FinalizingOrders                       finalizingOrders = 1 [(gogoproto.nullable) = false];
+           cosmos.base.query.v1beta1.PageResponse pagination       = 2;
+}
+

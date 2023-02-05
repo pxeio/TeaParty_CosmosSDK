@@ -41,7 +41,7 @@ func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyR
 
 	// create a pending-order object
 	po := types.PendingOrders{
-		Index:                        tradeOrder.Index,
+		Index:                        tradeOrder.SellerNknAddr,
 		BuyerEscrowWalletPublicKey:   buyerPublicKey,
 		BuyerEscrowWalletPrivateKey:  buyerPrivateKey.D.String(),
 		SellerEscrowWalletPublicKey:  sellerPublicKey,
