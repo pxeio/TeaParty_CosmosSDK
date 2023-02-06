@@ -27,6 +27,9 @@ ignite scaffold message transaction-result txID outcome --module party -y
 
 ignite scaffold map transcation-results txID outcome blockHeight:int --module party -y 
 
+
+ignite scaffold map paid-transactions orderID seller:bool --module party -y 
+
 ## Building from cli
 ignite scaffold chain github.com/TeaPartyCrypto/partychain --no-module
 
@@ -291,7 +294,7 @@ partychaind tx party submit-sell  "ethereum" "1000000000000000000" "polygon" "40
 
 partychaind q party list-trade-orders --output json
 
-partychaind tx party buy "cosmos1v03lavezd42arn556z6mhjgmjcxwty2uznt8sa" "0x5bbfa5724260Cb175cB39b24802A04c3bfe72eb3" "3678e59acb9052b4a9e7bce381ad1fa7fcbdc3cc2aef52218ef7ef0aeb13cb05"  "0x5bbfa5724260Cb175cB39b24802A04c3bfe72eb3" --from bob -y
+./partychaind tx party buy "a34eba303ef9734b95710e2b073f57bd0b045e5f7c6f844baf7d91d796318fbe" "0x5bbfa5724260Cb175cB39b24802A04c3bfe72eb3" "1c765347ee40622f90646c1619af9f41377a98a361c917bacfd35d37bbef6538"  "0x5bbfa5724260Cb175cB39b24802A04c3bfe72eb3" --from alice --keyring-backend test -y
 
 partychaind  tx party account-watch-outcome party1w062pa09dqvcrlk6tyl2yreaac7ttgq8avsmxa false success --from alice -y
 partychaind  tx party account-watch-outcome party1w062pa09dqvcrlk6tyl2yreaac7ttgq8avsmxa true success --from alice -y
