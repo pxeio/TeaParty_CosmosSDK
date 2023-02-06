@@ -197,18 +197,18 @@ func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 	fmt.Println("")
 	fmt.Println("")
 	// fmt.Println("Orders Under Watch: ", am.keeper.GetAllOrdersUnderWatch(ctx))
-	fmt.Println("Orders Under Watch: ")
-	// pretty print the orders under watch
-	for _, order := range am.keeper.GetAllOrdersUnderWatch(ctx) {
-		b, err := json.MarshalIndent(order, "", "  ")
-		if err != nil {
-			fmt.Println("error: ", err)
-		}
-		fmt.Println(string(b))
-	}
-	fmt.Println("")
-	fmt.Println("")
-	fmt.Println("Complete orders in Finalizing Orders: ")
+	// fmt.Println("Orders Under Watch: ")
+	// // pretty print the orders under watch
+	// for _, order := range am.keeper.GetAllOrdersUnderWatch(ctx) {
+	// 	b, err := json.MarshalIndent(order, "", "  ")
+	// 	if err != nil {
+	// 		fmt.Println("error: ", err)
+	// 	}
+	// 	fmt.Println(string(b))
+	// }
+	// fmt.Println("")
+	// fmt.Println("")
+	fmt.Println("Complete orders in Finalizing: ")
 	for _, order := range am.keeper.GetAllFinalizingOrders(ctx) {
 		b, err := json.MarshalIndent(order, "", "  ")
 		if err != nil {
@@ -259,15 +259,22 @@ func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 		}
 	}
 
-	oaf := am.keeper.GetAllOrdersAwaitingFinalizer(ctx)
-	for _, order := range oaf {
-		fmt.Printf("Order %s is awaiting finalization", order.Index)
-		fmt.Println("sending order to finalizer")
-		if err := am.finalizeOrder(ctx, order); err != nil {
-			// TODO: handle error
-			fmt.Println("error: ", err)
-		}
-	}
+	// oaf := am.keeper.GetAllOrdersAwaitingFinalizer(ctx)
+	// for _, order := range oaf {
+	// 	fmt.Printf("Order %s is awaiting finalization", order.Index)
+	// 	fmt.Printf("Order %s is awaiting finalization", order.Index)
+	// 	fmt.Printf("Order %s is awaiting finalization", order.Index)
+	// 	fmt.Printf("Order %s is awaiting finalization", order.Index)
+	// 	fmt.Println("sending order to finalizer")
+	// 	fmt.Println("sending order to finalizer")
+	// 	fmt.Println("sending order to finalizer")
+	// 	fmt.Println("sending order to finalizer")
+	// 	fmt.Println("sending order to finalizer")
+	// 	if err := am.finalizeOrder(ctx, order); err != nil {
+	// 		// TODO: handle error
+	// 		fmt.Println("error: ", err)
+	// 	}
+	// }
 
 }
 

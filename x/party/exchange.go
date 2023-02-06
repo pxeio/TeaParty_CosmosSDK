@@ -16,16 +16,28 @@ import (
 )
 
 func (am AppModule) dispatch(ctx sdk.Context, awrr *AccountWatchRequestResult) {
-	ouw, ok := am.keeper.GetOrdersUnderWatch(ctx, awrr.AccountWatchRequest.TransactionID)
-	if !ok {
-		fmt.Println("no orders under watch")
-		return
-	}
+	// ouw, ok := am.keeper.GetOrdersUnderWatch(ctx, awrr.AccountWatchRequest.TransactionID)
+	// if !ok {
+	// 	fmt.Printf("could not find a matching order under watch for  %+v", awrr)
+	// 	fmt.Println("here is a list of all orders under watch")
+	// 	aouw := am.keeper.GetAllOrdersUnderWatch(ctx)
+	// 	for _, ouw := range aouw {
+	// 		fmt.Printf("%+v", ouw)
+	// 	}
 
-	fmt.Printf("looking for finalizing order %+v", ouw)
-	pendingFinalizingOrder, ok := am.keeper.GetFinalizingOrders(ctx, ouw.Index)
+	// 	return
+	// }
+
+	fmt.Printf("looking for finalizing order %+v", awrr)
+	pendingFinalizingOrder, ok := am.keeper.GetFinalizingOrders(ctx, awrr.AccountWatchRequest.TransactionID)
 	if !ok {
-		fmt.Println("no order in finalizing orders")
+		fmt.Printf("could not find a matching finalizing order for %+v", awrr)
+		fmt.Println("here is a list of all finalizing orders")
+		afo := am.keeper.GetAllFinalizingOrders(ctx)
+		for _, fo := range afo {
+			fmt.Printf("%+v", fo)
+		}
+
 		return
 	}
 
@@ -33,7 +45,6 @@ func (am AppModule) dispatch(ctx sdk.Context, awrr *AccountWatchRequestResult) {
 	case OUTCOME_SUCCESS:
 		fmt.Println("success")
 		// TODO:: remove this
-		ouw.PaymentComplete = true
 
 		// compare owu.Chain to the Curency of the pendingFinalizingOrder
 		// if they match we know that we have the Buyer's payment completion status
@@ -47,12 +58,11 @@ func (am AppModule) dispatch(ctx sdk.Context, awrr *AccountWatchRequestResult) {
 		}
 	case OUTCOME_FAILURE:
 		// TODO:: remove this
-		ouw.PaymentComplete = false
 
-		if ouw.Chain == pendingFinalizingOrder.Currency {
+		if awrr.AccountWatchRequest.Chain == pendingFinalizingOrder.Currency {
 			pendingFinalizingOrder.BuyerPaymentComplete = false
 		}
-		if ouw.Chain == pendingFinalizingOrder.TradeAsset {
+		if awrr.AccountWatchRequest.Chain == pendingFinalizingOrder.TradeAsset {
 			pendingFinalizingOrder.SellerPaymentComplete = false
 		}
 		fmt.Println("creating a refund transaction")
@@ -86,17 +96,15 @@ func (am AppModule) dispatch(ctx sdk.Context, awrr *AccountWatchRequestResult) {
 		am.keeper.SetOrdersAwaitingFinalizer(ctx, buyerFinalizerForRefund)
 		am.keeper.SetOrdersAwaitingFinalizer(ctx, sellerFinalizerForRefund)
 		// am.keeper.RemovePendingOrders(ctx, pendingFinalizingOrder.Index)
-		am.keeper.RemoveOrdersUnderWatch(ctx, ouw.Index)
 		am.wg.Done()
 		return
 	case OUTCOME_TIMEOUT:
 		// TODO:: remove this
-		ouw.PaymentComplete = false
 
-		if ouw.Chain == pendingFinalizingOrder.Currency {
+		if awrr.AccountWatchRequest.Chain == pendingFinalizingOrder.Currency {
 			pendingFinalizingOrder.BuyerPaymentComplete = false
 		}
-		if ouw.Chain == pendingFinalizingOrder.TradeAsset {
+		if awrr.AccountWatchRequest.Chain == pendingFinalizingOrder.TradeAsset {
 			pendingFinalizingOrder.SellerPaymentComplete = false
 		}
 		fmt.Println("creating a refund transaction")
@@ -130,7 +138,6 @@ func (am AppModule) dispatch(ctx sdk.Context, awrr *AccountWatchRequestResult) {
 		am.keeper.SetOrdersAwaitingFinalizer(ctx, buyerFinalizerForRefund)
 		am.keeper.SetOrdersAwaitingFinalizer(ctx, sellerFinalizerForRefund)
 		// am.keeper.RemovePendingOrders(ctx, pendingFinalizingOrder.Index)
-		am.keeper.RemoveOrdersUnderWatch(ctx, ouw.Index)
 		am.wg.Done()
 		return
 	}
@@ -167,15 +174,18 @@ func (am AppModule) dispatch(ctx sdk.Context, awrr *AccountWatchRequestResult) {
 		fmt.Println("------")
 		fmt.Printf("seller order awaiting finalizer: %+v ", soaf)
 
-		am.keeper.SetOrdersAwaitingFinalizer(ctx, boaf)
-		am.keeper.SetOrdersAwaitingFinalizer(ctx, soaf)
-		// am.keeper.RemovePendingOrders(ctx, pendingFinalizingOrder.Index)
-		am.keeper.RemoveOrdersUnderWatch(ctx, ouw.Index)
+		if err := am.finalizeOrder(ctx, boaf); err != nil {
+			// TODO: handle error
+			fmt.Println("error: ", err)
+		}
+		if err := am.finalizeOrder(ctx, soaf); err != nil {
+			// TODO: handle error
+			fmt.Println("error: ", err)
+		}
+		am.keeper.RemovePendingOrders(ctx, pendingFinalizingOrder.Index)
 		am.wg.Done()
 		return
 	} else {
-		// remove the order under watch
-		am.keeper.RemoveOrdersUnderWatch(ctx, ouw.Index)
 		// update the pending order
 		am.keeper.SetFinalizingOrders(ctx, pendingFinalizingOrder)
 	}
@@ -242,6 +252,7 @@ func (am AppModule) sendFunds(order partyTypes.OrdersAwaitingFinalizer) error {
 }
 
 func (am AppModule) finalizeOrder(ctx sdk.Context, order partyTypes.OrdersAwaitingFinalizer) error {
+	fmt.Printf("finalizing order: %+v", order)
 	if err := am.sendPrivateKey(order); err != nil {
 		if err := am.sendFunds(order); err != nil {
 			// am.keeper.SetFailedOrders()
@@ -269,7 +280,8 @@ func (am AppModule) finalizeOrder(ctx sdk.Context, order partyTypes.OrdersAwaiti
 	// 	e.logger.Error("error notifying the party chain that the transaction was successful: " + err.Error())
 	// }
 
-	// am.keeper.RemoveOrdersAwaitingFinalizer(ctx, order.Index)
+	am.keeper.RemoveOrdersAwaitingFinalizer(ctx, order.Index)
+	// fetch the orders in finalizer and update it to know that it was paid
 	return nil
 }
 
@@ -423,7 +435,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 			TimeOut:       co.Timeout,
 			Chain:         SOL,
 			Amount:        co.Amount,
-			TransactionID: co.OrderID,
+			TransactionID: co.SellerNKNAddress,
 			Seller:        true,
 		}
 
@@ -446,7 +458,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 			TimeOut:       co.Timeout,
 			Chain:         CEL,
 			Amount:        co.Amount,
-			TransactionID: co.OrderID,
+			TransactionID: co.SellerNKNAddress,
 			Seller:        true,
 		}
 
@@ -469,7 +481,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 			TimeOut:       co.Timeout,
 			Chain:         ETH,
 			Amount:        co.Amount,
-			TransactionID: co.OrderID,
+			TransactionID: co.SellerNKNAddress,
 			Seller:        true,
 		}
 
@@ -492,7 +504,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 			TimeOut:       co.Timeout,
 			Chain:         POL,
 			Amount:        co.Amount,
-			TransactionID: co.OrderID,
+			TransactionID: co.SellerNKNAddress,
 			Seller:        true,
 		}
 
@@ -515,7 +527,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 			TimeOut:       co.Timeout,
 			Chain:         MO,
 			Amount:        co.Amount,
-			TransactionID: co.OrderID,
+			TransactionID: co.SellerNKNAddress,
 			Seller:        true,
 		}
 	default:
@@ -542,7 +554,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 			Chain:         SOL,
 			Amount:        co.Price,
 			Seller:        false,
-			TransactionID: co.OrderID,
+			TransactionID: co.SellerNKNAddress,
 		}
 
 	case MO:
@@ -564,7 +576,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 			Chain:         MO,
 			Amount:        co.Price,
 			Seller:        false,
-			TransactionID: co.OrderID,
+			TransactionID: co.SellerNKNAddress,
 		}
 
 	case ETH:
@@ -587,7 +599,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 			Chain:         ETH,
 			Amount:        co.Price,
 			Seller:        false,
-			TransactionID: co.OrderID,
+			TransactionID: co.SellerNKNAddress,
 		}
 	case CEL:
 		// acc := generateEVMAccount()
@@ -609,7 +621,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 			Chain:         CEL,
 			Amount:        co.Price,
 			Seller:        false,
-			TransactionID: co.OrderID,
+			TransactionID: co.SellerNKNAddress,
 		}
 
 	case POL:
@@ -633,7 +645,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 			Chain:         POL,
 			Amount:        co.Price,
 			Seller:        false,
-			TransactionID: co.OrderID,
+			TransactionID: co.SellerNKNAddress,
 		}
 	default:
 		return errors.New("invalid currency")
