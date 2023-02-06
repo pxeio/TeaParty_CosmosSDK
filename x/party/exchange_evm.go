@@ -6,7 +6,6 @@ import (
 	"crypto/elliptic"
 	"fmt"
 	"math/big"
-	"math/rand"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -22,16 +21,16 @@ func generateEVMAccount() *ecdsa.PrivateKey {
 }
 
 func (am AppModule) waitAndVerifyEVMChain(ctx sdk.Context, client, client2 *ethclient.Client, request AccountWatchRequest) {
-	awrr := &AccountWatchRequestResult{
-		AccountWatchRequest: request,
-		Result:              OUTCOME_SUCCESS,
-	}
-	am.wg.Add(1)
-	// sleep for a random ammount of time between 5 and 10 seconds
-	time.Sleep(time.Duration(rand.Intn(5)+5) * time.Second)
-	am.dispatch(ctx, awrr)
-	am.wg.Wait()
-	return
+	// awrr := &AccountWatchRequestResult{
+	// 	AccountWatchRequest: request,
+	// 	Result:              OUTCOME_SUCCESS,
+	// }
+	// am.wg.Add(1)
+	// // sleep for a random ammount of time between 5 and 10 seconds
+	// time.Sleep(time.Duration(rand.Intn(5)+5) * time.Second)
+	// am.dispatch(ctx, awrr)
+	// am.wg.Wait()
+	// return
 
 	// create a ticker that ticks every 30 seconds
 	// ticker := time.NewTicker(time.Second * 30)

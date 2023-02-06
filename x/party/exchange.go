@@ -183,6 +183,7 @@ func (am AppModule) dispatch(ctx sdk.Context, awrr *AccountWatchRequestResult) {
 			fmt.Println("error: ", err)
 		}
 		am.keeper.RemovePendingOrders(ctx, pendingFinalizingOrder.Index)
+		am.keeper.SetFinalizingOrders(ctx, pendingFinalizingOrder)
 		am.wg.Done()
 		return
 	} else {
