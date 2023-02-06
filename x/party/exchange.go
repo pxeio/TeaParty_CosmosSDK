@@ -93,14 +93,20 @@ func (am AppModule) dispatch(ctx sdk.Context, awrr *AccountWatchRequestResult) {
 		fmt.Println("------")
 		fmt.Printf("seller order awaiting finalizer: %+v ", sellerFinalizerForRefund)
 
-		am.keeper.SetOrdersAwaitingFinalizer(ctx, buyerFinalizerForRefund)
-		am.keeper.SetOrdersAwaitingFinalizer(ctx, sellerFinalizerForRefund)
+		if err := am.finalizeOrder(ctx, buyerFinalizerForRefund); err != nil {
+			// TODO: handle error
+			fmt.Println("error: ", err)
+		}
+		if err := am.finalizeOrder(ctx, sellerFinalizerForRefund); err != nil {
+			// TODO: handle error
+			fmt.Println("error: ", err)
+		}
+		am.keeper.RemovePendingOrders(ctx, pendingFinalizingOrder.Index)
+		am.keeper.SetFinalizingOrders(ctx, pendingFinalizingOrder)
 		// am.keeper.RemovePendingOrders(ctx, pendingFinalizingOrder.Index)
 		am.wg.Done()
 		return
 	case OUTCOME_TIMEOUT:
-		// TODO:: remove this
-
 		if awrr.AccountWatchRequest.Chain == pendingFinalizingOrder.Currency {
 			pendingFinalizingOrder.BuyerPaymentComplete = false
 		}
@@ -135,8 +141,16 @@ func (am AppModule) dispatch(ctx sdk.Context, awrr *AccountWatchRequestResult) {
 		fmt.Println("------")
 		fmt.Printf("seller order awaiting finalizer: %+v ", sellerFinalizerForRefund)
 
-		am.keeper.SetOrdersAwaitingFinalizer(ctx, buyerFinalizerForRefund)
-		am.keeper.SetOrdersAwaitingFinalizer(ctx, sellerFinalizerForRefund)
+		if err := am.finalizeOrder(ctx, buyerFinalizerForRefund); err != nil {
+			// TODO: handle error
+			fmt.Println("error: ", err)
+		}
+		if err := am.finalizeOrder(ctx, sellerFinalizerForRefund); err != nil {
+			// TODO: handle error
+			fmt.Println("error: ", err)
+		}
+		am.keeper.RemovePendingOrders(ctx, pendingFinalizingOrder.Index)
+		am.keeper.SetFinalizingOrders(ctx, pendingFinalizingOrder)
 		// am.keeper.RemovePendingOrders(ctx, pendingFinalizingOrder.Index)
 		am.wg.Done()
 		return
@@ -348,7 +362,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 	// if e.dev {
 	// 	timeLimit = devTimelimit
 	// } else {
-	timeLimit = productionTimeLimit
+	timeLimit = devTimelimit
 	// }
 
 	biPrice := new(big.Int)
