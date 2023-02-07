@@ -362,7 +362,7 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 	// if e.dev {
 	// 	timeLimit = devTimelimit
 	// } else {
-	timeLimit = devTimelimit
+	timeLimit = productionTimeLimit
 	// }
 
 	biPrice := new(big.Int)
