@@ -10,6 +10,8 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/ethereum/go-ethereum/crypto"
+
+	"github.com/gagliardetto/solana-go"
 )
 
 func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyResponse, error) {
@@ -25,17 +27,45 @@ func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyR
 	if !found {
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "No matching sell order found.")
 	}
+	// remove the trade order from the store
+	k.RemoveTradeOrders(ctx, tradeOrder.SellerNknAddr)
 
-	// create a new escrow wallet for the buyer
-	err, buyerPrivateKey, buyerPublicKey := generateEVMAccount()
-	if err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Failed to generate escrow wallet for buyer.")
+	var buyerPublicKey string
+	var buyerPrivateKey string
+	var err error
+	// check the chain
+	if tradeOrder.TradeAsset == "ethereum" || tradeOrder.TradeAsset == "polygon" || tradeOrder.TradeAsset == "celo" {
+		// create a new escrow wallet for the buyer
+		err, buyerPrivateKey, buyerPublicKey = generateEVMAccount()
+		if err != nil {
+			return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Failed to generate escrow wallet for buyer.")
+		}
 	}
 
-	// create a new escrow wallet for the seller
-	err, sellerPrivateKey, sellerPublicKey := generateEVMAccount()
-	if err != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Failed to generate escrow wallet for seller.")
+	if tradeOrder.TradeAsset == "solana" {
+		// create a new escrow wallet for the buyer
+		err, buyerPrivateKey, buyerPublicKey = createSolanaAccount()
+		if err != nil {
+			return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Failed to generate escrow wallet for buyer.")
+		}
+	}
+
+	var sellerPublicKey string
+	var sellerPrivateKey string
+	// check the chain
+	if tradeOrder.TradeAsset == "ethereum" || tradeOrder.TradeAsset == "polygon" || tradeOrder.TradeAsset == "celo" {
+		// create a new escrow wallet for the seller
+		err, sellerPrivateKey, sellerPublicKey = generateEVMAccount()
+		if err != nil {
+			return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Failed to generate escrow wallet for seller.")
+		}
+	}
+	if tradeOrder.TradeAsset == "solana" {
+		// create a new escrow wallet for the seller
+		err, sellerPrivateKey, sellerPublicKey = createSolanaAccount()
+		if err != nil {
+			return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Failed to generate escrow wallet for seller.")
+		}
 	}
 
 	// create a pending-order object
@@ -61,10 +91,6 @@ func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyR
 
 	// store the pending order
 	k.SetPendingOrders(ctx, po)
-
-	// remove the trade order from the store
-	k.RemoveTradeOrders(ctx, po.Index)
-
 	return &types.MsgBuyResponse{}, nil
 }
 
@@ -78,4 +104,10 @@ func generateEVMAccount() (error, string, string) {
 
 	// TODO:: fix this again. was lost in a bad git commit
 	return nil, hex.EncodeToString(privateKey.D.Bytes()), crypto.PubkeyToAddress(privateKey.PublicKey).String()
+}
+
+func createSolanaAccount() (error, string, string) {
+	account := solana.NewWallet()
+
+	return nil, account.PrivateKey.String(), account.PublicKey().String()
 }

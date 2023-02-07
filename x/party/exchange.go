@@ -2,14 +2,12 @@ package party
 
 import (
 	"context"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"math/big"
 
 	partyTypes "github.com/TeaPartyCrypto/partychain/x/party/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	solRPC "github.com/gagliardetto/solana-go/rpc"
 	"github.com/shopspring/decimal"
@@ -431,14 +429,14 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 
 	switch order.Currency {
 	case SOL:
-		// generate a new solana account for the buyer
-		acc := createSolanaAccount()
+		// // generate a new solana account for the buyer
+		// acc := createSolanaAccount()
 
-		co.SellerEscrowWallet = EscrowWallet{
-			PublicAddress: acc.PublicKey,
-			PrivateKey:    acc.PrivateKey,
-			Chain:         SOL,
-		}
+		// co.SellerEscrowWallet = EscrowWallet{
+		// 	PublicAddress: acc.PublicKey,
+		// 	PrivateKey:    acc.PrivateKey,
+		// 	Chain:         SOL,
+		// }
 
 		if err := notifySellerOfBuyer(*co); err != nil {
 			// TODO:: Cancle the order
@@ -455,13 +453,13 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 		}
 
 	case CEL:
-		acc := generateEVMAccount()
-		co.SellerEscrowWallet = EscrowWallet{
-			ECDSA:         acc,
-			PublicAddress: crypto.PubkeyToAddress(acc.PublicKey).String(),
-			PrivateKey:    hex.EncodeToString(acc.D.Bytes()),
-			Chain:         CEL,
-		}
+		// acc := generateEVMAccount()
+		// co.SellerEscrowWallet = EscrowWallet{
+		// 	ECDSA:         acc,
+		// 	PublicAddress: crypto.PubkeyToAddress(acc.PublicKey).String(),
+		// 	PrivateKey:    hex.EncodeToString(acc.D.Bytes()),
+		// 	Chain:         CEL,
+		// }
 
 		if err := notifySellerOfBuyer(*co); err != nil {
 			// TODO:: Cancle the order
@@ -478,13 +476,13 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 		}
 
 	case ETH:
-		acc := generateEVMAccount()
-		co.SellerEscrowWallet = EscrowWallet{
-			ECDSA:         acc,
-			PublicAddress: crypto.PubkeyToAddress(acc.PublicKey).String(),
-			PrivateKey:    hex.EncodeToString(acc.D.Bytes()),
-			Chain:         ETH,
-		}
+		// acc := generateEVMAccount()
+		// co.SellerEscrowWallet = EscrowWallet{
+		// 	ECDSA:         acc,
+		// 	PublicAddress: crypto.PubkeyToAddress(acc.PublicKey).String(),
+		// 	PrivateKey:    hex.EncodeToString(acc.D.Bytes()),
+		// 	Chain:         ETH,
+		// }
 
 		if err := notifySellerOfBuyer(*co); err != nil {
 			// TODO:: Cancle the order
@@ -501,13 +499,13 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 		}
 
 	case POL:
-		acc := generateEVMAccount()
-		co.SellerEscrowWallet = EscrowWallet{
-			ECDSA:         acc,
-			PublicAddress: crypto.PubkeyToAddress(acc.PublicKey).String(),
-			PrivateKey:    hex.EncodeToString(acc.D.Bytes()),
-			Chain:         POL,
-		}
+		// acc := generateEVMAccount()
+		// co.SellerEscrowWallet = EscrowWallet{
+		// 	ECDSA:         acc,
+		// 	PublicAddress: crypto.PubkeyToAddress(acc.PublicKey).String(),
+		// 	PrivateKey:    hex.EncodeToString(acc.D.Bytes()),
+		// 	Chain:         POL,
+		// }
 
 		if err := notifySellerOfBuyer(*co); err != nil {
 			// TODO:: Cancle the order
@@ -524,13 +522,13 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 		}
 
 	case MO:
-		acc := generateEVMAccount()
-		co.SellerEscrowWallet = EscrowWallet{
-			ECDSA:         acc,
-			PublicAddress: crypto.PubkeyToAddress(acc.PublicKey).String(),
-			PrivateKey:    hex.EncodeToString(acc.D.Bytes()),
-			Chain:         MO,
-		}
+		// acc := generateEVMAccount()
+		// co.SellerEscrowWallet = EscrowWallet{
+		// 	ECDSA:         acc,
+		// 	PublicAddress: crypto.PubkeyToAddress(acc.PublicKey).String(),
+		// 	PrivateKey:    hex.EncodeToString(acc.D.Bytes()),
+		// 	Chain:         MO,
+		// }
 
 		if err := notifySellerOfBuyer(*co); err != nil {
 			// TODO:: Cancle the order
@@ -551,17 +549,10 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 
 	switch ta {
 	case SOL:
-		// acc := createSolanaAccount()
-		// co.BuyerEscrowWallet = EscrowWallet{
-		// 	PublicAddress: acc.PublicKey,
-		// 	PrivateKey:    acc.PrivateKey,
-		// 	Chain:         SOL,
-		// }
-
-		// if err := sendBuyerPayInfo(*co); err != nil {
-		// 	// TODO:: Cancle the order
-		// 	return err
-		// }
+		if err := sendBuyerPayInfo(*co); err != nil {
+			// TODO:: Cancle the order
+			return err
+		}
 
 		buyersAccountWatchRequest = &AccountWatchRequest{
 			Account:       co.BuyerEscrowWallet.PublicAddress,
@@ -573,14 +564,6 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 		}
 
 	case MO:
-		// acc := generateEVMAccount()
-		// co.BuyerEscrowWallet = EscrowWallet{
-		// 	ECDSA:         acc,
-		// 	PublicAddress: crypto.PubkeyToAddress(acc.PublicKey).String(),
-		// 	PrivateKey:    hex.EncodeToString(acc.D.Bytes()),
-		// 	Chain:         MO,
-		// }
-
 		if err := sendBuyerPayInfo(*co); err != nil {
 			// TODO:: Cancle the order
 			return err
@@ -595,14 +578,6 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 		}
 
 	case ETH:
-		// acc := generateEVMAccount()
-		// co.BuyerEscrowWallet = EscrowWallet{
-		// 	ECDSA:         acc,
-		// 	PublicAddress: crypto.PubkeyToAddress(acc.PublicKey).String(),
-		// 	PrivateKey:    hex.EncodeToString(acc.D.Bytes()),
-		// 	Chain:         ETH,
-		// }
-
 		if err := sendBuyerPayInfo(*co); err != nil {
 			// TODO:: Cancle the order
 			return err
@@ -617,13 +592,6 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 			TransactionID: co.SellerNKNAddress,
 		}
 	case CEL:
-		// acc := generateEVMAccount()
-		// co.BuyerEscrowWallet = EscrowWallet{
-		// 	ECDSA:         acc,
-		// 	PublicAddress: crypto.PubkeyToAddress(acc.PublicKey).String(),
-		// 	PrivateKey:    hex.EncodeToString(acc.D.Bytes()),
-		// 	Chain:         CEL,
-		// }
 
 		if err := sendBuyerPayInfo(*co); err != nil {
 			// TODO:: Cancle the order
@@ -640,13 +608,6 @@ func (am AppModule) initMonitor(ctx sdk.Context, order partyTypes.PendingOrders)
 		}
 
 	case POL:
-		// acc := generateEVMAccount()
-		// co.BuyerEscrowWallet = EscrowWallet{
-		// 	ECDSA:         acc,
-		// 	PublicAddress: crypto.PubkeyToAddress(acc.PublicKey).String(),
-		// 	PrivateKey:    hex.EncodeToString(acc.D.Bytes()),
-		// 	Chain:         POL,
-		// }
 
 		if err := sendBuyerPayInfo(*co); err != nil {
 			// TODO:: Cancle the order
