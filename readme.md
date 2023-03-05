@@ -1,3 +1,6 @@
+... good job leaking other peoples code
+
+
 GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build . 
 
 ignite scaffold chain github.com/TeaPartyCrypto/partychainalpha --no-module
